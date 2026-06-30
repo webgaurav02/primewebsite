@@ -83,16 +83,23 @@ export default function MarketLinkagePage() {
       </section>
 
       {/* Stats bar */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06] border border-white/[0.06]">
-          {stats.map((s) => (
-            <div key={s.label} className="bg-[#1B4332] p-10 text-center">
-              <p className="font-black text-[#2D6A4F] leading-none mb-2" style={{ fontSize: "var(--text-display)" }}>
-                {s.value}
-              </p>
-              <p className="text-white/40" style={{ fontSize: "var(--text-sm)" }}>{s.label}</p>
-            </div>
-          ))}
+      <section className="bg-[#1B4332] border-t border-b border-white/[0.08] py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06]">
+            {stats.map((s) => (
+              <div key={s.label} className="bg-[#1B4332] px-6 py-10 md:px-10 md:py-14 text-center flex flex-col items-center gap-3">
+                <p
+                  className="font-black text-[#74C69D] leading-none"
+                  style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+                >
+                  {s.value}
+                </p>
+                <p className="text-white/40 leading-snug" style={{ fontSize: "var(--text-sm)" }}>
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
