@@ -99,7 +99,7 @@ export default function WhatPrimeDoes() {
 
         {/* Visual process grid — bold icon boxes, dark invert on hover */}
         <AnimateIn delay={0.08}>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-px bg-black/[0.07] border border-black/[0.07] mb-14">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-px bg-black/[0.07] border border-black/[0.07] mb-14">
             {services.map((svc) => (
               <Link
                 key={svc.num}

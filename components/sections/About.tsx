@@ -127,8 +127,8 @@ export default function About() {
     <section id="about" className="bg-white border-t border-black/[0.06]">
 
       {/* Text + stats */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-24 md:py-36">
-        <div className="grid md:grid-cols-[1fr_1.1fr] gap-12 md:gap-24 items-start mb-20 md:mb-28">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-36">
+        <div className="grid md:grid-cols-[1fr_1.1fr] gap-10 md:gap-24 items-start mb-16 md:mb-28">
 
           <AnimateIn direction="left">
             <div className="flex items-center gap-4 mb-8">
@@ -196,8 +196,29 @@ export default function About() {
         </div>
       </div>
 
-      {/* Scroll image cycler — full bleed */}
-      <ScrollImageCycler />
+      {/* Mobile: simple 2×2 image grid */}
+      <div className="grid grid-cols-2 md:hidden">
+        {photos.map((photo, i) => (
+          <div key={i} className="relative aspect-square overflow-hidden bg-black/10">
+            <Image
+              src={photo.src}
+              alt={photo.label}
+              fill
+              className="object-cover"
+              sizes="50vw"
+            />
+            <div className="absolute inset-0 bg-black/25" />
+            <p className="absolute bottom-3 left-3 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
+              {photo.label}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: scroll-driven image cycler — full bleed */}
+      <div className="hidden md:block">
+        <ScrollImageCycler />
+      </div>
 
     </section>
   );

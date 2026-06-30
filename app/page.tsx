@@ -4,6 +4,7 @@ import Hero from "@/components/sections/Hero";
 import Marquee from "@/components/sections/Marquee";
 import About from "@/components/sections/About";
 import WhatPrimeDoes from "@/components/sections/WhatPrimeDoes";
+import Stats from "@/components/sections/Stats";
 import EntrepreneursOfPrime from "@/components/sections/EntrepreneursOfPrime";
 import Gallery from "@/components/sections/Gallery";
 import FAQ from "@/components/sections/FAQ";
@@ -18,6 +19,7 @@ export default function Home() {
         <Marquee />
         <About />
         <WhatPrimeDoes />
+        <Stats />
         <EntrepreneursOfPrime />
         <Gallery />
         <FAQ />

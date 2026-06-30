@@ -4,12 +4,12 @@ import Image from "next/image";
 import AnimateIn from "@/components/ui/AnimateIn";
 
 const entrepreneurs = [
-  { name: "Emika Mawlong",          sector: "Rural Enterprise",      tag: "East Khasi Hills", img: "/assets/entrepreneurs/Emika-Mawlong.jpg" },
-  { name: "Bryan Daoba D. Shira",   sector: "Government & Startup",  tag: "Ri Bhoi",          img: "/assets/entrepreneurs/Bryan-Daoba-D-Shira.jpg" },
-  { name: "Anikit R. Marak",        sector: "District Coordinator",  tag: "West Garo Hills",  img: "/assets/entrepreneurs/Anikit-R-Marak.jpg" },
-  { name: "Priyana Marak",          sector: "Business Facilitation", tag: "East Garo Hills",  img: "/assets/entrepreneurs/Priyana-Marak.jpg" },
-  { name: "Mark Altroge CH. Marak", sector: "Media & Comms",         tag: "West Garo Hills",  img: "/assets/entrepreneurs/Mark-Altroge-CH-Marak.jpg" },
-  { name: "Andrew Tshering Bareh",  sector: "Communications",        tag: "East Khasi Hills", img: "/assets/entrepreneurs/Andrew.jpg" },
+  { name: "Cordelia Kharsati",       business: "Mohor",                    sector: "Fashion",              tag: "East Khasi Hills",   img: "/assets/entrepreneurs-directory/Custommahor2.jpg" },
+  { name: "Jenifer Suiam",           business: "Laichaphrang Handicraft",  sector: "Handicrafts",          tag: "West Jaintia Hills", img: "/assets/entrepreneurs-directory/Laichphrangprofile.jpg" },
+  { name: "Plantina Mujai",          business: "Mei-Ramew Cafe",           sector: "Tourism & Hospitality",tag: "Ri Bhoi",            img: "/assets/entrepreneurs-directory/Meiramewcafecp.jpg" },
+  { name: "Tiara Roxettee M Sangma", business: "WEDOA Chocolate",          sector: "Food Processing",      tag: "West Garo Hills",    img: "/assets/entrepreneurs-directory/WEDOAcp.jpg" },
+  { name: "Rosemary T Sangma",       business: "Rose Tegite",              sector: "Fashion",              tag: "South Garo Hills",   img: "/assets/entrepreneurs-directory/RoseTegiteprofile.jpg" },
+  { name: "Ibajanai Lyngdoh",        business: "Crochet Haven",            sector: "Handicrafts",          tag: "East Khasi Hills",   img: "/assets/entrepreneurs-directory/CrochetHavenprofile.jpg" },
 ];
 
 export default function EntrepreneursOfPrime() {
@@ -70,8 +70,12 @@ export default function EntrepreneursOfPrime() {
                   </span>
                 </div>
 
-                {/* Name */}
-                <p className="font-bold text-black leading-snug" style={{ fontSize: "var(--text-body)" }}>
+                {/* Business name */}
+                <p className="font-black text-black leading-snug mb-0.5" style={{ fontSize: "var(--text-body)" }}>
+                  {e.business}
+                </p>
+                {/* Entrepreneur name */}
+                <p className="text-black/40 font-medium" style={{ fontSize: "var(--text-sm)" }}>
                   {e.name}
                 </p>
               </div>

@@ -3,6 +3,7 @@ import { Host_Grotesk, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import PageLoader from "@/components/ui/PageLoader";
 import CookieConsent from "@/components/ui/CookieConsent";
+import PageTransition from "@/components/ui/PageTransition";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
@@ -32,7 +33,7 @@ export default function RootLayout({
       <body className="bg-white text-black antialiased">
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <PageLoader />
-        {children}
+        <PageTransition>{children}</PageTransition>
         <CookieConsent />
       </body>
     </html>

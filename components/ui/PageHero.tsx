@@ -6,7 +6,7 @@ interface PageHeroProps {
 
 export default function PageHero({ title, subtitle, breadcrumb }: PageHeroProps) {
   return (
-    <section id="main-content" className="bg-[#1B4332] pt-44 pb-20 border-b border-white/[0.06]">
+    <section id="main-content" className="bg-[#1B4332] pt-32 md:pt-44 pb-14 md:pb-20 border-b border-white/[0.06]">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="flex items-center gap-4 mb-10">
           <span className="w-6 h-px bg-[#2D6A4F]" />

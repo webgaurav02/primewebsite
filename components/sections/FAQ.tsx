@@ -131,8 +131,8 @@ export default function FAQ() {
                           className="overflow-hidden"
                         >
                           <p
-                            className="text-black/45 leading-[1.8] pb-6 pl-13 pr-10"
-                            style={{ fontSize: "var(--text-body)", paddingLeft: "52px" }}
+                            className="text-black/45 leading-[1.8] pb-6 pl-4 md:pl-[52px] pr-4 md:pr-10"
+                            style={{ fontSize: "var(--text-body)" }}
                           >
                             {faq.answer}
                           </p>

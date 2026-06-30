@@ -156,6 +156,7 @@ const navLinks: NavLink[] = [
       },
     },
   },
+  { label: "Entrepreneurs", href: "/entrepreneurs", mega: null },
   { label: "Updates", href: "/updates", mega: null },
 ];
 
@@ -406,7 +407,7 @@ export default function Navbar() {
                           <p className="text-[11px] text-white/50 leading-relaxed mb-4">
                             {featured.desc}
                           </p>
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F] group-hover:gap-3 transition-all duration-300">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#74C69D] group-hover:gap-3 transition-all duration-300">
                             {featured.cta} <span>→</span>
                           </span>
                         </div>
