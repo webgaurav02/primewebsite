@@ -202,7 +202,7 @@ export default function Navbar() {
       onMouseLeave={scheduleClose}
     >
       {/* ── Main bar ── */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-[1fr_auto_1fr] items-center h-[76px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-[76px]">
 
         {/* Col 1 — Logo + tagline */}
         <Link href="/" className="flex shrink-0 items-start" onClick={() => setOpenDropdown(null)}>
