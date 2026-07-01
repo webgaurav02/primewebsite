@@ -78,9 +78,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 1.0, ease: EASE }}
         >
           <Link
-            href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/register"
             className="inline-flex items-center gap-3 px-7 py-3.5 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] hover:text-[#1B4332] transition-colors duration-300"
             style={{ fontSize: "var(--text-sm)" }}
           >

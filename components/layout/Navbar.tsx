@@ -70,7 +70,7 @@ const navLinks: NavLink[] = [
         {
           heading: "Connect",
           items: [
-            { label: "PRIME Portal",  subtitle: "Register your startup", href: "https://portal.primemeghalaya.com", external: true },
+            { label: "PRIME Portal",  subtitle: "Register your startup", href: "/register" },
             { label: "Contact Us",    subtitle: "Reach our team",        href: "/about-us#contact" },
             { label: "Grievance",     subtitle: "File a complaint",      href: "/grievance" },
           ],
@@ -261,18 +261,13 @@ export default function Navbar() {
         <div className="flex items-center gap-3 justify-end">
           {/* Apply CTA */}
           <Link
-            href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/register"
             data-lpignore="true"
             data-form-type="other"
             onMouseEnter={scheduleClose}
             className="hidden md:inline-flex items-center gap-1 text-[15px] font-semibold text-black hover:text-[#2D6A4F] transition-colors"
           >
             Apply
-            <svg width="9" height="9" viewBox="0 0 10 10" fill="none" className="opacity-55 mt-px">
-              <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
           </Link>
 
           {/* Divider */}
@@ -280,10 +275,8 @@ export default function Navbar() {
 
           {/* Portal user icon */}
           <Link
-            href="https://portal.primemeghalaya.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="PRIME Portal"
+            href="/login"
+            aria-label="Sign in"
             onMouseEnter={scheduleClose}
             className="hidden md:flex items-center justify-center w-8 h-8 text-black/40 hover:text-black transition-colors"
           >
@@ -457,11 +450,10 @@ export default function Navbar() {
             </div>
           ))}
           <Link
-            href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
-            target="_blank"
+            href="/register"
             className="mt-3 px-4 py-3 bg-black text-white text-sm font-bold text-center hover:bg-[#2D6A4F] hover:text-white transition-colors"
           >
-            Apply on PRIME Portal ↗
+            Apply to PRIME →
           </Link>
         </div>
       </motion.div>

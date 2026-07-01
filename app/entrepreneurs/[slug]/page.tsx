@@ -228,29 +228,47 @@ export default async function EntrepreneurProfilePage({
 
       {/* ── Stats bar ──────────────────────────────────────────── */}
       {stats.length > 0 && (
-        <section className="bg-[#1B4332] border-t border-b border-white/[0.07]">
-          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-20">
-            <div
-              className="grid gap-px bg-white/[0.07]"
-              style={{ gridTemplateColumns: `repeat(${Math.min(stats.length, 5)}, 1fr)` }}
-            >
+        <section className="bg-[#1B4332]">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-14 md:py-20">
+
+            {/* Label */}
+            <div className="flex items-center gap-4 mb-10 md:mb-12">
+              <span className="w-6 h-px bg-[#74C69D]/50" />
+              <p
+                className="font-semibold tracking-[0.25em] uppercase text-white/25"
+                style={{ fontSize: "var(--text-label)" }}
+              >
+                Impact at a glance
+              </p>
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-white/[0.06]">
               {stats.map((s) => (
                 <div
                   key={s.label}
-                  className="bg-[#1B4332] px-5 py-8 md:px-8 md:py-12 text-center flex flex-col items-center gap-3"
+                  className="bg-[#1B4332] px-5 py-7 md:px-6 md:py-8 flex flex-col gap-2.5"
                 >
+                  {/* Green top accent */}
+                  <div className="w-7 h-[2px] bg-[#74C69D]/50 mb-1" />
+                  {/* Label */}
                   <p
-                    className="font-black text-[#74C69D] leading-none"
-                    style={{ fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)" }}
+                    className="text-white/30 font-semibold uppercase tracking-[0.18em] leading-tight"
+                    style={{ fontSize: "9px" }}
+                  >
+                    {s.label}
+                  </p>
+                  {/* Value */}
+                  <p
+                    className="font-black text-[#74C69D] leading-none whitespace-nowrap"
+                    style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.75rem)" }}
                   >
                     {s.value}
-                  </p>
-                  <p className="text-white/40 leading-snug text-center" style={{ fontSize: "var(--text-label)" }}>
-                    {s.label}
                   </p>
                 </div>
               ))}
             </div>
+
           </div>
         </section>
       )}
