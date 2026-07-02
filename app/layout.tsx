@@ -5,7 +5,6 @@ import PageLoader from "@/components/ui/PageLoader";
 import CookieConsent from "@/components/ui/CookieConsent";
 import PageTransition from "@/components/ui/PageTransition";
 import AccessibilityToolbar from "@/components/ui/AccessibilityToolbar";
-import FloatingSocials from "@/components/ui/FloatingSocials";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
@@ -38,7 +37,6 @@ export default function RootLayout({
         <PageTransition>{children}</PageTransition>
         <CookieConsent />
         <AccessibilityToolbar />
-        <FloatingSocials />
       </body>
     </html>
   );

@@ -1,5 +1,9 @@
+"use client";
+
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, AnimatePresence, useScroll, useSpring, useTransform, useMotionValueEvent } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
 import {
   HiLightningBolt,
@@ -30,71 +34,91 @@ const photos = [
   { src: "/assets/images/event-3.jpg",     label: "PRIME Hub Activity"     },
 ];
 
-function PhotoCollage() {
+function ScrollImageCycler() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [labelIndex, setLabelIndex] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Spring-smoothed progress — adds natural lag so fast scrolling still feels fluid
+  const smooth = useSpring(scrollYProgress, { stiffness: 55, damping: 22, restDelta: 0.001 });
+
+  // Per-image opacities driven directly by the motion value — no re-renders, GPU smooth
+  const opacity0 = useTransform(smooth, [0,    0.20, 0.28], [1, 1, 0]);
+  const opacity1 = useTransform(smooth, [0.20, 0.28, 0.45, 0.53], [0, 1, 1, 0]);
+  const opacity2 = useTransform(smooth, [0.45, 0.53, 0.70, 0.78], [0, 1, 1, 0]);
+  const opacity3 = useTransform(smooth, [0.70, 0.78, 1.0 ], [0, 1, 1]);
+  const opacities = [opacity0, opacity1, opacity2, opacity3];
+
+  // Progress bar width
+  const barWidth = useTransform(smooth, [0, 1], ["0%", "100%"]);
+
+  // Label text only (discrete — just for the counter/label UI)
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    setLabelIndex(Math.min(Math.floor(p * photos.length), photos.length - 1));
+  });
+
   return (
-    <AnimateIn direction="up" distance={24}>
-      <div className="grid grid-cols-12 grid-rows-2 gap-3 h-[480px] md:h-[560px]">
-        {/* Main large image — left, spans 2 rows */}
-        <div className="col-span-7 row-span-2 relative overflow-hidden bg-black/10 group">
-          <Image
-            src={photos[0].src}
-            alt={photos[0].label}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            sizes="(max-width: 768px) 100vw, 58vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          <span className="absolute bottom-4 left-4 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
-            {photos[0].label}
-          </span>
+    <div ref={containerRef} style={{ height: `${photos.length * 100}vh` }}>
+      <div className="sticky top-0 h-screen overflow-hidden">
+
+        {/* All images stacked — opacity controlled by scroll */}
+        {photos.map((photo, i) => (
+          <motion.div key={photo.src} className="absolute inset-0" style={{ opacity: opacities[i] }}>
+            <Image
+              src={photo.src}
+              alt={photo.label}
+              fill
+              className="object-cover"
+              priority={i === 0}
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-black/25" />
+          </motion.div>
+        ))}
+
+        {/* Progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-white/10">
+          <motion.div className="h-full bg-[#74C69D]" style={{ width: barWidth }} />
         </div>
 
-        {/* Top-right */}
-        <div className="col-span-5 row-span-1 relative overflow-hidden bg-black/10 group">
-          <Image
-            src={photos[1].src}
-            alt={photos[1].label}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            sizes="(max-width: 768px) 50vw, 42vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          <span className="absolute bottom-3 left-3 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
-            {photos[1].label}
+        {/* Counter + label */}
+        <div className="absolute bottom-8 left-6 lg:left-10 flex items-center gap-4">
+          <span className="font-black text-white/20 tabular-nums" style={{ fontSize: "var(--text-heading)" }}>
+            {String(labelIndex + 1).padStart(2, "0")}
           </span>
+          <span className="w-px h-6 bg-white/20" />
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={labelIndex}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.25 }}
+              className="text-white/50 font-semibold tracking-[0.2em] uppercase"
+              style={{ fontSize: "11px" }}
+            >
+              {photos[labelIndex].label}
+            </motion.p>
+          </AnimatePresence>
         </div>
 
-        {/* Bottom-right split: two images side by side */}
-        <div className="col-span-3 row-span-1 relative overflow-hidden bg-black/10 group">
-          <Image
-            src={photos[2].src}
-            alt={photos[2].label}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            sizes="25vw"
-          />
-          <div className="absolute inset-0 bg-black/20" />
-          <span className="absolute bottom-3 left-3 text-white/60 font-semibold tracking-wide" style={{ fontSize: "9px" }}>
-            {photos[2].label}
-          </span>
+        {/* Dot indicators */}
+        <div className="absolute bottom-10 right-6 lg:right-10 flex gap-2 items-center">
+          {photos.map((_, i) => (
+            <div
+              key={i}
+              className="h-1 rounded-full bg-white transition-all duration-500"
+              style={{ width: i === labelIndex ? 24 : 6, opacity: i === labelIndex ? 1 : 0.25 }}
+            />
+          ))}
         </div>
 
-        {/* Bottom-right accent */}
-        <div className="col-span-2 row-span-1 relative overflow-hidden bg-[#1B4332] flex flex-col items-center justify-center p-4">
-          <p className="font-black text-[#74C69D] text-center leading-tight" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)" }}>
-            2019
-          </p>
-          <p className="text-white/40 font-medium text-center tracking-[0.12em] uppercase" style={{ fontSize: "9px" }}>
-            Est.
-          </p>
-          <div className="mt-3 w-6 h-px bg-[#74C69D]/40" />
-          <p className="mt-2 text-white/25 font-medium text-center" style={{ fontSize: "8px" }}>
-            Govt. of<br />Meghalaya
-          </p>
-        </div>
       </div>
-    </AnimateIn>
+    </div>
   );
 }
 
@@ -191,9 +215,9 @@ export default function About() {
         ))}
       </div>
 
-      {/* Desktop: photo collage */}
-      <div className="hidden md:block px-6 lg:px-10 pb-16 md:pb-24 max-w-7xl mx-auto w-full">
-        <PhotoCollage />
+      {/* Desktop: scroll-driven image cycler — full bleed */}
+      <div className="hidden md:block">
+        <ScrollImageCycler />
       </div>
 
     </section>

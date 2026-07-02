@@ -84,7 +84,7 @@ export default function ContactPage() {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
@@ -343,32 +343,6 @@ export default function ContactPage() {
                 );
               })}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map */}
-      <section className="border-t border-black/[0.06]">
-        <div className="relative w-full h-[420px] md:h-[520px] bg-[#e8ede9]">
-          <iframe
-            src="https://maps.google.com/maps?q=Jawaharlal+Nehru+Stadium+Shillong+Meghalaya+India&hl=en&z=15&output=embed"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="PRIME Meghalaya — Shillong Hub location"
-            className="absolute inset-0"
-          />
-          {/* Overlay badge */}
-          <div className="absolute top-5 left-5 bg-[#1B4332] px-5 py-3 shadow-lg z-10 pointer-events-none">
-            <p className="text-white font-black leading-tight" style={{ fontSize: "var(--text-sm)" }}>
-              PRIME Meghalaya
-            </p>
-            <p className="text-[#74C69D] font-medium mt-0.5" style={{ fontSize: "10px" }}>
-              JN Stadium, Shillong
-            </p>
           </div>
         </div>
       </section>

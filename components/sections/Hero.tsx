@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -19,22 +18,13 @@ export default function Hero() {
       className="relative flex items-center min-h-[100svh] overflow-hidden bg-[#1B4332]"
       aria-label="Hero — PRIME Meghalaya"
     >
-      {/* Video background — poster is the fallback image; swap src when video is available */}
-      <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <video
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/assets/images/hero-bg.jpg"
-        >
-          <source src="/assets/videos/hero.mp4" type="video/mp4" />
-          {/* Falls back to poster image when video file is not available */}
-        </video>
-      </motion.div>
+      {/* Background photo */}
+      <motion.div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/assets/images/hero-bg.jpg')", y: bgY }}
+      />
 
-      {/* Dark overlay */}
+      {/* Dark overlay — clean, no gradient */}
       <div className="absolute inset-0 bg-black/55" />
 
       {/* Content — centred */}
@@ -42,39 +32,18 @@ export default function Hero() {
         className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32 flex flex-col items-center text-center"
         style={{ opacity: contentOpacity }}
       >
-        {/* Logo lockup */}
+        {/* Eyebrow */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-          className="flex flex-col items-center gap-5 mb-12"
+          transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
+          className="flex items-center gap-3 mb-8"
         >
-          {/* Government seal row */}
-          <div className="flex items-center gap-3">
-            {/* Emblem SVG */}
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="13" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
-              <circle cx="14" cy="14" r="9"  stroke="rgba(116,198,157,0.5)"  strokeWidth="0.8" />
-              <path d="M14 5 L15.5 9.5 L20 9.5 L16.5 12.5 L18 17 L14 14 L10 17 L11.5 12.5 L8 9.5 L12.5 9.5 Z" fill="rgba(116,198,157,0.7)" />
-            </svg>
-            <span className="text-white/55 font-semibold tracking-[0.22em] uppercase" style={{ fontSize: "var(--text-label)" }}>
-              Government of Meghalaya
-            </span>
-            <span className="w-px h-3.5 bg-white/20" />
-            <span className="text-[#74C69D]/70 font-medium tracking-[0.18em] uppercase" style={{ fontSize: "var(--text-label)" }}>
-              Est. 2019
-            </span>
-          </div>
-
-          {/* PRIME logo */}
-          <Image
-            src="/logo-white.png"
-            alt="PRIME Meghalaya"
-            width={280}
-            height={84}
-            className="h-16 md:h-20 w-auto object-contain animate-prime-glow"
-            priority
-          />
+          <span className="w-6 h-px bg-[#74C69D]" />
+          <span className="text-white/50 font-medium tracking-[0.2em] uppercase" style={{ fontSize: "var(--text-label)" }}>
+            Government of Meghalaya · Est. 2019
+          </span>
+          <span className="w-6 h-px bg-[#74C69D]" />
         </motion.div>
 
         {/* Headline */}
@@ -84,7 +53,7 @@ export default function Hero() {
             style={{ fontSize: "var(--text-hero)" }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.95, delay: 0.35, ease: EASE }}
+            transition={{ duration: 0.95, delay: 0.3, ease: EASE }}
           >
             Meghalaya&apos;s Hub<br />
             for <span className="text-[#74C69D]">Entrepreneurs.</span>
@@ -95,7 +64,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.85, ease: EASE }}
+          transition={{ duration: 0.7, delay: 0.8, ease: EASE }}
           className="text-white/60 leading-[1.75] max-w-md mb-10"
           style={{ fontSize: "var(--text-lead)" }}
         >
@@ -106,7 +75,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.05, ease: EASE }}
+          transition={{ duration: 0.6, delay: 1.0, ease: EASE }}
           className="flex flex-wrap items-center gap-4 justify-center"
         >
           <Link
@@ -114,7 +83,7 @@ export default function Hero() {
             className="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors duration-300"
             style={{ fontSize: "var(--text-sm)" }}
           >
-            Apply for PRIME ID <span>→</span>
+            Apply to PRIME <span>→</span>
           </Link>
           <Link
             href="/about-us"

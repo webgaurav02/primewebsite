@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
@@ -56,77 +55,45 @@ export default function FAQ() {
 
         <div className="grid md:grid-cols-[5fr_7fr] gap-16 md:gap-24">
 
-          {/* Left: heading + ? decoration + CM photo */}
-          <div className="md:sticky md:top-36 md:self-start">
+          {/* Left: heading */}
+          <div className="md:sticky md:top-24 md:self-start">
             <AnimateIn direction="left">
-              {/* Decorative question mark — spans behind heading */}
-              <div className="relative mb-8">
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-8 -left-4 font-black text-black/[0.04] leading-none select-none pointer-events-none"
-                  style={{ fontSize: "clamp(120px, 20vw, 220px)", lineHeight: 1 }}
-                >
-                  ?
-                </span>
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-4 mb-8">
-                    <span className="w-8 h-px bg-[#2D6A4F]" />
-                    <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
-                      FAQ
-                    </p>
-                  </div>
-                  <h2
-                    className="font-black text-black leading-[0.9] tracking-tight mb-8"
-                    style={{ fontSize: "var(--text-heading)" }}
-                  >
-                    Questions<br />
-                    we get<br />
-                    asked a lot.
-                  </h2>
-                  <p className="text-black/40 leading-[1.75] mb-8" style={{ fontSize: "var(--text-body)" }}>
-                    Can&apos;t find what you&apos;re looking for?{" "}
-                    <a href="mailto:info@primemeghalaya.com" className="text-[#2D6A4F] hover:underline">
-                      info@primemeghalaya.com
-                    </a>
-                  </p>
-                </div>
+              <div className="flex items-center gap-4 mb-8">
+                <span className="w-8 h-px bg-[#2D6A4F]" />
+                <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
+                  FAQ
+                </p>
               </div>
-
-              {/* CM photo */}
-              <div className="relative overflow-hidden aspect-[4/3] bg-black/[0.05]">
-                <Image
-                  src="/assets/images/about-image.jpg"
-                  alt="Chief Minister Conrad Sangma interacting with PRIME entrepreneurs"
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-width: 768px) 100vw, 35vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <p className="text-white font-semibold leading-tight mb-0.5" style={{ fontSize: "var(--text-sm)" }}>
-                    CM Conrad Sangma with PRIME entrepreneurs
-                  </p>
-                  <p className="text-white/50" style={{ fontSize: "10px" }}>
-                    Government of Meghalaya · PRIME Programme
-                  </p>
-                </div>
-              </div>
+              <h2
+                className="font-black text-black leading-[0.9] tracking-tight mb-8"
+                style={{ fontSize: "var(--text-heading)" }}
+              >
+                Questions<br />
+                we get<br />
+                asked a lot.
+              </h2>
+              <p className="text-black/40 leading-[1.75]" style={{ fontSize: "var(--text-body)" }}>
+                Can&apos;t find what you&apos;re looking for?{" "}
+                <a href="mailto:info@primemeghalaya.com" className="text-[#2D6A4F] hover:underline">
+                  info@primemeghalaya.com
+                </a>
+              </p>
             </AnimateIn>
           </div>
 
-          {/* Right: accordion */}
+          {/* Right: accordion — each item staggers in individually */}
           <div className="border-t border-black/[0.08]">
             {faqs.map((faq, i) => {
-              const isOpen = openIndex === i;
-              return (
-                <AnimateIn key={i} delay={i * 0.07} direction="up" distance={12}>
+                const isOpen = openIndex === i;
+                return (
+                  <AnimateIn key={i} delay={i * 0.07} direction="up" distance={12}>
                   <div className="border-b border-black/[0.08]">
                     <button
                       onClick={() => setOpenIndex(isOpen ? null : i)}
                       className="w-full flex items-start justify-between gap-6 py-5 text-left group"
                     >
                       <div className="flex items-start gap-4">
+                        {/* Icon box */}
                         <div className={`shrink-0 w-9 h-9 flex items-center justify-center transition-colors duration-200 ${
                           isOpen
                             ? "bg-[#2D6A4F] text-white"
@@ -173,10 +140,10 @@ export default function FAQ() {
                       )}
                     </AnimatePresence>
                   </div>
-                </AnimateIn>
-              );
-            })}
-          </div>
+                  </AnimateIn>
+                );
+              })}
+            </div>
 
         </div>
       </div>
