@@ -34,6 +34,18 @@ type NavLink = {
   };
 };
 
+const tickerItems = [
+  "2847+ CM Elevate Graduates",
+  "1350+ Registered Startups",
+  "885+ Funding Cases Supported",
+  "459 BFS Sector Startups",
+  "353 Incubation Cohort Members",
+  "287 Rural Enterprises",
+  "Shillong · Tura · Nongpoh",
+  "Est. 2019",
+];
+const tickerText = tickerItems.join("   ·   ");
+
 const navLinks: NavLink[] = [
   { label: "Home", href: "/", mega: null },
   {
@@ -58,16 +70,6 @@ const navLinks: NavLink[] = [
           ],
         },
         {
-          heading: "Programmes",
-          items: [
-            { label: "Incubation",            subtitle: "CM's E-Championship",   href: "/incubation"            },
-            { label: "Market Linkage",        subtitle: "Trade & exhibitions",   href: "/market-linkage"        },
-            { label: "Business Facilitation", subtitle: "Startup handholding",   href: "/business-facilitation" },
-            { label: "Training Centres",      subtitle: "Skill development",     href: "/trainingcentres"       },
-            { label: "Fellowship",            subtitle: "Deep-dive programme",   href: "/fellowship"            },
-          ],
-        },
-        {
           heading: "Connect",
           items: [
             { label: "PRIME Portal",  subtitle: "Register your startup", href: "/register" },
@@ -87,28 +89,30 @@ const navLinks: NavLink[] = [
     },
   },
   {
-    label: "Programmes",
+    label: "Sectors",
     href: "#",
     mega: {
       columns: [
         {
-          heading: "Incubation & Support",
+          heading: "Programmes",
           items: [
-            { label: "CM's E-Championship",   subtitle: "75 founders, 9 months",   href: "/incubation"            },
-            { label: "Business Facilitation", subtitle: "Handholding & liaison",   href: "/business-facilitation" },
-            { label: "Market Linkage",        subtitle: "Trade & ONDC access",     href: "/market-linkage"        },
-            { label: "Training Centres",      subtitle: "Sector-specific skills",  href: "/trainingcentres"       },
-            { label: "Fellowship",            subtitle: "Deep-dive immersive",     href: "/fellowship"            },
+            { label: "Incubation",                   subtitle: "CM's E-Championship Challenge",   href: "/incubation"            },
+            { label: "PRIME Rural",                  subtitle: "Rural enterprise development",    href: "/prime-rural"           },
+            { label: "Business Facilitation Service",subtitle: "Startup handholding & liaison",  href: "/business-facilitation" },
+            { label: "Partnership",                  subtitle: "Institutional collaborations",    href: "/about-us#partners"     },
+            { label: "CM Elevate",                   subtitle: "Credit-linked subsidy scheme",   href: "/cm-elevate"            },
+            { label: "Media & Comms",                subtitle: "Outreach & visibility",          href: "/updates"               },
+            { label: "Admin",                        subtitle: "Governance & operations",        href: "/contact"               },
           ],
         },
         {
           heading: "Funding & Schemes",
           items: [
-            { label: "All Schemes",              subtitle: "Overview of all funds",     href: "/funding-schemes"                },
-            { label: "CM Elevate",               subtitle: "Subsidy across 15 sectors", href: "/cm-elevate"                     },
-            { label: "Entrepreneurship Fund",    subtitle: "Up to ₹75L zero-interest",  href: "/prime-entrepreneurship-funding" },
-            { label: "IFAD GAP Funding",         subtitle: "Agriculture & food chains", href: "/ifad-gap-funding"               },
-            { label: "Student Tinkering Fund",   subtitle: "Youth innovation grants",   href: "/student-tinkering-fund"         },
+            { label: "All Schemes",              subtitle: "Overview of all funds",        href: "/funding-schemes"                },
+            { label: "CM Elevate",               subtitle: "Subsidy across 15+ sectors",  href: "/cm-elevate"                     },
+            { label: "Entrepreneurship Fund",    subtitle: "Up to ₹75L zero-interest",    href: "/prime-entrepreneurship-funding" },
+            { label: "Student Tinkering Fund",   subtitle: "Youth innovation grants",     href: "/student-tinkering-fund"         },
+            { label: "Training Centre Fund",     subtitle: "Infrastructure support",      href: "/funding-schemes"                },
           ],
         },
       ],
@@ -140,9 +144,9 @@ const navLinks: NavLink[] = [
         {
           heading: "Loans & Investment",
           items: [
-            { label: "Entrepreneurship Fund", subtitle: "Up to ₹75L zero-interest",  href: "/prime-entrepreneurship-funding" },
-            { label: "IFAD GAP Funding",      subtitle: "Agriculture value chains",  href: "/ifad-gap-funding"               },
-            { label: "All Schemes",           subtitle: "Full overview & eligibility", href: "/funding-schemes"              },
+            { label: "Entrepreneurship Fund",    subtitle: "Up to ₹75L zero-interest", href: "/prime-entrepreneurship-funding" },
+            { label: "Training Centre Fund",     subtitle: "Infrastructure support",    href: "/funding-schemes"               },
+            { label: "All Schemes",              subtitle: "Full overview & eligibility", href: "/funding-schemes"             },
           ],
         },
       ],
@@ -195,268 +199,278 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-4 left-4 right-4 z-50 bg-white/[0.88] backdrop-blur-md border border-black/[0.07] rounded-2xl transition-shadow duration-300 ${
-        scrolled ? "shadow-[0_8px_32px_rgba(0,0,0,0.10)]" : "shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
-      }`}
+      className={`fixed top-4 left-4 right-4 z-50 flex flex-col gap-1.5 transition-all duration-300`}
       role="banner"
       onMouseLeave={scheduleClose}
     >
       {/* ── Main bar ── */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-[76px]">
+      <div className={`bg-white/[0.88] backdrop-blur-md border border-black/[0.07] rounded-2xl transition-shadow duration-300 ${
+        scrolled ? "shadow-[0_8px_32px_rgba(0,0,0,0.10)]" : "shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-[72px]">
 
-        {/* Col 1 — Logo + tagline */}
-        <Link href="/" className="flex shrink-0 items-start" onClick={() => setOpenDropdown(null)}>
-          <Image
-            src="/logo-color.png"
-            alt="PRIME Meghalaya"
-            width={160}
-            height={48}
-            className="h-8 w-auto object-contain object-left"
-            priority
-          />
-        </Link>
+          {/* Col 1 — Logo */}
+          <Link href="/" className="flex shrink-0 items-start" onClick={() => setOpenDropdown(null)}>
+            <Image
+              src="/logo-color.png"
+              alt="PRIME Meghalaya"
+              width={160}
+              height={48}
+              className="h-8 w-auto object-contain object-left"
+              priority
+            />
+          </Link>
 
-        {/* Col 2 — Nav links */}
-        <ul className="hidden md:flex items-center gap-8" role="navigation" aria-label="Main navigation">
-          {navLinks.map((link) => {
-            const isOpen = openDropdown === link.label;
-            return (
-              <li key={link.label}>
-                {link.mega ? (
-                  <button
-                    onMouseEnter={() => openMenu(link.label)}
-                    onFocus={() => openMenu(link.label)}
-                    aria-expanded={isOpen}
-                    aria-haspopup="true"
-                    className={`text-[15px] flex items-center gap-1.5 transition-colors py-1 font-medium ${
-                      isOpen ? "text-black" : "text-black/50 hover:text-black"
-                    }`}
-                  >
-                    {link.label}
-                    <motion.span
-                      animate={{ rotate: isOpen ? 180 : 0 }}
-                      transition={{ duration: 0.18 }}
-                      className={isOpen ? "text-[#2D6A4F]" : "opacity-50 text-current"}
+          {/* Col 2 — Nav links */}
+          <ul className="hidden md:flex items-center gap-8" role="navigation" aria-label="Main navigation">
+            {navLinks.map((link) => {
+              const isOpen = openDropdown === link.label;
+              return (
+                <li key={link.label}>
+                  {link.mega ? (
+                    <button
+                      onMouseEnter={() => openMenu(link.label)}
+                      onFocus={() => openMenu(link.label)}
+                      aria-expanded={isOpen}
+                      aria-haspopup="true"
+                      className={`text-[15px] flex items-center gap-1.5 transition-colors py-1 font-medium ${
+                        isOpen ? "text-black" : "text-black/50 hover:text-black"
+                      }`}
                     >
-                      <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
-                        <path d="M1 1L4 4L7 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </motion.span>
-                  </button>
-                ) : (
-                  <Link
-                    href={link.href}
-                    className="text-[15px] font-medium text-black/50 hover:text-black transition-colors"
-                    onMouseEnter={scheduleClose}
-                  >
-                    {link.label}
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                      {link.label}
+                      <motion.span
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.18 }}
+                        className={isOpen ? "text-[#2D6A4F]" : "opacity-50 text-current"}
+                      >
+                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+                          <path d="M1 1L4 4L7 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                      </motion.span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="text-[15px] font-medium text-black/50 hover:text-black transition-colors"
+                      onMouseEnter={scheduleClose}
+                    >
+                      {link.label}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
 
-        {/* Col 3 — Right utility bar */}
-        <div className="flex items-center gap-3 justify-end">
-          {/* Apply CTA */}
-          <Link
-            href="/register"
-            data-lpignore="true"
-            data-form-type="other"
-            onMouseEnter={scheduleClose}
-            className="hidden md:inline-flex items-center gap-1 text-[15px] font-semibold text-black hover:text-[#2D6A4F] transition-colors"
-          >
-            Apply
-          </Link>
+          {/* Col 3 — Right utility bar */}
+          <div className="flex items-center gap-3 justify-end">
+            <Link
+              href="/register"
+              data-lpignore="true"
+              data-form-type="other"
+              onMouseEnter={scheduleClose}
+              className="hidden md:inline-flex items-center gap-1 text-[14px] font-semibold text-[#1B4332] hover:text-[#2D6A4F] transition-colors"
+            >
+              Apply for PRIME ID
+            </Link>
 
-          {/* Divider */}
-          <span className="hidden md:block w-px h-4 bg-black/[0.12]" aria-hidden="true" />
+            <span className="hidden md:block w-px h-4 bg-black/[0.12]" aria-hidden="true" />
 
-          {/* Portal user icon */}
-          <Link
-            href="/login"
-            aria-label="Sign in"
-            onMouseEnter={scheduleClose}
-            className="hidden md:flex items-center justify-center w-8 h-8 text-black/40 hover:text-black transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
-          </Link>
+            <Link
+              href="/login"
+              aria-label="Sign in"
+              onMouseEnter={scheduleClose}
+              className="hidden md:flex items-center justify-center w-8 h-8 text-black/40 hover:text-black transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </Link>
 
-          {/* Mobile toggle */}
-          <button
-            className="md:hidden p-1 text-black/60 hover:text-black transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-          >
-            <div className="w-5 flex flex-col gap-1.5">
-              <motion.span animate={{ rotate: menuOpen ? 45 : 0,  y: menuOpen ? 6 : 0  }} className="block h-px bg-current" />
-              <motion.span animate={{ opacity: menuOpen ? 0 : 1 }}                        className="block h-px bg-current" />
-              <motion.span animate={{ rotate: menuOpen ? -45 : 0, y: menuOpen ? -6 : 0 }} className="block h-px bg-current" />
-            </div>
-          </button>
+            {/* Mobile toggle */}
+            <button
+              className="md:hidden p-1 text-black/60 hover:text-black transition-colors"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+            >
+              <div className="w-5 flex flex-col gap-1.5">
+                <motion.span animate={{ rotate: menuOpen ? 45 : 0,  y: menuOpen ? 6 : 0  }} className="block h-px bg-current" />
+                <motion.span animate={{ opacity: menuOpen ? 0 : 1 }}                        className="block h-px bg-current" />
+                <motion.span animate={{ rotate: menuOpen ? -45 : 0, y: menuOpen ? -6 : 0 }} className="block h-px bg-current" />
+              </div>
+            </button>
+          </div>
         </div>
+
+        {/* ── Mega menu panel ── */}
+        <AnimatePresence>
+          {openDropdown && navLinks.find(l => l.label === openDropdown)?.mega && (
+            <motion.div
+              key={openDropdown}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute left-0 right-0 top-[calc(100%+6px)] bg-white/[0.97] backdrop-blur-md border border-black/[0.07] rounded-2xl shadow-xl shadow-black/[0.08] z-50"
+              onMouseEnter={cancelClose}
+              onMouseLeave={scheduleClose}
+              role="region"
+              aria-label={`${openDropdown} menu`}
+            >
+              <div className="max-w-7xl mx-auto px-8 lg:px-12 py-10">
+                {(() => {
+                  const link = navLinks.find(l => l.label === openDropdown);
+                  if (!link?.mega) return null;
+                  const { columns, featured } = link.mega;
+
+                  return (
+                    <div className={`grid gap-12 ${featured ? "grid-cols-[repeat(auto-fit,minmax(160px,1fr))_280px]" : "grid-cols-[repeat(auto-fit,minmax(160px,1fr))]"}`}>
+                      {/* Columns */}
+                      <div className={`grid gap-16 ${columns.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                        {columns.map((col) => (
+                          <div key={col.heading}>
+                            <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-black/30 mb-6 pb-3 border-b border-black/[0.07]">
+                              {col.heading}
+                            </p>
+                            <ul className="flex flex-col gap-0.5">
+                              {col.items.map((item) => (
+                                <li key={item.href + item.label}>
+                                  <Link
+                                    href={item.href}
+                                    target={item.external ? "_blank" : undefined}
+                                    rel={item.external ? "noopener noreferrer" : undefined}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="group flex items-start gap-3 py-2.5 rounded-sm hover:bg-black/[0.04] -mx-2 px-2 transition-colors"
+                                  >
+                                    {item.img && (
+                                      <div className="shrink-0 w-10 h-10 rounded-[2px] overflow-hidden bg-black/10 mt-0.5">
+                                        <Image
+                                          src={item.img}
+                                          alt=""
+                                          width={40}
+                                          height={40}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+                                    <div>
+                                      <p className="text-[15px] font-semibold text-black/80 group-hover:text-black transition-colors leading-tight flex items-center gap-1.5">
+                                        {item.label}
+                                        {item.external && (
+                                          <svg className="w-2.5 h-2.5 opacity-40" viewBox="0 0 10 10" fill="none">
+                                            <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                                          </svg>
+                                        )}
+                                      </p>
+                                      {item.subtitle && (
+                                        <p className="text-[11px] text-black/35 mt-0.5 leading-tight">{item.subtitle}</p>
+                                      )}
+                                    </div>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Featured card */}
+                      {featured && (
+                        <Link
+                          href={featured.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className="group relative overflow-hidden rounded-sm bg-black flex flex-col min-h-[240px]"
+                        >
+                          <Image
+                            src={featured.img}
+                            alt=""
+                            fill
+                            className="object-cover opacity-40 group-hover:opacity-50 group-hover:scale-[1.03] transition-all duration-500"
+                          />
+                          <div className="relative z-10 flex flex-col justify-end flex-1 p-5">
+                            {featured.badge && (
+                              <span className="inline-block self-start mb-3 px-2 py-0.5 text-[9px] font-bold tracking-[0.2em] uppercase bg-[#2D6A4F] text-white rounded-[2px]">
+                                {featured.badge}
+                              </span>
+                            )}
+                            <p className="text-[14px] font-black text-white leading-snug mb-1.5">
+                              {featured.title}
+                            </p>
+                            <p className="text-[11px] text-white/50 leading-relaxed mb-4">
+                              {featured.desc}
+                            </p>
+                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#74C69D] group-hover:gap-3 transition-all duration-300">
+                              {featured.cta} <span>→</span>
+                            </span>
+                          </div>
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Mobile menu ── */}
+        <motion.div
+          id="mobile-menu"
+          initial={false}
+          animate={{ height: menuOpen ? "auto" : 0, opacity: menuOpen ? 1 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="md:hidden overflow-hidden bg-white/[0.97] backdrop-blur-md border-t border-black/[0.07] rounded-b-2xl"
+          aria-hidden={!menuOpen}
+        >
+          <div className="px-6 py-5 flex flex-col gap-1">
+            {navLinks.map((link) => (
+              <div key={link.label}>
+                <Link
+                  href={link.href === "#" ? "/" : link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="block py-3 text-black/70 hover:text-black text-sm font-medium border-b border-black/[0.07]"
+                >
+                  {link.label}
+                </Link>
+                {link.mega && (
+                  <div className="pl-4 pt-1 pb-2 flex flex-col gap-0.5">
+                    {link.mega.columns.flatMap(col => col.items).map((item) => (
+                      <Link
+                        key={item.href + item.label}
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="block py-2 text-black/45 hover:text-[#2D6A4F] text-[12px] transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <Link
+              href="/register"
+              className="mt-3 px-4 py-3 bg-[#1B4332] text-white text-sm font-bold text-center hover:bg-[#2D6A4F] transition-colors"
+            >
+              Apply for PRIME ID →
+            </Link>
+          </div>
+        </motion.div>
       </div>
 
-      {/* ── Mega menu panel ── */}
-      <AnimatePresence>
-        {openDropdown && navLinks.find(l => l.label === openDropdown)?.mega && (
-          <motion.div
-            key={openDropdown}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-0 right-0 top-[calc(100%+6px)] bg-white/[0.97] backdrop-blur-md border border-black/[0.07] rounded-2xl shadow-xl shadow-black/[0.08] z-50"
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-            role="region"
-            aria-label={`${openDropdown} menu`}
-          >
-            <div className="max-w-7xl mx-auto px-8 lg:px-12 py-10">
-              {(() => {
-                const link = navLinks.find(l => l.label === openDropdown);
-                if (!link?.mega) return null;
-                const { columns, featured } = link.mega;
-
-                return (
-                  <div className={`grid gap-12 ${featured ? "grid-cols-[repeat(auto-fit,minmax(160px,1fr))_280px]" : "grid-cols-[repeat(auto-fit,minmax(160px,1fr))]"}`}>
-                    {/* Columns */}
-                    <div className={`grid gap-16 ${columns.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-                      {columns.map((col) => (
-                        <div key={col.heading}>
-                          <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-black/30 mb-6 pb-3 border-b border-black/[0.07]">
-                            {col.heading}
-                          </p>
-                          <ul className="flex flex-col gap-0.5">
-                            {col.items.map((item) => (
-                              <li key={item.href}>
-                                <Link
-                                  href={item.href}
-                                  target={item.external ? "_blank" : undefined}
-                                  rel={item.external ? "noopener noreferrer" : undefined}
-                                  onClick={() => setOpenDropdown(null)}
-                                  className="group flex items-start gap-3 py-2.5 rounded-sm hover:bg-black/[0.04] -mx-2 px-2 transition-colors"
-                                >
-                                  {item.img && (
-                                    <div className="shrink-0 w-10 h-10 rounded-[2px] overflow-hidden bg-black/10 mt-0.5">
-                                      <Image
-                                        src={item.img}
-                                        alt=""
-                                        width={40}
-                                        height={40}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  )}
-                                  <div>
-                                    <p className="text-[15px] font-semibold text-black/80 group-hover:text-black transition-colors leading-tight flex items-center gap-1.5">
-                                      {item.label}
-                                      {item.external && (
-                                        <svg className="w-2.5 h-2.5 opacity-40" viewBox="0 0 10 10" fill="none">
-                                          <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                                        </svg>
-                                      )}
-                                    </p>
-                                    {item.subtitle && (
-                                      <p className="text-[11px] text-black/35 mt-0.5 leading-tight">{item.subtitle}</p>
-                                    )}
-                                  </div>
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Featured card */}
-                    {featured && (
-                      <Link
-                        href={featured.href}
-                        onClick={() => setOpenDropdown(null)}
-                        className="group relative overflow-hidden rounded-sm bg-black flex flex-col min-h-[240px]"
-                      >
-                        <Image
-                          src={featured.img}
-                          alt=""
-                          fill
-                          className="object-cover opacity-40 group-hover:opacity-50 group-hover:scale-[1.03] transition-all duration-500"
-                        />
-                        <div className="relative z-10 flex flex-col justify-end flex-1 p-5">
-                          {featured.badge && (
-                            <span className="inline-block self-start mb-3 px-2 py-0.5 text-[9px] font-bold tracking-[0.2em] uppercase bg-[#2D6A4F] text-white rounded-[2px]">
-                              {featured.badge}
-                            </span>
-                          )}
-                          <p className="text-[14px] font-black text-white leading-snug mb-1.5">
-                            {featured.title}
-                          </p>
-                          <p className="text-[11px] text-white/50 leading-relaxed mb-4">
-                            {featured.desc}
-                          </p>
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#74C69D] group-hover:gap-3 transition-all duration-300">
-                            {featured.cta} <span>→</span>
-                          </span>
-                        </div>
-                      </Link>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Mobile menu ── */}
-      <motion.div
-        id="mobile-menu"
-        initial={false}
-        animate={{ height: menuOpen ? "auto" : 0, opacity: menuOpen ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="md:hidden overflow-hidden bg-white/[0.97] backdrop-blur-md border-t border-black/[0.07]"
-        aria-hidden={!menuOpen}
-      >
-        <div className="px-6 py-5 flex flex-col gap-1">
-          {navLinks.map((link) => (
-            <div key={link.label}>
-              <Link
-                href={link.href === "#" ? "/" : link.href}
-                onClick={() => setMenuOpen(false)}
-                className="block py-3 text-black/70 hover:text-black text-sm font-medium border-b border-black/[0.07]"
-              >
-                {link.label}
-              </Link>
-              {link.mega && (
-                <div className="pl-4 pt-1 pb-2 flex flex-col gap-0.5">
-                  {link.mega.columns.flatMap(col => col.items).map((item) => (
-                    <Link
-                      key={item.href + item.label}
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="block py-2 text-black/45 hover:text-[#2D6A4F] text-[12px] transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+      {/* ── Green ticker sub-bar — floats with the nav ── */}
+      <div className="bg-[#2D6A4F] rounded-xl overflow-hidden py-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.12)]">
+        <div className="animate-marquee select-none flex">
+          {[tickerText, tickerText].map((t, i) => (
+            <span key={i} className="flex items-center pr-20 text-[10px] font-bold tracking-[0.22em] uppercase text-white whitespace-nowrap">
+              {t}
+            </span>
           ))}
-          <Link
-            href="/register"
-            className="mt-3 px-4 py-3 bg-black text-white text-sm font-bold text-center hover:bg-[#2D6A4F] hover:text-white transition-colors"
-          >
-            Apply to PRIME →
-          </Link>
         </div>
-      </motion.div>
+      </div>
     </header>
   );
 }

@@ -185,15 +185,29 @@ export default function CMElevatePage() {
           <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
             Register on the PRIME portal and apply for a scheme that matches your business. Financial support of 35–75% of project cost is available across all covered sectors.
           </p>
-          <a
-            href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
-            style={{ fontSize: "var(--text-sm)" }}
-          >
-            Register on PRIME Portal
-          </a>
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              Register on PRIME Portal
+            </a>
+            <a
+              href="https://meghalayaone.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-9 py-4 border border-white/20 text-white/70 font-semibold hover:border-white/50 hover:text-white transition-all"
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              Visit MeghalayaOne
+              <svg className="w-3 h-3 opacity-60" viewBox="0 0 10 10" fill="none">
+                <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+            </a>
+          </div>
         </div>
       </section>
 

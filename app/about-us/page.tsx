@@ -23,11 +23,13 @@ const pillars: { title: string; description: string; Icon: IconType }[] = [
 
 const components: { label: string; detail: string; Icon: IconType }[] = [
   { label: "PRIME Hubs",              detail: "Anchors for enterprise promotion set up in all district and block HQs, serving as centres for innovation, knowledge sharing, incubation and skill development.", Icon: HiOfficeBuilding },
-  { label: "Startup Enterprises",     detail: "~100 top entrepreneurial ideas selected and incubated annually — innovation-based and the vanguard of entrepreneurship in Meghalaya.", Icon: HiLightningBolt },
-  { label: "Nano & Micro Enterprises", detail: "10,000 micro and nano enterprises incubated over five years through comprehensive business development, market access, technology and credit linkages.", Icon: HiHome },
-  { label: "Livelihood Enterprises",  detail: "Support for 50,000 livelihood enterprises through networks of Self Help Groups and Cooperative Societies.", Icon: HiUsers },
+  { label: "Startup Enterprises",     detail: "75 startups are selected annually through the CM's E-Championship Challenge for a 9-month intensive incubation programme — innovation-based and the vanguard of entrepreneurship in Meghalaya.", Icon: HiLightningBolt },
+  { label: "Training",                detail: "Sector-specific entrepreneurial training programmes delivered through PRIME-supported Training Centres statewide, equipping founders with practical skills.", Icon: HiAcademicCap },
+  { label: "Exposure Visit",          detail: "Curated exposure visits to industry leaders, established enterprises, and national ecosystems — broadening horizons and building networks for PRIME entrepreneurs.", Icon: HiHome },
+  { label: "Market Access",           detail: "Demand-side networks including trade exhibitions, ONDC onboarding, B2B connections, and Act East Business Show participation to open real buying channels.", Icon: HiTrendingUp },
+  { label: "Mentorship",              detail: "Direct access to experienced founders, industry experts, and domain specialists through structured mentoring relationships and PRIME's expert network.", Icon: HiUsers },
+  { label: "Technology",              detail: "Digital tools and platforms that multiply enterprise productivity — from online peer networks and opportunity maps to e-commerce and digital marketing support.", Icon: HiChip },
   { label: "Dedicated Funding Windows", detail: "Interest subvention programs and credit enhancement through First Loan Default Guarantee (FLDG) schemes to improve access to bank finance.", Icon: HiCreditCard },
-  { label: "Mindset Interventions",   detail: "Nurturing entrepreneurial mindsets in schools and colleges to create a culture of enterprise from the ground up.", Icon: HiAcademicCap },
 ];
 
 export default function AboutUsPage() {
@@ -144,7 +146,7 @@ export default function AboutUsPage() {
               className="font-black text-black leading-[0.9] tracking-tight"
               style={{ fontSize: "var(--text-heading)" }}
             >
-              The growth quartet that drives every entrepreneur
+              The approach that drives every entrepreneur
             </h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/[0.07] border border-black/[0.07]">

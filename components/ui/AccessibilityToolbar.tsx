@@ -13,7 +13,7 @@ type Settings = {
 };
 
 const DEFAULT: Settings = {
-  fontSize: 0,
+  fontSize: 1,
   highContrast: false,
   grayscale: false,
   highlightLinks: false,
@@ -90,7 +90,7 @@ export default function AccessibilityToolbar() {
   if (!mounted) return null;
 
   const hasActive =
-    settings.fontSize !== 0 ||
+    settings.fontSize !== 1 ||
     settings.highContrast ||
     settings.grayscale ||
     settings.highlightLinks ||
