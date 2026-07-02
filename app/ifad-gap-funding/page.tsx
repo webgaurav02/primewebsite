@@ -53,7 +53,7 @@ export default function IFADGAPFundingPage() {
       />
 
       {/* What is it */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-start">
           <div>
             <div className="flex items-center gap-4 mb-8">
@@ -116,7 +116,7 @@ export default function IFADGAPFundingPage() {
       </section>
 
       {/* Fund types */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -144,7 +144,7 @@ export default function IFADGAPFundingPage() {
                 >
                   {f.name}
                 </h3>
-                <p className="font-black text-[#2D6A4F] leading-[0.9] mb-6" style={{ fontSize: "var(--text-heading)" }}>
+                <p className={`font-black ${f.highlight ? "text-[#74C69D]" : "text-[#2D6A4F]"} leading-[0.9] mb-6`} style={{ fontSize: "var(--text-heading)" }}>
                   {f.range}
                 </p>
                 <dl className="flex flex-col gap-4">
@@ -170,7 +170,7 @@ export default function IFADGAPFundingPage() {
       </section>
 
       {/* How to apply */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -206,7 +206,7 @@ export default function IFADGAPFundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />

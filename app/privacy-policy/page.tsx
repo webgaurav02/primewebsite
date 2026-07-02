@@ -157,7 +157,7 @@ export default function PrivacyPolicyPage() {
 
       <main id="main-content">
         {/* Quick-nav */}
-        <section className="bg-[#f5f5f5] border-b border-black/[0.07] py-8">
+        <section className="bg-[#f5f5f5] texture-dots border-b border-black/[0.07] py-8">
           <div className="max-w-4xl mx-auto px-6 lg:px-10">
             <p className="font-semibold tracking-[0.25em] uppercase text-black/35 mb-4" style={{ fontSize: "var(--text-label)" }}>
               Jump to section
@@ -178,7 +178,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         {/* Policy body */}
-        <section className="bg-white py-16 md:py-24">
+        <section className="bg-white texture-grid py-16 md:py-24">
           <div className="max-w-4xl mx-auto px-6 lg:px-10 space-y-14">
             {/* Preamble */}
             <div className="p-6 bg-[#2D6A4F]/8 border-l-4 border-[#2D6A4F]">

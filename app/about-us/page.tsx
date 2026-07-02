@@ -5,7 +5,7 @@ import PageHero from "@/components/ui/PageHero";
 import {
   HiOfficeBuilding,
   HiLightningBolt,
-  HiHome,
+  HiGlobe,
   HiUsers,
   HiCreditCard,
   HiAcademicCap,
@@ -23,9 +23,12 @@ const pillars: { title: string; description: string; Icon: IconType }[] = [
 
 const components: { label: string; detail: string; Icon: IconType }[] = [
   { label: "PRIME Hubs",              detail: "Anchors for enterprise promotion set up in all district and block HQs, serving as centres for innovation, knowledge sharing, incubation and skill development.", Icon: HiOfficeBuilding },
-  { label: "Startup Enterprises",     detail: "~100 top entrepreneurial ideas selected and incubated annually — innovation-based and the vanguard of entrepreneurship in Meghalaya.", Icon: HiLightningBolt },
-  { label: "Nano & Micro Enterprises", detail: "10,000 micro and nano enterprises incubated over five years through comprehensive business development, market access, technology and credit linkages.", Icon: HiHome },
-  { label: "Livelihood Enterprises",  detail: "Support for 50,000 livelihood enterprises through networks of Self Help Groups and Cooperative Societies.", Icon: HiUsers },
+  { label: "Startup Enterprises",      detail: "75 startups are selected and incubated annually — innovation-based and the vanguard of entrepreneurship in Meghalaya.", Icon: HiLightningBolt },
+  { label: "Training",                 detail: "Structured programmes delivering practical business skills, technical knowledge, and entrepreneurial tools directly to enterprises.", Icon: HiAcademicCap },
+  { label: "Exposure Visits",          detail: "Curated visits to successful enterprises, markets, and innovation hubs to broaden entrepreneur perspectives and unlock new opportunities.", Icon: HiGlobe },
+  { label: "Market Access",            detail: "Connecting enterprises to local markets, trade shows, ONDC, and national retail networks to grow revenue and demand.", Icon: HiTrendingUp },
+  { label: "Mentorship",               detail: "One-on-one guidance from domain experts, industry veterans, and PRIME mentors across the full entrepreneurial journey.", Icon: HiUsers },
+  { label: "Technology",               detail: "Access to tools, platforms, and technical solutions that improve productivity, quality, and market reach for enterprises of all sizes.", Icon: HiChip },
   { label: "Dedicated Funding Windows", detail: "Interest subvention programs and credit enhancement through First Loan Default Guarantee (FLDG) schemes to improve access to bank finance.", Icon: HiCreditCard },
   { label: "Mindset Interventions",   detail: "Nurturing entrepreneurial mindsets in schools and colleges to create a culture of enterprise from the ground up.", Icon: HiAcademicCap },
 ];
@@ -41,7 +44,7 @@ export default function AboutUsPage() {
       />
 
       {/* Mission & Vision */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <div className="flex items-center gap-4 mb-8">
@@ -96,7 +99,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Key Components */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36" id="overview">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36" id="overview">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -131,7 +134,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Strategy / Pillars */}
-      <section className="bg-white py-24 md:py-36" id="journey">
+      <section className="bg-white texture-grid py-24 md:py-36" id="journey">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -144,7 +147,7 @@ export default function AboutUsPage() {
               className="font-black text-black leading-[0.9] tracking-tight"
               style={{ fontSize: "var(--text-heading)" }}
             >
-              The growth quartet that drives every entrepreneur
+              What drives every entrepreneur
             </h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/[0.07] border border-black/[0.07]">
@@ -166,7 +169,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Partners */}
-      <section className="bg-[#1B4332] py-24 md:py-36" id="partners">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36" id="partners">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />
@@ -182,12 +185,19 @@ export default function AboutUsPage() {
           </h2>
           <div className="flex flex-wrap items-center gap-x-14 gap-y-10">
             {[
-              { name: "Startup India",                           src: "/assets/partners/startup-india.png", w: 541, h: 140 },
-              { name: "IIM Calcutta Innovation Park",            src: "/assets/partners/iim-calcutta.png",  w: 350, h: 381 },
-              { name: "MBMA",                                    src: "/assets/partners/mbma.png",          w: 445, h: 155 },
-              { name: "Meghalaya Institute of Entrepreneurship", src: "/assets/partners/mie.png",           w: 168, h: 190 },
+              { name: "Startup India",                           src: "/assets/partners/startup-india.png", w: 541, h: 140, href: "https://www.startupindia.gov.in/" },
+              { name: "IIM Calcutta Innovation Park",            src: "/assets/partners/iim-calcutta.png",  w: 350, h: 381, href: "https://iimcip.org/" },
+              { name: "MBMA",                                    src: "/assets/partners/mbma.png",          w: 445, h: 155, href: "https://mbma.org.in/" },
+              { name: "Meghalaya Institute of Entrepreneurship", src: "/assets/partners/mie.png",           w: 168, h: 190, href: "https://mie.gov.in/" },
             ].map((p) => (
-              <div key={p.name} className="bg-white px-6 py-4 flex items-center justify-center">
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={p.name}
+                className="bg-white px-6 py-4 flex items-center justify-center hover:opacity-80 transition-opacity"
+              >
                 <Image
                   src={p.src}
                   alt={p.name}
@@ -196,7 +206,7 @@ export default function AboutUsPage() {
                   className="object-contain"
                   style={{ height: 44, width: "auto" }}
                 />
-              </div>
+              </a>
             ))}
           </div>
         </div>

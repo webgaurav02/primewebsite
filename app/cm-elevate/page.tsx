@@ -52,7 +52,7 @@ export default function CMElevatePage() {
       />
 
       {/* Quote */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-3xl">
             <blockquote
@@ -61,7 +61,7 @@ export default function CMElevatePage() {
             >
               &ldquo;The CM-ELEVATE program is the next step to the PRIME program that we had started 5 years back. It targets 20,000 entrepreneurs in the next 5 years. We want to push and support entrepreneurs by giving subsidy, linking with banks allowing you to get easy finance as well as linking you with technology providers. This again is another massive step towards ensuring that we are creating that entrepreneurship spirit and pushing our entrepreneurs to really take that risk, follow that passion, and really bring Meghalaya into the entrepreneurship map.&rdquo;
             </blockquote>
-            <p className="text-[#2D6A4F] font-semibold tracking-wide" style={{ fontSize: "var(--text-sm)" }}>
+            <p className="text-white/40 font-semibold tracking-wide" style={{ fontSize: "var(--text-sm)" }}>
               — Conrad Sangma, Hon&apos;ble Chief Minister of Meghalaya
             </p>
           </div>
@@ -69,7 +69,7 @@ export default function CMElevatePage() {
       </section>
 
       {/* Overview */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <div className="flex items-center gap-4 mb-8">
@@ -96,7 +96,7 @@ export default function CMElevatePage() {
       </section>
 
       {/* Objectives */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -131,7 +131,7 @@ export default function CMElevatePage() {
       </section>
 
       {/* Sectors */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -168,7 +168,7 @@ export default function CMElevatePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />
@@ -183,17 +183,28 @@ export default function CMElevatePage() {
             Apply for CM-ELEVATE
           </h2>
           <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
-            Register on the PRIME portal and apply for a scheme that matches your business. Financial support of 35–75% of project cost is available across all covered sectors.
+            Applications for CM-ELEVATE are processed through MeghalayaOne — the Government of Meghalaya&apos;s unified e-services portal. Financial support of 35–75% of project cost is available across all covered sectors.
           </p>
-          <a
-            href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
-            style={{ fontSize: "var(--text-sm)" }}
-          >
-            Register on PRIME Portal
-          </a>
+          <div className="flex flex-wrap gap-4">
+            <a
+              href="https://meghalayaone.gov.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              Apply on MeghalayaOne →
+            </a>
+            <a
+              href="https://portal.primemeghalaya.com/GeneralRegistraion.php"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-9 py-4 border border-white/20 text-white/60 font-semibold hover:border-white/40 hover:text-white transition-colors"
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              Register on PRIME Portal
+            </a>
+          </div>
         </div>
       </section>
 

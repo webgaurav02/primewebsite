@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
 import { HiDownload, HiPlay, HiArrowRight } from "react-icons/hi";
-import { articles, CATEGORIES, type Category, type Article } from "@/lib/updates-data";
+import { articles, type Category, type Article } from "@/lib/updates-data";
 
 function ArticleCard({ post }: { post: Article }) {
   const isReadable = !post.download && !post.video && post.content;
@@ -56,11 +55,8 @@ function ArticleCard({ post }: { post: Article }) {
         )}
       </div>
 
-      {/* Meta tags */}
+      {/* Meta */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="border border-black/20 px-2.5 py-1 font-semibold tracking-[0.15em] uppercase text-black/50" style={{ fontSize: "10px" }}>
-          {post.category}
-        </span>
         <span className="text-black/25 font-medium" style={{ fontSize: "10px" }}>{post.date}</span>
         {post.readTime && (
           <>
@@ -71,12 +67,12 @@ function ArticleCard({ post }: { post: Article }) {
       </div>
 
       {/* Title */}
-      <h2
+      <h3
         className="font-black text-black leading-snug mb-3 transition-colors duration-200 group-hover:text-[#2D6A4F]"
         style={{ fontSize: "var(--text-body)" }}
       >
         {post.title}
-      </h2>
+      </h3>
 
       {/* Excerpt */}
       <p className="text-black/45 leading-relaxed mb-5 flex-1" style={{ fontSize: "var(--text-sm)" }}>
@@ -116,11 +112,16 @@ function ArticleCard({ post }: { post: Article }) {
   );
 }
 
+const SECTION_ORDER: Exclude<Category, "All">[] = [
+  "Success Stories",
+  "Updates",
+  "Newsletter",
+  "Brochure",
+  "Catalogue",
+  "Videos",
+];
+
 export default function UpdatesPage() {
-  const [active, setActive] = useState<Category>("All");
-
-  const filtered = active === "All" ? articles : articles.filter((a) => a.category === active);
-
   return (
     <>
       <Navbar />
@@ -130,40 +131,36 @@ export default function UpdatesPage() {
         subtitle="Success stories, programme news, newsletters, catalogues, brochures, and videos from across the PRIME ecosystem."
       />
 
-      <section className="bg-white py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+      <section className="bg-white texture-grid py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col gap-20 md:gap-28">
+          {SECTION_ORDER.map((cat) => {
+            const posts = articles.filter((a) => a.category === cat);
+            if (posts.length === 0) return null;
+            return (
+              <div key={cat}>
+                {/* Section heading */}
+                <div className="flex items-center gap-6 mb-10">
+                  <h2
+                    className="font-black text-black uppercase tracking-wider shrink-0"
+                    style={{ fontSize: "var(--text-body)" }}
+                  >
+                    {cat}
+                  </h2>
+                  <div className="flex-1 h-px bg-black/[0.08]" />
+                  <span className="text-black/25 font-semibold shrink-0" style={{ fontSize: "var(--text-label)" }}>
+                    {posts.length} {posts.length === 1 ? "item" : "items"}
+                  </span>
+                </div>
 
-          {/* Category filter */}
-          <div className="flex flex-wrap gap-2 mb-14 border-b border-black/[0.07] pb-8">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActive(cat)}
-                className={`px-4 py-2 font-semibold tracking-[0.12em] uppercase transition-all duration-200 ${
-                  active === cat
-                    ? "bg-[#1B4332] text-white"
-                    : "bg-black/[0.04] text-black/50 hover:bg-black/[0.08] hover:text-black"
-                }`}
-                style={{ fontSize: "11px" }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
-            {filtered.map((post) => (
-              <ArticleCard key={post.slug} post={post} />
-            ))}
-          </div>
-
-          {filtered.length === 0 && (
-            <p className="text-black/35 text-center py-24" style={{ fontSize: "var(--text-body)" }}>
-              No posts in this category yet.
-            </p>
-          )}
-
+                {/* Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
+                  {posts.map((post) => (
+                    <ArticleCard key={post.slug} post={post} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

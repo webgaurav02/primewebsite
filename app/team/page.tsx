@@ -137,7 +137,7 @@ export default function TeamPage() {
         subtitle="A dynamic mix of government officials, social entrepreneurs, and passionate changemakers — united by one mission."
       />
 
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col gap-16">
           {departments.map((dept) => (
             <div key={dept.name}>

@@ -56,7 +56,7 @@ export default function BusinessFacilitationPage() {
       />
 
       {/* Intro */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-start">
           <div>
             <div className="flex items-center gap-4 mb-8">
@@ -95,14 +95,14 @@ export default function BusinessFacilitationPage() {
       </section>
 
       {/* Featured image */}
-      <section className="bg-white">
+      <section className="bg-white texture-grid">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 pb-24 md:pb-36">
           <ImagePlaceholder label="Business Facilitation in Action" className="w-full aspect-[16/7]" />
         </div>
       </section>
 
       {/* Entrepreneur of the Month */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-2xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -170,7 +170,7 @@ export default function BusinessFacilitationPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white py-24 md:py-36 border-t border-black/[0.06]">
+      <section className="bg-white texture-grid py-24 md:py-36 border-t border-black/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />

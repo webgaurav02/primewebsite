@@ -306,6 +306,78 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* ── Map ──────────────────────────────────────────────── */}
+      <section className="bg-white border-t border-black/[0.06] py-20 md:py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="w-6 h-px bg-[#2D6A4F]" />
+            <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
+              Find us
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-[300px_1fr] border border-black/[0.08] overflow-hidden">
+            {/* Address */}
+            <div className="bg-[#1B4332] p-8 flex flex-col justify-between gap-8">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 flex items-center justify-center bg-white/10 shrink-0 mt-0.5">
+                    <HiLocationMarker size={16} className="text-[#74C69D]" />
+                  </div>
+                  <div>
+                    <p className="text-white/40 mb-1" style={{ fontSize: "var(--text-label)" }}>Address</p>
+                    <p className="text-white font-semibold leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
+                      PRIME Meghalaya<br />Shillong, Meghalaya<br />793001, India
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 flex items-center justify-center bg-white/10 shrink-0 mt-0.5">
+                    <HiPhone size={16} className="text-[#74C69D]" />
+                  </div>
+                  <div>
+                    <p className="text-white/40 mb-1" style={{ fontSize: "var(--text-label)" }}>Phone</p>
+                    <p className="text-white font-semibold" style={{ fontSize: "var(--text-sm)" }}>+91 364 222 1234</p>
+                    <p className="text-white/30 mt-0.5" style={{ fontSize: "var(--text-label)" }}>Mon – Fri, 9:30 am – 5:30 pm</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 flex items-center justify-center bg-white/10 shrink-0 mt-0.5">
+                    <HiMail size={16} className="text-[#74C69D]" />
+                  </div>
+                  <div>
+                    <p className="text-white/40 mb-1" style={{ fontSize: "var(--text-label)" }}>Email</p>
+                    <p className="text-white font-semibold" style={{ fontSize: "var(--text-sm)" }}>info@primemeghalaya.com</p>
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://maps.google.com/?q=Shillong+Meghalaya"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-semibold text-[#74C69D] hover:gap-4 transition-all duration-200 self-start"
+                style={{ fontSize: "var(--text-sm)" }}
+              >
+                Open in Google Maps <HiArrowRight size={14} />
+              </a>
+            </div>
+
+            {/* Map */}
+            <div className="h-[420px] lg:h-[480px]">
+              <iframe
+                src="https://www.openstreetmap.org/export/embed.html?bbox=91.8600%2C25.5580%2C91.9200%2C25.6000&layer=mapnik&marker=25.5788%2C91.8933"
+                width="100%"
+                height="100%"
+                style={{ border: 0, display: "block", height: "100%" }}
+                allowFullScreen
+                loading="lazy"
+                title="PRIME Meghalaya — Shillong Head Office"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── PRIME Hubs ───────────────────────────────────────── */}
       <section className="bg-[#f7f7f5] border-t border-black/[0.06] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">

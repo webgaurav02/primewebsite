@@ -83,7 +83,7 @@ export default function Hero() {
             className="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors duration-300"
             style={{ fontSize: "var(--text-sm)" }}
           >
-            Apply to PRIME <span>→</span>
+            Apply for PRIME ID <span>→</span>
           </Link>
           <Link
             href="/about-us"

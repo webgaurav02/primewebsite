@@ -6,24 +6,28 @@ const partners = [
     src: "/assets/partners/mie.png",
     w: 168, h: 190,
     label: "Implementation Partner",
+    href: "https://mie.gov.in/",
   },
   {
     name: "MBMA",
     src: "/assets/partners/mbma.png",
     w: 445, h: 155,
     label: "Implementation Partner",
+    href: "https://mbma.org.in/",
   },
   {
     name: "IIM Calcutta Innovation Park",
     src: "/assets/partners/iim-calcutta.png",
     w: 350, h: 381,
     label: "Knowledge Partner",
+    href: "https://iimcip.org/",
   },
   {
     name: "Startup India",
     src: "/assets/partners/startup-india.png",
     w: 541, h: 140,
     label: "Ecosystem Partner",
+    href: "https://www.startupindia.gov.in/",
   },
 ];
 
@@ -42,7 +46,13 @@ export default function Partners() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
           {partners.map((p) => (
             <div key={p.name} className="flex flex-col items-center gap-4">
-              <div className="w-full border border-black/[0.08] bg-white flex items-center justify-center px-6 py-8 hover:border-black/20 transition-colors duration-300">
+              <a
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={p.name}
+                className="w-full border border-black/[0.08] bg-white flex items-center justify-center px-6 py-8 hover:border-black/20 transition-colors duration-300"
+              >
                 <Image
                   src={p.src}
                   alt={p.name}
@@ -55,7 +65,7 @@ export default function Partners() {
                     maxWidth: "100%",
                   }}
                 />
-              </div>
+              </a>
               <p
                 className="font-medium text-black/40 text-center"
                 style={{ fontSize: "var(--text-label)" }}

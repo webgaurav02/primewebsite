@@ -1,9 +1,5 @@
-"use client";
-
-import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useSpring, useTransform, useMotionValueEvent } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
 import {
   HiLightningBolt,
@@ -33,94 +29,6 @@ const photos = [
   { src: "/assets/images/event-2.jpg",     label: "Incubation Cohort"      },
   { src: "/assets/images/event-3.jpg",     label: "PRIME Hub Activity"     },
 ];
-
-function ScrollImageCycler() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [labelIndex, setLabelIndex] = useState(0);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Spring-smoothed progress — adds natural lag so fast scrolling still feels fluid
-  const smooth = useSpring(scrollYProgress, { stiffness: 55, damping: 22, restDelta: 0.001 });
-
-  // Per-image opacities driven directly by the motion value — no re-renders, GPU smooth
-  const opacity0 = useTransform(smooth, [0,    0.20, 0.28], [1, 1, 0]);
-  const opacity1 = useTransform(smooth, [0.20, 0.28, 0.45, 0.53], [0, 1, 1, 0]);
-  const opacity2 = useTransform(smooth, [0.45, 0.53, 0.70, 0.78], [0, 1, 1, 0]);
-  const opacity3 = useTransform(smooth, [0.70, 0.78, 1.0 ], [0, 1, 1]);
-  const opacities = [opacity0, opacity1, opacity2, opacity3];
-
-  // Progress bar width
-  const barWidth = useTransform(smooth, [0, 1], ["0%", "100%"]);
-
-  // Label text only (discrete — just for the counter/label UI)
-  useMotionValueEvent(scrollYProgress, "change", (p) => {
-    setLabelIndex(Math.min(Math.floor(p * photos.length), photos.length - 1));
-  });
-
-  return (
-    <div ref={containerRef} style={{ height: `${photos.length * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden">
-
-        {/* All images stacked — opacity controlled by scroll */}
-        {photos.map((photo, i) => (
-          <motion.div key={photo.src} className="absolute inset-0" style={{ opacity: opacities[i] }}>
-            <Image
-              src={photo.src}
-              alt={photo.label}
-              fill
-              className="object-cover"
-              priority={i === 0}
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-black/25" />
-          </motion.div>
-        ))}
-
-        {/* Progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-white/10">
-          <motion.div className="h-full bg-[#74C69D]" style={{ width: barWidth }} />
-        </div>
-
-        {/* Counter + label */}
-        <div className="absolute bottom-8 left-6 lg:left-10 flex items-center gap-4">
-          <span className="font-black text-white/20 tabular-nums" style={{ fontSize: "var(--text-heading)" }}>
-            {String(labelIndex + 1).padStart(2, "0")}
-          </span>
-          <span className="w-px h-6 bg-white/20" />
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={labelIndex}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.25 }}
-              className="text-white/50 font-semibold tracking-[0.2em] uppercase"
-              style={{ fontSize: "11px" }}
-            >
-              {photos[labelIndex].label}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-
-        {/* Dot indicators */}
-        <div className="absolute bottom-10 right-6 lg:right-10 flex gap-2 items-center">
-          {photos.map((_, i) => (
-            <div
-              key={i}
-              className="h-1 rounded-full bg-white transition-all duration-500"
-              style={{ width: i === labelIndex ? 24 : 6, opacity: i === labelIndex ? 1 : 0.25 }}
-            />
-          ))}
-        </div>
-
-      </div>
-    </div>
-  );
-}
 
 export default function About() {
   return (
@@ -196,29 +104,71 @@ export default function About() {
         </div>
       </div>
 
-      {/* Mobile: simple 2×2 image grid */}
-      <div className="grid grid-cols-2 md:hidden">
-        {photos.map((photo, i) => (
-          <div key={i} className="relative aspect-square overflow-hidden bg-black/10">
+      {/* Photo collage — full width */}
+      <AnimateIn direction="up" distance={20}>
+        <div className="grid grid-cols-2 md:grid-cols-12 grid-rows-2 md:h-[520px]">
+
+          {/* Main large image — desktop: left 7 cols, 2 rows */}
+          <div className="relative aspect-square md:aspect-auto md:col-span-7 md:row-span-2 overflow-hidden group bg-black/10">
             <Image
-              src={photo.src}
-              alt={photo.label}
+              src={photos[0].src}
+              alt={photos[0].label}
               fill
-              className="object-cover"
-              sizes="50vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(max-width: 768px) 50vw, 58vw"
             />
-            <div className="absolute inset-0 bg-black/25" />
-            <p className="absolute bottom-3 left-3 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
-              {photo.label}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+            <span className="absolute bottom-4 left-4 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
+              {photos[0].label}
+            </span>
+          </div>
+
+          {/* Top-right */}
+          <div className="relative aspect-square md:aspect-auto md:col-span-5 md:row-span-1 overflow-hidden group bg-black/10">
+            <Image
+              src={photos[1].src}
+              alt={photos[1].label}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(max-width: 768px) 50vw, 42vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            <span className="absolute bottom-3 left-3 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
+              {photos[1].label}
+            </span>
+          </div>
+
+          {/* Bottom-right: two images split */}
+          <div className="relative aspect-square md:aspect-auto md:col-span-3 md:row-span-1 overflow-hidden group bg-black/10">
+            <Image
+              src={photos[2].src}
+              alt={photos[2].label}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+            <span className="absolute bottom-3 left-3 text-white/60 font-semibold tracking-wide" style={{ fontSize: "9px" }}>
+              {photos[2].label}
+            </span>
+          </div>
+
+          {/* Accent tile */}
+          <div className="relative aspect-square md:aspect-auto md:col-span-2 md:row-span-1 bg-[#1B4332] flex flex-col items-center justify-center p-4">
+            <p className="font-black text-[#74C69D] text-center leading-none" style={{ fontSize: "clamp(1.6rem, 3vw, 2.8rem)" }}>
+              2019
+            </p>
+            <p className="text-white/40 font-semibold text-center tracking-[0.12em] uppercase mt-1" style={{ fontSize: "8px" }}>
+              Est.
+            </p>
+            <span className="my-3 w-5 h-px bg-[#74C69D]/40" />
+            <p className="text-white/25 font-medium text-center leading-snug" style={{ fontSize: "8px" }}>
+              Govt. of<br />Meghalaya
             </p>
           </div>
-        ))}
-      </div>
 
-      {/* Desktop: scroll-driven image cycler — full bleed */}
-      <div className="hidden md:block">
-        <ScrollImageCycler />
-      </div>
+        </div>
+      </AnimateIn>
 
     </section>
   );

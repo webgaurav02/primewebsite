@@ -48,7 +48,7 @@ export default function EntrepreneursDirectoryPage() {
         subtitle={`${profiles.length} entrepreneurs across 10 districts — building Meghalaya's most dynamic startup ecosystem.`}
       />
 
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-white texture-grid py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
           {/* Filters */}

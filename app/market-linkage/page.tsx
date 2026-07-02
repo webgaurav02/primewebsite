@@ -45,7 +45,7 @@ export default function MarketLinkagePage() {
       />
 
       {/* Intro */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <div className="flex items-center gap-4 mb-8">
@@ -83,7 +83,7 @@ export default function MarketLinkagePage() {
       </section>
 
       {/* Stats bar */}
-      <section className="bg-[#1B4332] border-t border-b border-white/[0.08] py-16 md:py-24">
+      <section className="bg-[#1B4332] texture-hatch border-t border-b border-white/[0.08] py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06]">
             {stats.map((s) => (
@@ -104,7 +104,7 @@ export default function MarketLinkagePage() {
       </section>
 
       {/* Channels */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -139,7 +139,7 @@ export default function MarketLinkagePage() {
       </section>
 
       {/* Events */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -174,7 +174,7 @@ export default function MarketLinkagePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />

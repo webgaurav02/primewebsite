@@ -109,7 +109,7 @@ export default async function EntrepreneurProfilePage({
       </section>
 
       {/* ── Profile content ────────────────────────────────────── */}
-      <section className="bg-white">
+      <section className="bg-white texture-grid">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-24">
           <div className="grid md:grid-cols-[340px_1fr] lg:grid-cols-[400px_1fr] gap-12 md:gap-16 lg:gap-24">
 
@@ -228,7 +228,7 @@ export default async function EntrepreneurProfilePage({
 
       {/* ── Stats bar ──────────────────────────────────────────── */}
       {stats.length > 0 && (
-        <section className="bg-[#1B4332]">
+        <section className="bg-[#1B4332] texture-hatch">
           <div className="max-w-7xl mx-auto px-6 lg:px-10 py-14 md:py-20">
 
             {/* Label */}
@@ -275,7 +275,7 @@ export default async function EntrepreneurProfilePage({
 
       {/* ── Social Impact ──────────────────────────────────────── */}
       {profile.socialImpact && (
-        <section className="bg-[#f5f5f5] py-20 md:py-28">
+        <section className="bg-[#f5f5f5] texture-dots py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-6 lg:px-10">
             <div className="flex items-center gap-4 mb-8">
               <span className="w-8 h-px bg-[#2D6A4F]" />
@@ -298,7 +298,7 @@ export default async function EntrepreneurProfilePage({
 
       {/* ── Products ───────────────────────────────────────────── */}
       {profile.products && (
-        <section className="bg-white py-20 md:py-28 border-t border-black/[0.05]">
+        <section className="bg-white texture-grid py-20 md:py-28 border-t border-black/[0.05]">
           <div className="max-w-7xl mx-auto px-6 lg:px-10">
             <div className="flex items-center gap-4 mb-8">
               <span className="w-8 h-px bg-[#2D6A4F]" />
@@ -320,7 +320,7 @@ export default async function EntrepreneurProfilePage({
       )}
 
       {/* ── Back to directory ──────────────────────────────────── */}
-      <section className="bg-[#1B4332] py-10 md:py-14">
+      <section className="bg-[#1B4332] texture-hatch py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between gap-6">
           <Link
             href="/entrepreneurs"

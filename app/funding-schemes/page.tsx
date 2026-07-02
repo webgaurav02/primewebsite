@@ -45,7 +45,7 @@ export default function FundingSchemesPage() {
       />
 
       {/* Intro with image */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16 items-center">
           <div className="relative aspect-[4/3] overflow-hidden order-last md:order-first">
             <Image
@@ -90,7 +90,7 @@ export default function FundingSchemesPage() {
       </section>
 
       {/* Schemes grid */}
-      <section className="bg-[#f5f5f5] py-24 md:py-36">
+      <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -117,7 +117,7 @@ export default function FundingSchemesPage() {
                 <div className={`w-12 h-12 flex items-center justify-center mb-6 ${s.highlight ? "bg-white/10" : "bg-[#74C69D]/20"}`}>
                   <span className={s.highlight ? "text-[#74C69D]" : "text-[#2D6A4F]"}><s.Icon size={24} /></span>
                 </div>
-                <p className="font-bold text-[#2D6A4F] uppercase tracking-widest mb-4" style={{ fontSize: "var(--text-label)" }}>
+                <p className={`font-bold ${s.highlight ? "text-[#74C69D]" : "text-[#2D6A4F]"} uppercase tracking-widest mb-4`} style={{ fontSize: "var(--text-label)" }}>
                   {s.tag}
                 </p>
                 <h3
@@ -142,7 +142,7 @@ export default function FundingSchemesPage() {
       </section>
 
       {/* How to apply */}
-      <section className="bg-white py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="max-w-xl mb-14">
             <div className="flex items-center gap-4 mb-6">
@@ -178,7 +178,7 @@ export default function FundingSchemesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1B4332] py-24 md:py-36">
+      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-4 mb-10">
             <span className="w-8 h-px bg-[#2D6A4F]" />

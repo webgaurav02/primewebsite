@@ -13,7 +13,7 @@ type Settings = {
 };
 
 const DEFAULT: Settings = {
-  fontSize: 0,
+  fontSize: 1,
   highContrast: false,
   grayscale: false,
   highlightLinks: false,
@@ -56,6 +56,8 @@ export default function AccessibilityToolbar() {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Settings;
+        // Clamp fontSize to values the UI exposes; stale -1 (A−) maps to default
+        if (![0, 1, 2].includes(parsed.fontSize)) parsed.fontSize = DEFAULT.fontSize;
         setSettings(parsed);
         applyToDOM(parsed);
       }
@@ -90,7 +92,7 @@ export default function AccessibilityToolbar() {
   if (!mounted) return null;
 
   const hasActive =
-    settings.fontSize !== 0 ||
+    settings.fontSize !== DEFAULT.fontSize ||
     settings.highContrast ||
     settings.grayscale ||
     settings.highlightLinks ||
@@ -119,7 +121,6 @@ export default function AccessibilityToolbar() {
   };
 
   const fontSizes: { val: Settings["fontSize"]; label: string; size: string }[] = [
-    { val: -1, label: "A−",  size: "10px" },
     { val:  0, label: "A",   size: "12px" },
     { val:  1, label: "A+",  size: "14px" },
     { val:  2, label: "A++", size: "16px" },

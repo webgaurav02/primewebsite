@@ -131,7 +131,7 @@ export default function TermsPage() {
       />
 
       <main id="main-content">
-        <section className="bg-white py-16 md:py-24">
+        <section className="bg-white texture-grid py-16 md:py-24">
           <div className="max-w-4xl mx-auto px-6 lg:px-10 space-y-12">
             {/* Quick-nav */}
             <div className="p-6 bg-[#f5f5f5] border border-black/[0.07]">
