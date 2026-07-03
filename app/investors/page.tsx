@@ -31,7 +31,7 @@ export default function InvestorsPage() {
   return (
     <>
       <Navbar />
-      <main id="main-content">
+      <main>
 
         <PageHero
           breadcrumb="Our Network"

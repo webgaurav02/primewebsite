@@ -58,7 +58,7 @@ export default function PartnersPage() {
   return (
     <>
       <Navbar />
-      <main id="main-content">
+      <main>
 
         <PageHero
           breadcrumb="Our Network"

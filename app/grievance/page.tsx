@@ -70,81 +70,7 @@ export default function GrievancePage() {
         subtitle="We are committed to addressing your concerns transparently and promptly. All grievances are handled in accordance with the DPDP Act, 2023 and applicable Government of Meghalaya guidelines."
       />
 
-      <main id="main-content">
-        {/* Officer card */}
-        <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
-          <div className="max-w-7xl mx-auto px-6 lg:px-10">
-            <div className="grid md:grid-cols-2 gap-px bg-white/[0.06] border border-white/[0.06]">
-              {/* Officer info */}
-              <div className="bg-[#1B4332] p-10">
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="w-8 h-px bg-[#74C69D]" />
-                  <p className="font-semibold tracking-[0.25em] uppercase text-white/50" style={{ fontSize: "var(--text-label)" }}>
-                    Designated Officer
-                  </p>
-                </div>
-                <h2 className="font-black text-white mb-8" style={{ fontSize: "var(--text-heading)" }}>
-                  Grievance Officer — PRIME
-                </h2>
-
-                <dl className="border-t border-white/[0.08]">
-                  {[
-                    { label: "Organisation", val: "Department of Commerce & Industries, Government of Meghalaya" },
-                    { label: "Email", val: "grievance@primemeghalaya.com", isEmail: true },
-                    { label: "Postal Address", val: "PRIME Meghalaya\n3rd Floor, Ri Kynmaw Complex\nNongrim Hills, Shillong – 793003\nMeghalaya, India" },
-                    { label: "Office Hours", val: "Monday – Friday, 10:00 AM – 5:00 PM\n(Excluding public holidays)" },
-                  ].map((d) => (
-                    <div key={d.label} className="py-5 border-b border-white/[0.08]">
-                      <dt className="font-semibold uppercase tracking-wide text-white/40 mb-1.5" style={{ fontSize: "var(--text-label)" }}>
-                        {d.label}
-                      </dt>
-                      <dd className="text-white/75 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
-                        {("isEmail" in d && d.isEmail) ? (
-                          <a href={`mailto:${d.val}`} className="text-[#74C69D] hover:text-white transition-colors">
-                            {d.val}
-                          </a>
-                        ) : (
-                          d.val.split("\n").map((line, i) => (
-                            <span key={i}>{line}<br /></span>
-                          ))
-                        )}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-
-              {/* Timelines */}
-              <div className="bg-[#1B4332] p-10">
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="w-8 h-px bg-[#74C69D]" />
-                  <p className="font-semibold tracking-[0.25em] uppercase text-white/50" style={{ fontSize: "var(--text-label)" }}>
-                    Response Timelines
-                  </p>
-                </div>
-                <h3 className="font-black text-white mb-8" style={{ fontSize: "var(--text-heading)" }}>
-                  When to expect a response
-                </h3>
-                <div className="border-t border-white/[0.08]">
-                  {timelines.map((t, i) => (
-                    <div key={i} className="flex items-center justify-between gap-4 py-5 border-b border-white/[0.08]">
-                      <p className="text-white/60" style={{ fontSize: "var(--text-sm)" }}>{t.label}</p>
-                      <p className="text-[#74C69D] font-semibold shrink-0" style={{ fontSize: "var(--text-sm)" }}>{t.time}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 p-5 border border-[#74C69D]/20 bg-[#74C69D]/5">
-                  <p className="text-white/60 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
-                    <strong className="text-[#74C69D]">DPDP Act, 2023:</strong> For data-protection
-                    requests, if we fail to respond within 30 days or if you are dissatisfied, you
-                    may approach the <strong className="text-white">Data Protection Board of India</strong>.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <main>
         {/* Grievance categories */}
         <section className="bg-white texture-grid py-24 md:py-36">
           <div className="max-w-7xl mx-auto px-6 lg:px-10">
@@ -205,6 +131,79 @@ export default function GrievancePage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Officer card + timelines */}
+        <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10">
+            <div className="grid md:grid-cols-2 gap-px bg-white/[0.06] border border-white/[0.06]">
+              {/* Officer info */}
+              <div className="bg-[#1B4332] p-10">
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="w-8 h-px bg-[#74C69D]" />
+                  <p className="font-semibold tracking-[0.25em] uppercase text-white/50" style={{ fontSize: "var(--text-label)" }}>
+                    Designated Officer
+                  </p>
+                </div>
+                <h2 className="font-black text-white mb-8" style={{ fontSize: "var(--text-heading)" }}>
+                  Grievance Officer — PRIME
+                </h2>
+                <dl className="border-t border-white/[0.08]">
+                  {[
+                    { label: "Organisation", val: "Department of Commerce & Industries, Government of Meghalaya" },
+                    { label: "Email", val: "grievance@primemeghalaya.com", isEmail: true },
+                    { label: "Postal Address", val: "PRIME Meghalaya\n3rd Floor, Ri Kynmaw Complex\nNongrim Hills, Shillong – 793003\nMeghalaya, India" },
+                    { label: "Office Hours", val: "Monday – Friday, 10:00 AM – 5:00 PM\n(Excluding public holidays)" },
+                  ].map((d) => (
+                    <div key={d.label} className="py-5 border-b border-white/[0.08]">
+                      <dt className="font-semibold uppercase tracking-wide text-white/40 mb-1.5" style={{ fontSize: "var(--text-label)" }}>
+                        {d.label}
+                      </dt>
+                      <dd className="text-white/75 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
+                        {("isEmail" in d && d.isEmail) ? (
+                          <a href={`mailto:${d.val}`} className="text-[#74C69D] hover:text-white transition-colors">
+                            {d.val}
+                          </a>
+                        ) : (
+                          d.val.split("\n").map((line, i) => (
+                            <span key={i}>{line}<br /></span>
+                          ))
+                        )}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+
+              {/* Timelines */}
+              <div className="bg-[#1B4332] p-10">
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="w-8 h-px bg-[#74C69D]" />
+                  <p className="font-semibold tracking-[0.25em] uppercase text-white/50" style={{ fontSize: "var(--text-label)" }}>
+                    Response Timelines
+                  </p>
+                </div>
+                <h3 className="font-black text-white mb-8" style={{ fontSize: "var(--text-heading)" }}>
+                  When to expect a response
+                </h3>
+                <div className="border-t border-white/[0.08]">
+                  {timelines.map((t, i) => (
+                    <div key={i} className="flex items-center justify-between gap-4 py-5 border-b border-white/[0.08]">
+                      <p className="text-white/60" style={{ fontSize: "var(--text-sm)" }}>{t.label}</p>
+                      <p className="text-[#74C69D] font-semibold shrink-0" style={{ fontSize: "var(--text-sm)" }}>{t.time}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 p-5 border border-[#74C69D]/20 bg-[#74C69D]/5">
+                  <p className="text-white/60 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
+                    <strong className="text-[#74C69D]">DPDP Act, 2023:</strong> For data-protection
+                    requests, if we fail to respond within 30 days or if you are dissatisfied, you
+                    may approach the <strong className="text-white">Data Protection Board of India</strong>.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

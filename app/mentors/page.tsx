@@ -40,7 +40,7 @@ export default function MentorsPage() {
   return (
     <>
       <Navbar />
-      <main id="main-content">
+      <main>
 
         <PageHero
           breadcrumb="Our Network"

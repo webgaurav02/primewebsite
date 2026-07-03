@@ -32,7 +32,7 @@ export default function MediaEntertainmentPage() {
   return (
     <>
       <Navbar />
-      <main id="main-content">
+      <main>
 
         <PageHero
           breadcrumb="Sectors of PRIME"
