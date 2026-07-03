@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import {
   HiInformationCircle,
   HiUser,
@@ -55,7 +56,7 @@ export default function FAQ() {
 
         <div className="grid md:grid-cols-[5fr_7fr] gap-16 md:gap-24">
 
-          {/* Left: heading */}
+          {/* Left: heading + image */}
           <div className="md:sticky md:top-24 md:self-start">
             <AnimateIn direction="left">
               <div className="flex items-center gap-4 mb-8">
@@ -64,15 +65,43 @@ export default function FAQ() {
                   FAQ
                 </p>
               </div>
-              <h2
-                className="font-black text-black leading-[0.9] tracking-tight mb-8"
-                style={{ fontSize: "var(--text-heading)" }}
-              >
-                Questions<br />
-                we get<br />
-                asked a lot.
-              </h2>
-              <p className="text-black/40 leading-[1.75]" style={{ fontSize: "var(--text-body)" }}>
+
+              {/* Heading with giant decorative ? behind it */}
+              <div className="relative mb-10 overflow-visible">
+                <svg
+                  aria-hidden="true"
+                  overflow="visible"
+                  className="absolute top-0 left-0 w-full h-full pointer-events-none select-none"
+                  viewBox="0 0 300 260"
+                  preserveAspectRatio="xMinYMin meet"
+                  fill="none"
+                >
+                  <text
+                    x="-10"
+                    y="248"
+                    fontFamily="system-ui, sans-serif"
+                    fontWeight="900"
+                    fontSize="300"
+                    fill="rgba(0,0,0,0.045)"
+                  >?</text>
+                </svg>
+                <h2
+                  className="relative z-10 font-black text-black leading-[0.9] tracking-tight"
+                  style={{ fontSize: "var(--text-display)" }}
+                >
+                  Questions<br />
+                  we get<br />
+                  asked a lot.
+                </h2>
+              </div>
+
+              {/* Photo */}
+              <ImagePlaceholder
+                label="CM interacts with entrepreneurs"
+                className="w-full aspect-[4/3] mb-8"
+              />
+
+              <p className="text-black/40 leading-[1.75]" style={{ fontSize: "var(--text-sm)" }}>
                 Can&apos;t find what you&apos;re looking for?{" "}
                 <a href="mailto:info@primemeghalaya.com" className="text-[#2D6A4F] hover:underline">
                   info@primemeghalaya.com

@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
 import Link from "next/link";
+import HoverCard from "@/components/ui/HoverCard";
 import { HiMail, HiShieldCheck, HiChat, HiGlobe, HiClipboardList } from "react-icons/hi";
 import type { IconType } from "react-icons";
 
@@ -163,13 +164,13 @@ export default function GrievancePage() {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-black/[0.07] border border-black/[0.07]">
               {categories.map((c) => (
-                <div key={c.title} className="bg-white p-8 hover:bg-[#f5f5f5] transition-colors">
+                <HoverCard key={c.title} className="p-8">
                   <div className="w-12 h-12 flex items-center justify-center bg-[#74C69D]/20 mb-6">
                     <span className="text-[#2D6A4F]"><c.Icon size={24} /></span>
                   </div>
                   <h3 className="font-bold text-black mb-3" style={{ fontSize: "var(--text-body)" }}>{c.title}</h3>
                   <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>{c.description}</p>
-                </div>
+                </HoverCard>
               ))}
             </div>
           </div>

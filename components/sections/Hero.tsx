@@ -29,28 +29,14 @@ export default function Hero() {
 
       {/* Content — centred */}
       <motion.div
-        className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32 flex flex-col items-center text-center"
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 pt-44 pb-24 md:py-32 flex flex-col items-center text-center"
         style={{ opacity: contentOpacity }}
       >
-        {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-          className="flex items-center gap-3 mb-8"
-        >
-          <span className="w-6 h-px bg-[#74C69D]" />
-          <span className="text-white/50 font-medium tracking-[0.2em] uppercase" style={{ fontSize: "var(--text-label)" }}>
-            Government of Meghalaya · Est. 2019
-          </span>
-          <span className="w-6 h-px bg-[#74C69D]" />
-        </motion.div>
-
         {/* Headline */}
         <div className="overflow-hidden mb-8">
           <motion.h1
             className="font-black text-white leading-[0.88] tracking-tight"
-            style={{ fontSize: "var(--text-hero)" }}
+            style={{ fontSize: "clamp(2.8rem, 7vw, 6.5rem)" }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             transition={{ duration: 0.95, delay: 0.3, ease: EASE }}
@@ -65,8 +51,8 @@ export default function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.8, ease: EASE }}
-          className="text-white/60 leading-[1.75] max-w-md mb-10"
-          style={{ fontSize: "var(--text-lead)" }}
+          className="text-white/60 leading-[1.75] mb-10 md:whitespace-nowrap"
+          style={{ fontSize: "var(--text-sm)" }}
         >
           Real support for real founders — incubation, funding, mentorship, and market access, right here in Meghalaya.
         </motion.p>

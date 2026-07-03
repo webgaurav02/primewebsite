@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
+import HoverCard from "@/components/ui/HoverCard";
 
 const tranches = [
   {
@@ -122,8 +123,8 @@ export default function StudentTinkeringFundPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/[0.07] border border-black/[0.07]">
             {steps.map((s) => (
-              <div key={s.step} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
-                <div className="h-px w-10 bg-[#2D6A4F] mb-8 group-hover:w-full transition-all duration-500" />
+              <HoverCard key={s.step} className="p-8">
+                <div className="h-px w-10 bg-[#2D6A4F] mb-8" />
                 <p className="font-black text-[#2D6A4F] mb-3" style={{ fontSize: "var(--text-label)" }}>
                   {s.step}
                 </p>
@@ -133,7 +134,7 @@ export default function StudentTinkeringFundPage() {
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
                   {s.desc}
                 </p>
-              </div>
+              </HoverCard>
             ))}
           </div>
           <p className="text-black/40 mt-8 max-w-2xl" style={{ fontSize: "var(--text-sm)" }}>
@@ -165,13 +166,13 @@ export default function StudentTinkeringFundPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
             {pathways.map((p, i) => (
-              <div key={i} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
+              <HoverCard key={i} className="p-8">
                 <p className="font-black text-[#2D6A4F] mb-5" style={{ fontSize: "var(--text-label)" }}>
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <h3 className="font-bold text-black mb-3" style={{ fontSize: "var(--text-body)" }}>{p.label}</h3>
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>{p.desc}</p>
-              </div>
+              </HoverCard>
             ))}
           </div>
         </div>

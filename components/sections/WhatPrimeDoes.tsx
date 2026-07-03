@@ -7,9 +7,10 @@ import {
   HiOfficeBuilding,
   HiUsers,
   HiCurrencyRupee,
-  HiAcademicCap,
-  HiGlobe,
+  HiHome,
   HiBriefcase,
+  HiSpeakerphone,
+  HiLink,
 } from "react-icons/hi";
 import type { IconType } from "react-icons";
 
@@ -17,49 +18,57 @@ const services: { num: string; title: string; description: string; href: string;
   {
     num: "01",
     title: "Incubation",
-    description: "9-month programme with co-working, mentorship, and IIM Calcutta certification.",
+    description: "CM's E-Championship — 9-month programme with co-working, mentorship, and IIM Calcutta certification.",
     href: "/incubation",
     Icon: HiOfficeBuilding,
     color: "#EF4444",
   },
   {
     num: "02",
-    title: "Mentorship",
-    description: "Direct access to founders, industry leaders, and domain experts nationwide.",
-    href: "/about-us",
-    Icon: HiUsers,
+    title: "CM Elevate",
+    description: "Credit-linked subsidy programme targeting 20,000 entrepreneurs across 15+ sectors over 5 years.",
+    href: "/cm-elevate",
+    Icon: HiCurrencyRupee,
     color: "#F97316",
   },
   {
     num: "03",
-    title: "Funding & Schemes",
-    description: "Grants, zero-interest loans, and startup investment — up to ₹75 Lakhs.",
-    href: "/funding-schemes",
-    Icon: HiCurrencyRupee,
-    color: "#FACC15",
-  },
-  {
-    num: "04",
-    title: "Training",
-    description: "Sector-specific skill programmes at PRIME-supported Training Centres statewide.",
-    href: "/trainingcentres",
-    Icon: HiAcademicCap,
+    title: "PRIME Rural",
+    description: "Village-level enterprise development bringing PRIME's support system to grassroots entrepreneurs.",
+    href: "/prime-rural",
+    Icon: HiHome,
     color: "#22C55E",
   },
   {
+    num: "04",
+    title: "Business Facilitation",
+    description: "Government liaison and complete handholding from idea to fully operational business.",
+    href: "/business-facilitation",
+    Icon: HiBriefcase,
+    color: "#FACC15",
+  },
+  {
     num: "05",
-    title: "Market Access",
-    description: "Exhibitions, ONDC onboarding, B2B connections, and national trade show exposure.",
-    href: "/market-linkage",
-    Icon: HiGlobe,
+    title: "Partnership",
+    description: "Institutional alliances with knowledge partners, industry bodies, and ecosystem enablers.",
+    href: "/partners",
+    Icon: HiLink,
     color: "#14B8A6",
   },
   {
     num: "06",
-    title: "Business Facilitation",
-    description: "Government liaison and complete handholding from idea to operational business.",
-    href: "/business-facilitation",
-    Icon: HiBriefcase,
+    title: "Media & Entertainment",
+    description: "Outreach, storytelling, and communications — amplifying the PRIME ecosystem and its founders.",
+    href: "/media-entertainment",
+    Icon: HiSpeakerphone,
+    color: "#8B5CF6",
+  },
+  {
+    num: "07",
+    title: "Admin & Governance",
+    description: "Operations, compliance, and governance infrastructure ensuring programme delivery at scale.",
+    href: "/admin-governance",
+    Icon: HiUsers,
     color: "#3B82F6",
   },
 ];
@@ -118,16 +127,16 @@ export default function WhatPrimeDoes() {
           <div className="flex items-center gap-4 mb-12">
             <span className="w-8 h-px bg-[#2D6A4F]" />
             <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
-              What We Offer
+              Sectors of PRIME
             </p>
           </div>
         </AnimateIn>
 
         <AnimateIn direction="left">
           <h2 className="font-black text-black leading-[0.9] tracking-tight mb-12" style={{ fontSize: "var(--text-display)" }}>
-            Everything a founder<br />
-            needs to{" "}
-            <span className="text-[#2D6A4F]">succeed.</span>
+            The sectors<br />
+            powering{" "}
+            <span className="text-[#2D6A4F]">PRIME.</span>
           </h2>
         </AnimateIn>
 
@@ -135,7 +144,7 @@ export default function WhatPrimeDoes() {
           <div />
           <AnimateIn direction="right" delay={0.1}>
             <p className="text-black/45 leading-[1.75] mb-6" style={{ fontSize: "var(--text-lead)" }}>
-              PRIME delivers six interlocking pillars of support — from your first idea to your fastest growth stage.
+              Seven sectors make up the PRIME ecosystem — each playing a distinct role in Meghalaya's entrepreneurship mission.
             </p>
             <Link
               href="/about-us"
@@ -150,7 +159,7 @@ export default function WhatPrimeDoes() {
 
         {/* Service cards grid */}
         <AnimateIn delay={0.08}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {services.map((svc) => (
               <ServiceCard key={svc.num} svc={svc} />
             ))}

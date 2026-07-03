@@ -48,8 +48,39 @@ function StatItem({ stat, delay }: { stat: typeof stats[number]; delay: number }
 
 export default function Stats() {
   return (
-    <section className="bg-[#1B4332] border-t border-b border-white/[0.07]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-28">
+    <section className="relative bg-[#0d2318] border-t border-b border-white/[0.07] overflow-hidden">
+
+      {/* Gradient background */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 60% at 25% 35%, rgba(45,106,79,0.28) 0%, transparent 65%),
+            radial-gradient(ellipse 50% 70% at 75% 80%, rgba(10,30,20,0.35) 0%, transparent 70%)
+          `,
+        }}
+      />
+
+      {/* Decorative arc lines */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        {[220, 360, 500, 650, 820].map((r) => (
+          <circle
+            key={r}
+            cx="92%"
+            cy="50%"
+            r={r}
+            fill="none"
+            stroke="rgba(116,198,157,0.055)"
+            strokeWidth="1"
+          />
+        ))}
+      </svg>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-28">
 
         {/* Two-column layout: heading left, stats right */}
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-14 lg:gap-20 items-center">
@@ -83,22 +114,23 @@ export default function Stats() {
               All figures since inception · 2019
             </p>
 
-            <Link
-              href="/ecosystem-data"
-              className="inline-flex items-center gap-3 px-7 py-3.5 border border-white/15 text-white/50 font-semibold hover:border-[#74C69D] hover:text-[#74C69D] transition-all duration-300"
-              style={{ fontSize: "var(--text-sm)" }}
-            >
-              Read more <span>→</span>
-            </Link>
           </AnimateIn>
 
-          {/* Right — 3×2 stat grid */}
+          {/* Right — 3×2 stat grid + CTA */}
           <AnimateIn direction="right" delay={0.1}>
-            {/* gap-px with bg-white/[0.07] creates hairline separators between cells */}
             <div className="grid grid-cols-3 gap-px bg-white/[0.07]">
               {stats.map((stat, i) => (
                 <StatItem key={stat.label} stat={stat} delay={0.12 + i * 0.07} />
               ))}
+            </div>
+            <div className="flex justify-end mt-5">
+              <Link
+                href="/ecosystem-data"
+                className="inline-flex items-center gap-3 px-7 py-3.5 border border-white/15 text-white/50 font-semibold hover:border-[#74C69D] hover:text-[#74C69D] transition-all duration-300"
+                style={{ fontSize: "var(--text-sm)" }}
+              >
+                Read more <span>→</span>
+              </Link>
             </div>
           </AnimateIn>
 

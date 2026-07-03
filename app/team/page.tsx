@@ -2,6 +2,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
+import HoverCard from "@/components/ui/HoverCard";
 
 const departments: {
   name: string;
@@ -149,7 +150,7 @@ export default function TeamPage() {
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
                 {dept.members.map((m) => (
-                  <div key={m.name} className="flex items-center gap-4 p-5 bg-white hover:bg-[#f5f5f5] transition-colors">
+                  <HoverCard key={m.name} className="flex items-center gap-4 p-5">
                     <Avatar name={m.name} img={m.img} />
                     <div className="min-w-0">
                       <p className="font-bold text-black truncate" style={{ fontSize: "var(--text-sm)" }}>
@@ -164,7 +165,7 @@ export default function TeamPage() {
                         </p>
                       )}
                     </div>
-                  </div>
+                  </HoverCard>
                 ))}
               </div>
             </div>

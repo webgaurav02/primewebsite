@@ -15,9 +15,9 @@ export default function Home() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <Stats />
         <About />
         <WhatPrimeDoes />
-        <Stats />
         <EntrepreneursOfPrime />
         <Gallery />
         <FAQ />

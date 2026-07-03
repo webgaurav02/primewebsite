@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import HoverCard from "@/components/ui/HoverCard";
 import {
   HiBell,
   HiMap,
@@ -124,10 +125,10 @@ export default function BusinessFacilitationPage() {
 
           <div className="grid md:grid-cols-2 gap-px bg-black/[0.07] border border-black/[0.07] mb-12">
             {eomWinners.map((w) => (
-              <div key={w.name} className="bg-white p-8 hover:bg-[#f5f5f5] transition-colors">
+              <HoverCard key={w.name} className="p-8">
                 <h3 className="font-bold text-black mb-3" style={{ fontSize: "var(--text-body)" }}>{w.name}</h3>
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>{w.tagline}</p>
-              </div>
+              </HoverCard>
             ))}
           </div>
 

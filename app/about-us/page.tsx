@@ -2,6 +2,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
+import HoverCard from "@/components/ui/HoverCard";
 import {
   HiOfficeBuilding,
   HiLightningBolt,
@@ -117,7 +118,7 @@ export default function AboutUsPage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
             {components.map((c) => (
-              <div key={c.label} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
+              <HoverCard key={c.label} className="p-8">
                 <div className="w-12 h-12 flex items-center justify-center bg-[#74C69D]/20 mb-6">
                   <span className="text-[#2D6A4F]"><c.Icon size={24} /></span>
                 </div>
@@ -127,7 +128,7 @@ export default function AboutUsPage() {
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
                   {c.detail}
                 </p>
-              </div>
+              </HoverCard>
             ))}
           </div>
         </div>
@@ -152,7 +153,7 @@ export default function AboutUsPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/[0.07] border border-black/[0.07]">
             {pillars.map((p) => (
-              <div key={p.title} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
+              <HoverCard key={p.title} className="p-8">
                 <div className="w-12 h-12 flex items-center justify-center bg-[#74C69D]/20 mb-6">
                   <span className="text-[#2D6A4F]"><p.Icon size={24} /></span>
                 </div>
@@ -162,7 +163,7 @@ export default function AboutUsPage() {
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
                   {p.description}
                 </p>
-              </div>
+              </HoverCard>
             ))}
           </div>
         </div>

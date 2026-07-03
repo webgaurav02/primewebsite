@@ -2,6 +2,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
+import HoverCard from "@/components/ui/HoverCard";
 import {
   HiStar,
   HiFire,
@@ -160,8 +161,8 @@ export default function FundingSchemesPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
             {steps.map((s) => (
-              <div key={s.step} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
-                <div className="h-px w-10 bg-[#2D6A4F] mb-8 group-hover:w-full transition-all duration-500" />
+              <HoverCard key={s.step} className="p-8">
+                <div className="h-px w-10 bg-[#2D6A4F] mb-8" />
                 <p className="font-black text-[#2D6A4F] mb-3" style={{ fontSize: "var(--text-label)" }}>
                   {s.step}
                 </p>
@@ -171,7 +172,7 @@ export default function FundingSchemesPage() {
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
                   {s.desc}
                 </p>
-              </div>
+              </HoverCard>
             ))}
           </div>
         </div>

@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import HoverCard from "@/components/ui/HoverCard";
 import {
   HiTrendingUp,
   HiCurrencyRupee,
@@ -52,18 +53,37 @@ export default function CMElevatePage() {
       />
 
       {/* Quote */}
-      <section className="bg-[#1B4332] texture-hatch py-24 md:py-36">
+      <section className="bg-white texture-grid py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="max-w-3xl">
+          <div className="grid lg:grid-cols-[1fr_2.2fr] gap-12 lg:gap-20 items-start">
+
+            {/* Left — decorative quote mark + attribution */}
+            <div className="flex flex-col gap-6 lg:pt-2">
+              <span
+                className="font-black text-[#2D6A4F]/15 leading-none select-none"
+                style={{ fontSize: "clamp(6rem, 14vw, 11rem)" }}
+                aria-hidden="true"
+              >
+                &ldquo;
+              </span>
+              <div className="border-l-2 border-[#74C69D] pl-5">
+                <p className="font-black text-black/80" style={{ fontSize: "var(--text-sm)" }}>
+                  Conrad Sangma
+                </p>
+                <p className="text-black/35 mt-1" style={{ fontSize: "var(--text-label)" }}>
+                  Hon&apos;ble Chief Minister<br />of Meghalaya
+                </p>
+              </div>
+            </div>
+
+            {/* Right — quote text */}
             <blockquote
-              className="text-white/70 italic leading-[1.8] mb-8"
+              className="text-black/55 italic leading-[1.85]"
               style={{ fontSize: "var(--text-lead)" }}
             >
-              &ldquo;The CM-ELEVATE program is the next step to the PRIME program that we had started 5 years back. It targets 20,000 entrepreneurs in the next 5 years. We want to push and support entrepreneurs by giving subsidy, linking with banks allowing you to get easy finance as well as linking you with technology providers. This again is another massive step towards ensuring that we are creating that entrepreneurship spirit and pushing our entrepreneurs to really take that risk, follow that passion, and really bring Meghalaya into the entrepreneurship map.&rdquo;
+              The CM-ELEVATE program is the next step to the PRIME program that we had started 5 years back. It targets 20,000 entrepreneurs in the next 5 years. We want to push and support entrepreneurs by giving subsidy, linking with banks allowing you to get easy finance as well as linking you with technology providers. This again is another massive step towards ensuring that we are creating that entrepreneurship spirit and pushing our entrepreneurs to really take that risk, follow that passion, and really bring Meghalaya into the entrepreneurship map.
             </blockquote>
-            <p className="text-white/40 font-semibold tracking-wide" style={{ fontSize: "var(--text-sm)" }}>
-              — Conrad Sangma, Hon&apos;ble Chief Minister of Meghalaya
-            </p>
+
           </div>
         </div>
       </section>
@@ -114,7 +134,7 @@ export default function CMElevatePage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
             {objectives.map((o) => (
-              <div key={o.title} className="bg-white p-8 group hover:bg-[#f5f5f5] transition-colors">
+              <HoverCard key={o.title} className="p-8">
                 <div className="w-12 h-12 flex items-center justify-center bg-[#74C69D]/20 mb-6">
                   <span className="text-[#2D6A4F]"><o.Icon size={24} /></span>
                 </div>
@@ -124,7 +144,7 @@ export default function CMElevatePage() {
                 <p className="text-black/50 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
                   {o.desc}
                 </p>
-              </div>
+              </HoverCard>
             ))}
           </div>
         </div>

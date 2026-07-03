@@ -5,6 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  HiInformationCircle, HiUsers, HiOfficeBuilding, HiGlobe,
+  HiBriefcase, HiAcademicCap, HiStar, HiLightBulb, HiLink,
+  HiCurrencyRupee, HiExternalLink, HiBookOpen, HiMail,
+  HiClipboardList, HiHome, HiSpeakerphone, HiCog,
+  HiLightningBolt, HiDocumentText, HiTrendingUp,
+} from "react-icons/hi";
+import type { IconType } from "react-icons";
 
 type MegaItem = {
   label: string;
@@ -12,6 +20,7 @@ type MegaItem = {
   href: string;
   img?: string;
   external?: boolean;
+  icon?: IconType;
 };
 
 type MegaColumn = {
@@ -56,36 +65,35 @@ const navLinks: NavLink[] = [
         {
           heading: "Who We Are",
           items: [
-            {
-              label: "About PRIME",
-              subtitle: "Our story & mission",
-              href: "/about-us",
-              img: "/assets/images/about-image.jpg",
-            },
-            {
-              label: "Our Team",
-              subtitle: "The people behind PRIME",
-              href: "/team",
-            },
+            { label: "About PRIME", subtitle: "Our story & mission",       href: "/about-us", img: "/assets/images/about-image.jpg", icon: HiInformationCircle },
+            { label: "Our Team",    subtitle: "The people behind PRIME",   href: "/team",                                            icon: HiUsers             },
           ],
         },
         {
           heading: "Programmes",
           items: [
-            { label: "Incubation",            subtitle: "CM's E-Championship",   href: "/incubation"            },
-            { label: "Market Linkage",        subtitle: "Trade & exhibitions",   href: "/market-linkage"        },
-            { label: "Business Facilitation", subtitle: "Startup handholding",   href: "/business-facilitation" },
-            { label: "Training Centres",      subtitle: "Skill development",     href: "/trainingcentres"       },
-            { label: "Fellowship",            subtitle: "Deep-dive programme",   href: "/fellowship"            },
+            { label: "Incubation",            subtitle: "CM's E-Championship",  href: "/incubation",            icon: HiOfficeBuilding },
+            { label: "Market Linkage",        subtitle: "Trade & exhibitions",  href: "/market-linkage",        icon: HiGlobe          },
+            { label: "Business Facilitation", subtitle: "Startup handholding",  href: "/business-facilitation", icon: HiBriefcase      },
+            { label: "Training Centres",      subtitle: "Skill development",    href: "/trainingcentres",       icon: HiAcademicCap    },
+            { label: "Fellowship",            subtitle: "Deep-dive programme",  href: "/fellowship",            icon: HiStar           },
+          ],
+        },
+        {
+          heading: "Our Network",
+          items: [
+            { label: "Mentors",   subtitle: "Experts guiding our founders",     href: "/mentors",   icon: HiLightBulb      },
+            { label: "Partners",  subtitle: "Institutional & ecosystem allies",  href: "/partners",  icon: HiLink           },
+            { label: "Investors", subtitle: "Funding connections for startups",  href: "/investors", icon: HiCurrencyRupee  },
           ],
         },
         {
           heading: "Connect",
           items: [
-            { label: "PRIME Portal",    subtitle: "Register your startup", href: "/register" },
-            { label: "Knowledge Base",  subtitle: "Answers & guides",      href: "/knowledge-base" },
-            { label: "Contact Us",      subtitle: "Reach our team",        href: "/contact" },
-            { label: "Grievance",       subtitle: "File a complaint",      href: "/grievance" },
+            { label: "PRIME Portal",   subtitle: "Register your startup", href: "/register",       icon: HiExternalLink  },
+            { label: "Knowledge Base", subtitle: "Answers & guides",      href: "/knowledge-base", icon: HiBookOpen      },
+            { label: "Contact Us",     subtitle: "Reach our team",        href: "/contact",        icon: HiMail          },
+            { label: "Grievance",      subtitle: "File a complaint",      href: "/grievance",      icon: HiClipboardList },
           ],
         },
       ],
@@ -105,25 +113,20 @@ const navLinks: NavLink[] = [
     mega: {
       columns: [
         {
-          heading: "Sectors",
+          heading: "Core Sectors",
           items: [
-            { label: "Incubation",                   subtitle: "CM's E-Championship",       href: "/incubation"            },
-            { label: "PRIME Rural",                  subtitle: "Village-level enterprise",  href: "/prime-rural"           },
-            { label: "Business Facilitation Service",subtitle: "Handholding & liaison",     href: "/business-facilitation" },
-            { label: "Partnership",                  subtitle: "Institutional alliances",   href: "#"                      },
-            { label: "CM Elevate",                   subtitle: "Subsidy across 15 sectors", href: "/cm-elevate"            },
-            { label: "Media & Comms",                subtitle: "Outreach & storytelling",   href: "#"                      },
-            { label: "Admin",                        subtitle: "Operations & governance",   href: "#"                      },
+            { label: "Incubation",                    subtitle: "CM's E-Championship",       href: "/incubation",            icon: HiOfficeBuilding },
+            { label: "PRIME Rural",                   subtitle: "Village-level enterprise",  href: "/prime-rural",           icon: HiHome           },
+            { label: "Business Facilitation Service", subtitle: "Handholding & liaison",     href: "/business-facilitation", icon: HiBriefcase      },
+            { label: "Partnership",                   subtitle: "Institutional alliances",   href: "#",                      icon: HiLink           },
           ],
         },
         {
-          heading: "Funding & Schemes",
+          heading: "Support Sectors",
           items: [
-            { label: "All Schemes",                      subtitle: "Overview of all funds",       href: "/funding-schemes"                },
-            { label: "CM Elevate",                       subtitle: "Subsidy across 15 sectors",   href: "/cm-elevate"                     },
-            { label: "Entrepreneurship Fund",            subtitle: "Up to ₹75L zero-interest",    href: "/prime-entrepreneurship-funding" },
-            { label: "Training Centre Establishment",    subtitle: "Up to ₹50L for training hubs",href: "/trainingcentres"                },
-            { label: "Student Tinkering Fund",           subtitle: "Youth innovation grants",     href: "/student-tinkering-fund"         },
+            { label: "CM Elevate",    subtitle: "Subsidy across 15 sectors", href: "/cm-elevate",        icon: HiTrendingUp   },
+            { label: "Media & Comms", subtitle: "Outreach & storytelling",   href: "/media-entertainment",icon: HiSpeakerphone },
+            { label: "Admin",         subtitle: "Operations & governance",   href: "/admin-governance",  icon: HiCog          },
           ],
         },
       ],
@@ -145,19 +148,19 @@ const navLinks: NavLink[] = [
         {
           heading: "Grants & Subsidies",
           items: [
-            { label: "CM Elevate",             subtitle: "35–75% project cost subsidy", href: "/cm-elevate"                     },
-            { label: "Kick Start Grant",       subtitle: "Up to ₹10L non-returnable",   href: "/funding-schemes"                },
-            { label: "Small Support Grant",    subtitle: "Up to ₹3L seed support",      href: "/funding-schemes"                },
-            { label: "InnoVenture Grant",      subtitle: "Up to ₹35L for innovators",   href: "/funding-schemes"                },
-            { label: "Student Tinkering Fund", subtitle: "Youth & campus innovation",   href: "/student-tinkering-fund"         },
+            { label: "CM Elevate",             subtitle: "35–75% project cost subsidy", href: "/cm-elevate",             icon: HiCurrencyRupee },
+            { label: "Kick Start Grant",       subtitle: "Up to ₹10L non-returnable",  href: "/funding-schemes",        icon: HiLightningBolt },
+            { label: "Small Support Grant",    subtitle: "Up to ₹3L seed support",     href: "/funding-schemes",        icon: HiStar          },
+            { label: "InnoVenture Grant",      subtitle: "Up to ₹35L for innovators",  href: "/funding-schemes",        icon: HiLightBulb     },
+            { label: "Student Tinkering Fund", subtitle: "Youth & campus innovation",  href: "/student-tinkering-fund", icon: HiAcademicCap   },
           ],
         },
         {
           heading: "Loans & Investment",
           items: [
-            { label: "Entrepreneurship Fund", subtitle: "Up to ₹75L zero-interest",  href: "/prime-entrepreneurship-funding" },
-            { label: "Training Centre Establishment", subtitle: "Up to ₹50L for training hubs", href: "/trainingcentres" },
-            { label: "All Schemes",           subtitle: "Full overview & eligibility", href: "/funding-schemes"              },
+            { label: "Entrepreneurship Fund",        subtitle: "Up to ₹75L zero-interest",     href: "/prime-entrepreneurship-funding", icon: HiTrendingUp    },
+            { label: "Training Centre Establishment",subtitle: "Up to ₹50L for training hubs", href: "/trainingcentres",               icon: HiOfficeBuilding},
+            { label: "All Schemes",                  subtitle: "Full overview & eligibility",  href: "/funding-schemes",               icon: HiDocumentText  },
           ],
         },
       ],
@@ -349,80 +352,52 @@ export default function Navbar() {
                 {(() => {
                   const link = navLinks.find(l => l.label === openDropdown);
                   if (!link?.mega) return null;
-                  const { columns, featured } = link.mega;
-                  const colGridCls = columns.length === 2 ? "grid-cols-2" : "grid-cols-3";
-                  const outerGridCls = featured
-                    ? "grid-cols-[repeat(auto-fit,minmax(160px,1fr))_280px]"
-                    : "grid-cols-[repeat(auto-fit,minmax(160px,1fr))]";
+                  const { columns } = link.mega;
+                  const colGridCls =
+                    columns.length === 2 ? "grid-cols-2" :
+                    columns.length === 4 ? "grid-cols-4" :
+                    "grid-cols-3";
                   return (
-                    <div className={`grid gap-12 ${outerGridCls}`}>
-                      <div className={`grid gap-16 ${colGridCls}`}>
-                        {columns.map((col) => (
-                          <div key={col.heading}>
-                            <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-black/30 mb-6 pb-3 border-b border-black/[0.07]">
-                              {col.heading}
-                            </p>
-                            <ul className="flex flex-col gap-0.5">
-                              {col.items.map((item) => (
-                                <li key={item.href}>
-                                  <Link
-                                    href={item.href}
-                                    target={item.external ? "_blank" : undefined}
-                                    rel={item.external ? "noopener noreferrer" : undefined}
-                                    onClick={() => setOpenDropdown(null)}
-                                    className="group flex items-start gap-3 py-2.5 rounded-sm hover:bg-black/[0.04] -mx-2 px-2 transition-colors"
-                                  >
-                                    {item.img && (
-                                      <div className="shrink-0 w-10 h-10 rounded-[2px] overflow-hidden bg-black/10 mt-0.5">
-                                        <Image src={item.img} alt="" width={40} height={40} className="w-full h-full object-cover" />
-                                      </div>
-                                    )}
-                                    <div>
-                                      <p className="text-[15px] font-semibold text-black/80 group-hover:text-black transition-colors leading-tight flex items-center gap-1.5">
-                                        {item.label}
-                                        {item.external && (
-                                          <svg className="w-2.5 h-2.5 opacity-40" viewBox="0 0 10 10" fill="none">
-                                            <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                                          </svg>
-                                        )}
-                                      </p>
-                                      {item.subtitle && (
-                                        <p className="text-[11px] text-black/35 mt-0.5 leading-tight">{item.subtitle}</p>
-                                      )}
+                    <div className={`grid gap-16 ${colGridCls}`}>
+                      {columns.map((col) => (
+                        <div key={col.heading}>
+                          <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-black/30 mb-6 pb-3 border-b border-black/[0.07]">
+                            {col.heading}
+                          </p>
+                          <ul className="flex flex-col gap-0.5">
+                            {col.items.map((item) => (
+                              <li key={item.href}>
+                                <Link
+                                  href={item.href}
+                                  target={item.external ? "_blank" : undefined}
+                                  rel={item.external ? "noopener noreferrer" : undefined}
+                                  onClick={() => setOpenDropdown(null)}
+                                  className="group flex items-center gap-3 py-2 rounded-lg hover:bg-black/[0.04] -mx-2 px-2 transition-colors"
+                                >
+                                  {item.icon && (
+                                    <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-black/[0.05] text-black/40 group-hover:bg-[#2D6A4F]/10 group-hover:text-[#2D6A4F] transition-colors duration-200">
+                                      <item.icon size={16} />
                                     </div>
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                      {featured && (
-                        <Link
-                          href={featured.href}
-                          onClick={() => setOpenDropdown(null)}
-                          className="group relative overflow-hidden rounded-sm bg-black flex flex-col min-h-[240px]"
-                        >
-                          <Image
-                            src={featured.img}
-                            alt=""
-                            fill
-                            className="object-cover opacity-40 group-hover:opacity-50 group-hover:scale-[1.03] transition-all duration-500"
-                          />
-                          <div className="relative z-10 flex flex-col justify-end flex-1 p-5">
-                            {featured.badge && (
-                              <span className="inline-block self-start mb-3 px-2 py-0.5 text-[9px] font-bold tracking-[0.2em] uppercase bg-[#2D6A4F] text-white rounded-[2px]">
-                                {featured.badge}
-                              </span>
-                            )}
-                            <p className="text-[14px] font-black text-white leading-snug mb-1.5">{featured.title}</p>
-                            <p className="text-[11px] text-white/50 leading-relaxed mb-4">{featured.desc}</p>
-                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#74C69D] group-hover:gap-3 transition-all duration-300">
-                              {featured.cta}{" "}<span>{"→"}</span>
-                            </span>
-                          </div>
-                        </Link>
-                      )}
+                                  )}
+                                  <div>
+                                    <p className="text-[14px] font-semibold text-black/80 group-hover:text-black transition-colors leading-tight flex items-center gap-1.5">
+                                      {item.label}
+                                      {item.external && (
+                                        <svg className="w-2.5 h-2.5 opacity-40" viewBox="0 0 10 10" fill="none">
+                                          <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                                        </svg>
+                                      )}
+                                    </p>
+                                    {item.subtitle && (
+                                      <p className="text-[11px] text-black/35 mt-0.5 leading-tight">{item.subtitle}</p>
+                                    )}
+                                  </div>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   );
                 })()}
@@ -431,20 +406,22 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* Mobile menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              id="mobile-menu"
-              key="mobile-menu"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="md:hidden overflow-hidden border-t border-black/[0.07]"
-              aria-label="Mobile navigation"
-            >
-              <div className="px-6 py-4 flex flex-col">
+      </div>
+
+      {/* Mobile menu — sibling to pill so overflow-y-auto works without parent clipping */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            id="mobile-menu"
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="md:hidden bg-white/[0.95] backdrop-blur-md border border-black/[0.07] rounded-2xl shadow-xl overflow-y-auto max-h-[calc(100dvh-104px)]"
+            aria-label="Mobile navigation"
+          >
+            <div className="px-6 py-4 flex flex-col">
                 {navLinks.map((link) => (
                   <div key={link.label}>
                     {link.mega ? (
@@ -491,9 +468,14 @@ export default function Navbar() {
                                           key={item.href + item.label}
                                           href={item.href}
                                           onClick={() => { setMenuOpen(false); setMobileOpen(null); }}
-                                          className="flex items-center gap-2 px-2 py-2.5 rounded-sm text-[14px] font-medium text-black/55 hover:text-[#2D6A4F] hover:bg-black/[0.03] transition-colors"
+                                          className="flex items-center gap-2.5 px-2 py-2 rounded-lg text-[14px] font-medium text-black/55 hover:text-[#2D6A4F] hover:bg-black/[0.03] transition-colors"
                                         >
-                                          {item.label}
+                                          {item.icon && (
+                                            <div className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-black/[0.05] text-black/35">
+                                              <item.icon size={14} />
+                                            </div>
+                                          )}
+                                          <span>{item.label}</span>
                                           {item.external && (
                                             <svg className="w-2.5 h-2.5 opacity-30 shrink-0" viewBox="0 0 10 10" fill="none">
                                               <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
@@ -542,8 +524,6 @@ export default function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
-
-      </div>
 
       {/* Green ticker — homepage only */}
       {pathname === "/" && <div className="bg-[#2D6A4F] rounded-xl overflow-hidden py-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.10)]">
