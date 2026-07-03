@@ -148,7 +148,6 @@ const navLinks: NavLink[] = [
         {
           heading: "Grants & Subsidies",
           items: [
-            { label: "CM Elevate",             subtitle: "35–75% project cost subsidy", href: "/cm-elevate",             icon: HiCurrencyRupee },
             { label: "Kick Start Grant",       subtitle: "Up to ₹10L non-returnable",  href: "/funding-schemes",        icon: HiLightningBolt },
             { label: "Small Support Grant",    subtitle: "Up to ₹3L seed support",     href: "/funding-schemes",        icon: HiStar          },
             { label: "InnoVenture Grant",      subtitle: "Up to ₹35L for innovators",  href: "/funding-schemes",        icon: HiLightBulb     },
