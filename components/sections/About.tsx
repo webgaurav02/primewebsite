@@ -10,10 +10,10 @@ import {
 import type { IconType } from "react-icons";
 
 const stats = [
-  { num: "2,847+", label: "CM Elevate Graduates" },
-  { num: "1,350+", label: "Registered Startups"  },
-  { num: "885+",   label: "Funding Cases"         },
-  { num: "2019",   label: "Year Founded"          },
+  { num: "12",   label: "Districts Covered" },
+  { num: "3",    label: "PRIME Hubs"        },
+  { num: "5+",   label: "Years Running"     },
+  { num: "2019", label: "Year Founded"      },
 ];
 
 const pillars: { num: string; label: string; desc: string; Icon: IconType }[] = [
