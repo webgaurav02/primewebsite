@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import Image from "next/image";
 import {
   HiInformationCircle,
   HiUser,
@@ -66,33 +67,25 @@ export default function FAQ() {
                 </p>
               </div>
 
-              {/* Heading with giant decorative ? behind it */}
-              <div className="relative mb-10 overflow-visible">
-                <svg
-                  aria-hidden="true"
-                  overflow="visible"
-                  className="absolute top-0 left-0 w-full h-full pointer-events-none select-none"
-                  viewBox="0 0 300 260"
-                  preserveAspectRatio="xMinYMin meet"
-                  fill="none"
-                >
-                  <text
-                    x="-10"
-                    y="248"
-                    fontFamily="system-ui, sans-serif"
-                    fontWeight="900"
-                    fontSize="300"
-                    fill="rgba(0,0,0,0.045)"
-                  >?</text>
-                </svg>
+              {/* Heading + ? side by side */}
+              <div className="flex items-center gap-4 mb-10">
                 <h2
-                  className="relative z-10 font-black text-black leading-[0.9] tracking-tight"
-                  style={{ fontSize: "var(--text-display)" }}
+                  className="font-black text-black leading-[0.9] tracking-tight"
+                  style={{ fontSize: "clamp(2rem, 4vw, 3.75rem)" }}
                 >
                   Questions<br />
                   we get<br />
                   asked a lot.
                 </h2>
+                <Image
+                  src="/assets/question-mark.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={400}
+                  height={600}
+                  className="shrink-0 select-none pointer-events-none"
+                  style={{ height: "clamp(7rem, 16vw, 14rem)", width: "auto" }}
+                />
               </div>
 
               {/* Photo */}

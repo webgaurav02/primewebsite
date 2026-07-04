@@ -31,8 +31,8 @@ const contacts = [
   {
     Icon: HiLocationMarker,
     label: "Head Office",
-    value: "PRIME Meghalaya, Shillong, Meghalaya — 793001",
-    href: "https://maps.google.com/?q=Shillong+Meghalaya",
+    value: "4th Floor, MTC Building, Police Bazaar, Shillong — 793001",
+    href: "https://maps.google.com/?q=MTC+Building+Police+Bazaar+Shillong",
     sub: "Mon – Fri, 9:30 am – 5:30 pm",
   },
   {
@@ -327,7 +327,7 @@ export default function ContactPage() {
                   <div>
                     <p className="text-white/40 mb-1" style={{ fontSize: "var(--text-label)" }}>Address</p>
                     <p className="text-white font-semibold leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
-                      PRIME Meghalaya<br />Shillong, Meghalaya<br />793001, India
+                      4th Floor, MTC Building<br />Police Bazaar, Shillong<br />Meghalaya — 793001
                     </p>
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <a
-                href="https://maps.google.com/?q=Shillong+Meghalaya"
+                href="https://maps.google.com/?q=MTC+Building+Police+Bazaar+Shillong"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 font-semibold text-[#74C69D] hover:gap-4 transition-all duration-200 self-start"

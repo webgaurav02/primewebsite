@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FaFacebook, FaInstagram, FaLinkedinIn, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { FaFacebook, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa6";
 
 const footerColumns = [
   {
@@ -22,6 +22,8 @@ const footerColumns = [
       { label: "Business Facilitation Service", href: "/business-facilitation" },
       { label: "Partnership",                   href: "#"                      },
       { label: "CM Elevate",                    href: "/cm-elevate"            },
+      { label: "Funding",                       href: "/funding-schemes"       },
+      { label: "Monitoring & Evaluation",       href: "/media-entertainment"   },
       { label: "Media & Comms",                 href: "#"                      },
       { label: "Admin",                         href: "#"                      },
     ],
@@ -41,7 +43,6 @@ const socials = [
   { label: "Facebook",  href: "#", Icon: FaFacebook   },
   { label: "Instagram", href: "#", Icon: FaInstagram  },
   { label: "LinkedIn",  href: "#", Icon: FaLinkedinIn },
-  { label: "X",         href: "#", Icon: FaXTwitter   },
   { label: "YouTube",   href: "#", Icon: FaYoutube    },
 ];
 

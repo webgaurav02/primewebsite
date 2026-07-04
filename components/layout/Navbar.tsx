@@ -125,7 +125,7 @@ const navLinks: NavLink[] = [
           heading: "Support Sectors",
           items: [
             { label: "CM Elevate",    subtitle: "Subsidy across 15 sectors", href: "/cm-elevate",        icon: HiTrendingUp   },
-            { label: "Media & Comms", subtitle: "Outreach & storytelling",   href: "/media-entertainment",icon: HiSpeakerphone },
+            { label: "Monitoring & Evaluation", subtitle: "Impact tracking & reporting", href: "/media-entertainment", icon: HiSpeakerphone },
             { label: "Admin",         subtitle: "Operations & governance",   href: "/admin-governance",  icon: HiCog          },
           ],
         },

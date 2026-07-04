@@ -2,33 +2,33 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
-import { HiSpeakerphone, HiFilm, HiPhotograph, HiMicrophone, HiDesktopComputer, HiNewspaper } from "react-icons/hi";
+import { HiChartBar, HiClipboardList, HiDatabase, HiEye, HiSearch, HiDocumentText } from "react-icons/hi";
 import type { IconType } from "react-icons";
 import HoverCard from "@/components/ui/HoverCard";
 
 export const metadata: Metadata = {
-  title: "Media & Entertainment — PRIME Meghalaya",
+  title: "Monitoring & Evaluation — PRIME Meghalaya",
   description:
-    "PRIME's Media & Entertainment sector supports outreach, storytelling, and communications — amplifying the PRIME ecosystem and its founders across Meghalaya and beyond.",
+    "PRIME's Monitoring & Evaluation framework tracks programme impact, measures outcomes for entrepreneurs, and ensures evidence-based delivery across Meghalaya.",
 };
 
 const focus: { Icon: IconType; title: string; desc: string }[] = [
-  { Icon: HiFilm,           title: "Film & Cinema",         desc: "Supporting cinema theatre development and film production enterprises that promote Meghalaya's creative economy." },
-  { Icon: HiSpeakerphone,   title: "Outreach & Campaigns",  desc: "State-wide communications campaigns promoting entrepreneurship, PRIME programmes, and success stories." },
-  { Icon: HiMicrophone,     title: "Media Entrepreneurship",desc: "Supporting media startups — podcasts, digital content studios, community radio, and journalism ventures." },
-  { Icon: HiPhotograph,     title: "Creative Content",      desc: "Photography, design, and visual content enterprises serving Meghalaya's tourism, government, and commercial sectors." },
-  { Icon: HiDesktopComputer,title: "Digital & Social Media",desc: "Digital media operations, social content, and PRIME's online presence across platforms." },
-  { Icon: HiNewspaper,      title: "PR & Storytelling",     desc: "Press relations, founder stories, impact documentation, and ecosystem narrative for PRIME's public profile." },
+  { Icon: HiChartBar,     title: "Impact Measurement",      desc: "Quantifying outcomes across PRIME's portfolio — jobs created, revenue generated, funding accessed, and enterprises sustained." },
+  { Icon: HiEye,          title: "Field Monitoring",        desc: "On-ground verification by district teams ensuring programme delivery matches commitments to beneficiary entrepreneurs." },
+  { Icon: HiDatabase,     title: "MIS & Data Systems",      desc: "Management Information Systems tracking every registered entrepreneur, application, and scheme disbursement across PRIME." },
+  { Icon: HiClipboardList, title: "Programme Evaluation",  desc: "Structured periodic evaluations assessing effectiveness, relevance, and efficiency of PRIME's schemes and interventions." },
+  { Icon: HiSearch,       title: "Third-party Assessment",  desc: "Independent evaluations commissioned to provide unbiased analysis of PRIME's impact on Meghalaya's entrepreneurship ecosystem." },
+  { Icon: HiDocumentText, title: "Reporting & Compliance", desc: "Annual impact reports, government submissions, donor reporting, and accountability documentation for all PRIME programmes." },
 ];
 
 const initiatives = [
-  { num: "01", title: "Founder Stories",      desc: "Documentary and editorial features highlighting entrepreneurs from across Meghalaya's 12 districts." },
-  { num: "02", title: "PRIME Media Lab",       desc: "A dedicated content and communications unit producing campaign material, reports, and programme collateral." },
-  { num: "03", title: "M&E Startup Support",   desc: "Tailored incubation and funding linkages for media and entertainment startups registered under PRIME." },
-  { num: "04", title: "Cinema Theatre Scheme", desc: "CM Elevate support for establishment of cinema theatres — promoting culture and the creative economy." },
+  { num: "01", title: "Annual Impact Report",       desc: "Comprehensive year-end publication documenting PRIME's reach, outcomes, case studies, and ecosystem-level impact across all sectors." },
+  { num: "02", title: "Real-time MIS Dashboard",    desc: "A live dashboard tracking beneficiary numbers, funding disbursements, scheme uptake, and programme milestones across all districts." },
+  { num: "03", title: "District Monitoring Visits", desc: "Structured field visits by PRIME district officers to verify programme implementation and collect ground-level feedback from entrepreneurs." },
+  { num: "04", title: "Outcome Tracking Framework", desc: "A standardised results framework defining indicators, baselines, and targets for each PRIME programme — enabling consistent progress measurement." },
 ];
 
-export default function MediaEntertainmentPage() {
+export default function MonitoringEvaluationPage() {
   return (
     <>
       <Navbar />
@@ -36,8 +36,8 @@ export default function MediaEntertainmentPage() {
 
         <PageHero
           breadcrumb="Sectors of PRIME"
-          title="Media & Entertainment"
-          subtitle="Amplifying the PRIME ecosystem through storytelling, outreach, and a thriving creative sector — while supporting Meghalaya's media and entertainment entrepreneurs."
+          title="Monitoring & Evaluation"
+          subtitle="Tracking impact, measuring outcomes, and ensuring PRIME delivers evidence-based results for every entrepreneur in Meghalaya."
         />
 
         {/* Focus areas */}
@@ -47,11 +47,11 @@ export default function MediaEntertainmentPage() {
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-8 h-px bg-[#2D6A4F]" />
                 <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
-                  What We Cover
+                  What We Do
                 </p>
               </div>
               <h2 className="font-black text-black leading-[0.9] tracking-tight" style={{ fontSize: "var(--text-heading)" }}>
-                The full spectrum of media & entertainment
+                How PRIME measures what matters
               </h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.07] border border-black/[0.07]">
@@ -77,7 +77,7 @@ export default function MediaEntertainmentPage() {
                 </p>
               </div>
               <h2 className="font-black text-black leading-[0.9] tracking-tight" style={{ fontSize: "var(--text-heading)" }}>
-                Key programmes & projects
+                Key M&E programmes
               </h2>
             </div>
             <div className="border-t border-black/[0.08]">
@@ -100,14 +100,14 @@ export default function MediaEntertainmentPage() {
             <div className="flex items-center gap-4 mb-10">
               <span className="w-8 h-px bg-[#2D6A4F]" />
               <p className="font-semibold tracking-[0.25em] uppercase text-white/30" style={{ fontSize: "var(--text-label)" }}>
-                Work With Us
+                Data & Insights
               </p>
             </div>
             <h2 className="font-black text-white leading-[0.9] tracking-tight mb-8 max-w-2xl" style={{ fontSize: "var(--text-heading)" }}>
-              Tell Meghalaya's entrepreneurship story.
+              Access PRIME's impact data.
             </h2>
             <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
-              Whether you are a media professional, content creator, or entertainment entrepreneur — reach out to explore how PRIME's M&E sector can support your work.
+              For data requests, evaluation reports, or programme performance information, reach out to the PRIME M&E team.
             </p>
             <a
               href="mailto:info@primemeghalaya.com"

@@ -57,8 +57,8 @@ const services: { num: string; title: string; description: string; href: string;
   },
   {
     num: "06",
-    title: "Media & Entertainment",
-    description: "Outreach, storytelling, and communications — amplifying the PRIME ecosystem and its founders.",
+    title: "Monitoring & Evaluation",
+    description: "Impact tracking, field monitoring, and data-driven evaluation ensuring PRIME delivers measurable results.",
     href: "/media-entertainment",
     Icon: HiSpeakerphone,
     color: "#8B5CF6",
