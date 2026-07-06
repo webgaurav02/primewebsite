@@ -40,10 +40,10 @@ const footerColumns = [
 ];
 
 const socials = [
-  { label: "Facebook",  href: "#", Icon: FaFacebook   },
-  { label: "Instagram", href: "#", Icon: FaInstagram  },
-  { label: "LinkedIn",  href: "#", Icon: FaLinkedinIn },
-  { label: "YouTube",   href: "#", Icon: FaYoutube    },
+  { label: "Facebook",  href: "https://www.facebook.com/primemeghalaya/",                        Icon: FaFacebook   },
+  { label: "Instagram", href: "https://www.instagram.com/primemeghalaya/",                       Icon: FaInstagram  },
+  { label: "LinkedIn",  href: "https://in.linkedin.com/company/prime-startup-meghalaya",         Icon: FaLinkedinIn },
+  { label: "YouTube",   href: "https://www.youtube.com/channel/UCqVwccQWXyVIc-v6lg_0nbw",       Icon: FaYoutube    },
 ];
 
 export default function Footer() {
