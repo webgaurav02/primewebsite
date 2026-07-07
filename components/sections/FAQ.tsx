@@ -75,7 +75,7 @@ export default function FAQ() {
                 >
                   Questions<br />
                   we get<br />
-                  asked a lot.
+                  asked a lot
                 </h2>
                 <Image
                   src="/assets/question-mark.png"
