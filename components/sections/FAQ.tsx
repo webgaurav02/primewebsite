@@ -68,7 +68,7 @@ export default function FAQ() {
               </div>
 
               {/* Heading + ? side by side */}
-              <div className="flex items-center gap-4 mb-10">
+              <div className="flex items-end gap-4 mb-10">
                 <h2
                   className="font-black text-black leading-[0.9] tracking-tight"
                   style={{ fontSize: "clamp(2rem, 4vw, 3.75rem)" }}
@@ -84,7 +84,7 @@ export default function FAQ() {
                   width={400}
                   height={600}
                   className="shrink-0 select-none pointer-events-none"
-                  style={{ height: "clamp(7rem, 16vw, 14rem)", width: "auto" }}
+                  style={{ height: "clamp(4.5rem, 10vw, 10rem)", width: "auto" }}
                 />
               </div>
 
