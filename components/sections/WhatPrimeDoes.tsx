@@ -11,6 +11,7 @@ import {
   HiBriefcase,
   HiSpeakerphone,
   HiLink,
+  HiNewspaper,
 } from "react-icons/hi";
 import type { IconType } from "react-icons";
 
@@ -70,6 +71,14 @@ const services: { num: string; title: string; description: string; href: string;
     href: "/admin-governance",
     Icon: HiUsers,
     color: "#3B82F6",
+  },
+  {
+    num: "08",
+    title: "Media & Comms",
+    description: "Communications, press relations, and media outreach amplifying PRIME's impact and stories.",
+    href: "#",
+    Icon: HiNewspaper,
+    color: "#EC4899",
   },
 ];
 

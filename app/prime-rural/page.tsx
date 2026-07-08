@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PrimeRural from "@/components/sections/PrimeRural";
@@ -190,6 +191,18 @@ export default function PrimeRuralPage() {
           </div>
         </section>
 
+        {/* Full-width rural photo */}
+        <div className="w-full aspect-[21/9] overflow-hidden">
+          <Image
+            src="/assets/prime-rural.jpg"
+            alt="PRIME Rural entrepreneurs"
+            width={2100}
+            height={900}
+            className="w-full h-full object-cover object-center"
+            quality={90}
+          />
+        </div>
+
         {/* Role of a Fellow / Associate */}
         <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
           <div className="max-w-7xl mx-auto px-6 lg:px-10">
@@ -290,6 +303,18 @@ export default function PrimeRuralPage() {
             </div>
           </div>
         </section>
+
+        {/* Rural photo 2 */}
+        <div className="w-full aspect-[21/9] overflow-hidden">
+          <Image
+            src="/assets/prime-rural-1.jpg"
+            alt="PRIME Rural field work"
+            width={2100}
+            height={900}
+            className="w-full h-full object-cover object-center"
+            quality={90}
+          />
+        </div>
 
         {/* At a Glance — roles comparison */}
         <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
@@ -395,6 +420,17 @@ export default function PrimeRuralPage() {
                 Applications not adhering to the requirements or process will be disqualified.
               </p>
             </div>
+            <div className="flex flex-col gap-6">
+              <div className="w-full aspect-[4/3] overflow-hidden">
+                <Image
+                  src="/assets/prime-rural-2.jpg"
+                  alt="PRIME Rural community"
+                  width={800}
+                  height={600}
+                  className="w-full h-full object-cover object-center"
+                  quality={90}
+                />
+              </div>
             <div className="bg-[#f5f5f5] border border-black/[0.07] p-8 md:p-10 space-y-6">
               <p
                 className="font-semibold text-black/60 leading-relaxed border-b border-black/[0.08] pb-6"
@@ -427,6 +463,7 @@ export default function PrimeRuralPage() {
                   </a>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </section>

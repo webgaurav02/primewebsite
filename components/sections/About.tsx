@@ -116,6 +116,7 @@ export default function About() {
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               sizes="(max-width: 768px) 50vw, 58vw"
+              quality={90}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
             <span className="absolute bottom-4 left-4 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
@@ -131,6 +132,7 @@ export default function About() {
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               sizes="(max-width: 768px) 50vw, 42vw"
+              quality={90}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             <span className="absolute bottom-3 left-3 text-white/70 font-semibold tracking-wide" style={{ fontSize: "10px" }}>
@@ -146,6 +148,7 @@ export default function About() {
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               sizes="(max-width: 768px) 50vw, 25vw"
+              quality={90}
             />
             <div className="absolute inset-0 bg-black/20" />
             <span className="absolute bottom-3 left-3 text-white/60 font-semibold tracking-wide" style={{ fontSize: "9px" }}>

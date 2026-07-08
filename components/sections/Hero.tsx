@@ -1,8 +1,16 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
+
+const HERO_IMAGES = [
+  { src: "/assets/home-5.jpg", position: "center 30%" },
+  { src: "/assets/home-7.jpg", position: "center 20%" },
+  { src: "/assets/home-1.jpg", position: "center 45%" },
+  { src: "/assets/home-2.jpg", position: "center 35%" },
+];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -12,22 +20,51 @@ export default function Hero() {
   const bgY            = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section
       ref={ref}
       className="relative flex items-center min-h-[100svh] overflow-hidden bg-[#1B4332]"
       aria-label="Hero — PRIME Meghalaya"
     >
-      {/* Background photo */}
-      <motion.div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/assets/images/hero-bg.jpg')", y: bgY }}
-      />
+      {/* Slideshow background */}
+      <motion.div className="absolute inset-0" style={{ y: bgY }}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={current}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+          >
+            <Image
+              src={HERO_IMAGES[current].src}
+              alt=""
+              fill
+              priority={current === 0}
+              className="object-cover"
+              style={{ objectPosition: HERO_IMAGES[current].position }}
+              sizes="100vw"
+              quality={95}
+              unoptimized
+            />
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
 
-      {/* Dark overlay — clean, no gradient */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/55" />
 
-      {/* Content — centred */}
+      {/* Content */}
       <motion.div
         className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 pt-44 pb-24 md:py-32 flex flex-col items-center text-center"
         style={{ opacity: contentOpacity }}
@@ -80,6 +117,20 @@ export default function Hero() {
           </Link>
         </motion.div>
       </motion.div>
+
+      {/* Slide dots */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+        {HERO_IMAGES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`transition-all duration-300 rounded-full ${
+              i === current ? "w-6 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/35 hover:bg-white/60"
+            }`}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))}
+      </div>
 
       {/* Scroll indicator */}
       <motion.div

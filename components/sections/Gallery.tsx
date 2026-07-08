@@ -46,6 +46,7 @@ export default function Gallery() {
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
+                quality={90}
               />
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <p className="absolute bottom-4 left-4 right-4 text-white font-semibold tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ fontSize: "11px" }}>

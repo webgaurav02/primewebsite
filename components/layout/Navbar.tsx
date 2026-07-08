@@ -116,6 +116,7 @@ const navLinks: NavLink[] = [
           heading: "Core Sectors",
           items: [
             { label: "Incubation",                    subtitle: "CM's E-Championship",       href: "/incubation",            icon: HiOfficeBuilding },
+            { label: "CM Elevate",                    subtitle: "Subsidy across 15 sectors", href: "/cm-elevate",            icon: HiTrendingUp     },
             { label: "PRIME Rural",                   subtitle: "Village-level enterprise",  href: "/prime-rural",           icon: HiHome           },
             { label: "Business Facilitation Service", subtitle: "Handholding & liaison",     href: "/business-facilitation", icon: HiBriefcase      },
             { label: "Partnership",                   subtitle: "Institutional alliances",   href: "#",                      icon: HiLink           },
@@ -124,9 +125,8 @@ const navLinks: NavLink[] = [
         {
           heading: "Support Sectors",
           items: [
-            { label: "CM Elevate",    subtitle: "Subsidy across 15 sectors", href: "/cm-elevate",        icon: HiTrendingUp   },
             { label: "Monitoring & Evaluation", subtitle: "Impact tracking & reporting", href: "/media-entertainment", icon: HiSpeakerphone },
-            { label: "Admin",         subtitle: "Operations & governance",   href: "/admin-governance",  icon: HiCog          },
+            { label: "Admin",                   subtitle: "Operations & governance",     href: "/admin-governance",    icon: HiCog          },
           ],
         },
       ],
