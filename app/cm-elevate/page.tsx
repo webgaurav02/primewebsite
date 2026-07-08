@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import Image from "next/image";
 import HoverCard from "@/components/ui/HoverCard";
 import {
   HiTrendingUp,
@@ -111,7 +111,9 @@ export default function CMElevatePage() {
               Financial support ranging from <strong className="text-black">35% to 75% of project cost</strong> is provided to selected applicants across a wide range of sectors — from agriculture and tourism to entertainment and wellness.
             </p>
           </div>
-          <ImagePlaceholder label="CM-Elevate Programme" className="aspect-[4/3]" />
+          <div className="aspect-[4/3] overflow-hidden">
+            <Image src="/assets/cm-elevate.jpg" alt="CM Elevate Programme" width={800} height={600} className="w-full h-full object-cover" />
+          </div>
         </div>
       </section>
 

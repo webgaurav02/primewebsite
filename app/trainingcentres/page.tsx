@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import Image from "next/image";
 import { HiCollection, HiDesktopComputer, HiArchive, HiChip, HiStar } from "react-icons/hi";
 import type { IconType } from "react-icons";
 
@@ -55,7 +55,9 @@ export default function TrainingCentresPage() {
               The best proposals are selected through a transparent competition process — awarding up to <strong className="text-black">₹50 Lakhs</strong> per selected training centre.
             </p>
           </div>
-          <ImagePlaceholder label="Training Centre" className="aspect-[4/3]" />
+          <div className="aspect-[4/3] overflow-hidden">
+            <Image src="/assets/incubation.jpg" alt="Training Centre" width={800} height={600} className="w-full h-full object-cover" />
+          </div>
         </div>
       </section>
 

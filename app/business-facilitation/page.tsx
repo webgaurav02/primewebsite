@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import Image from "next/image";
 import HoverCard from "@/components/ui/HoverCard";
 import {
   HiBell,
@@ -98,7 +98,9 @@ export default function BusinessFacilitationPage() {
       {/* Featured image */}
       <section className="bg-white texture-grid">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 pb-24 md:pb-36">
-          <ImagePlaceholder label="Business Facilitation in Action" className="w-full aspect-[16/7]" />
+          <div className="w-full aspect-[16/7] overflow-hidden">
+            <Image src="/assets/bfs.jpg" alt="Business Facilitation in Action" width={1400} height={612} className="w-full h-full object-cover" />
+          </div>
         </div>
       </section>
 

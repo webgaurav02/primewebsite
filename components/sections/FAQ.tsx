@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimateIn from "@/components/ui/AnimateIn";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import Image from "next/image";
 import {
   HiInformationCircle,
@@ -89,10 +88,15 @@ export default function FAQ() {
               </div>
 
               {/* Photo */}
-              <ImagePlaceholder
-                label="CM interacts with entrepreneurs"
-                className="w-full aspect-[4/3] mb-8"
-              />
+              <div className="w-full aspect-[4/3] mb-8 overflow-hidden">
+                <Image
+                  src="/assets/faq-cm.jpg"
+                  alt="CM interacts with entrepreneurs"
+                  width={800}
+                  height={600}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
               <p className="text-black/40 leading-[1.75]" style={{ fontSize: "var(--text-sm)" }}>
                 Can&apos;t find what you&apos;re looking for?{" "}

@@ -1,14 +1,13 @@
 import Image from "next/image";
 import AnimateIn from "@/components/ui/AnimateIn";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 
 const images = [
-  { src: "/assets/images/event-1.jpg",  label: "Act East Business Show", exists: true  },
-  { src: "/assets/images/event-2.jpg",  label: "Incubation Cohort",      exists: true  },
-  { src: "/assets/images/event-3.jpg",  label: "PRIME Hub Activity",     exists: true  },
-  { src: "/assets/images/team-bg.jpg",  label: "Team & Leadership",      exists: true  },
-  { src: "",                            label: "Event / Programme Photo", exists: false },
-  { src: "",                            label: "Event / Programme Photo", exists: false },
+  { src: "/assets/images/event-1.jpg", label: "Act East Business Show" },
+  { src: "/assets/images/event-2.jpg", label: "Incubation Cohort"      },
+  { src: "/assets/images/event-3.jpg", label: "PRIME Hub Activity"     },
+  { src: "/assets/images/team-bg.jpg", label: "Team & Leadership"      },
+  { src: "/assets/home-7.jpg",         label: "PRIME in Action"        },
+  { src: "/assets/sectors.jpg",        label: "Sectors Powering PRIME" },
 ];
 
 export default function Gallery() {
@@ -38,27 +37,23 @@ export default function Gallery() {
 
       {/* Full-bleed image strip */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-        {images.map((img, i) =>
-          img.exists ? (
-            <AnimateIn key={i} delay={i * 0.04} direction="up">
-              <div className="relative aspect-[3/4] overflow-hidden bg-black/10 group">
-                <Image
-                  src={img.src}
-                  alt={img.label}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
-                />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <p className="absolute bottom-4 left-4 right-4 text-white font-semibold tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ fontSize: "11px" }}>
-                  {img.label}
-                </p>
-              </div>
-            </AnimateIn>
-          ) : (
-            <ImagePlaceholder key={i} label={img.label} className="aspect-[3/4]" />
-          )
-        )}
+        {images.map((img, i) => (
+          <AnimateIn key={i} delay={i * 0.04} direction="up">
+            <div className="relative aspect-[3/4] overflow-hidden bg-black/10 group">
+              <Image
+                src={img.src}
+                alt={img.label}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
+              />
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <p className="absolute bottom-4 left-4 right-4 text-white font-semibold tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ fontSize: "11px" }}>
+                {img.label}
+              </p>
+            </div>
+          </AnimateIn>
+        ))}
       </div>
 
     </section>

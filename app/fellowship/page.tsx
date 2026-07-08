@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import Image from "next/image";
 
 const supportAreas = [
   "Registration & Licensing",
@@ -101,7 +101,9 @@ export default function FellowshipPage() {
             </p>
           </div>
           <div>
-            <ImagePlaceholder label="Fellowship in the Field" className="aspect-[4/3] mb-10" />
+            <div className="aspect-[4/3] overflow-hidden mb-10">
+              <Image src="/assets/prime-rural-1.jpg" alt="Fellowship in the Field" width={800} height={600} className="w-full h-full object-cover" />
+            </div>
             <div className="flex items-center gap-4 mb-8">
               <span className="w-8 h-px bg-[#2D6A4F]" />
               <p className="font-semibold tracking-[0.25em] uppercase text-black/35" style={{ fontSize: "var(--text-label)" }}>
