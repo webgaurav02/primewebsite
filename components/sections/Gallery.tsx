@@ -2,12 +2,12 @@ import Image from "next/image";
 import AnimateIn from "@/components/ui/AnimateIn";
 
 const images = [
-  { src: "/assets/images/event-1.jpg", label: "Act East Business Show" },
-  { src: "/assets/images/event-2.jpg", label: "Incubation Cohort"      },
-  { src: "/assets/images/event-3.jpg", label: "PRIME Hub Activity"     },
-  { src: "/assets/images/team-bg.jpg", label: "Team & Leadership"      },
-  { src: "/assets/home-7.jpg",         label: "PRIME in Action"        },
-  { src: "/assets/sectors.jpg",        label: "Sectors Powering PRIME" },
+  { src: "/assets/home-1.jpg",          label: "Act East Business Show"    },
+  { src: "/assets/bfs.jpg",             label: "BFS Training Session"      },
+  { src: "/assets/incubation.jpg",      label: "Incubation Programme"      },
+  { src: "/assets/partnership-mou.jpg", label: "Partnership & MoU"         },
+  { src: "/assets/home-7.jpg",          label: "CM at PRIME Urban"         },
+  { src: "/assets/dsc00880.jpg",        label: "Entrepreneur of the Month" },
 ];
 
 export default function Gallery() {

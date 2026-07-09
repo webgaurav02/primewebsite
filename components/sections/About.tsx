@@ -24,10 +24,10 @@ const pillars: { num: string; label: string; desc: string; Icon: IconType }[] = 
 ];
 
 const photos = [
-  { src: "/assets/images/about-image.jpg", label: "PRIME in Action"        },
-  { src: "/assets/images/event-1.jpg",     label: "Act East Business Show" },
-  { src: "/assets/images/event-2.jpg",     label: "Incubation Cohort"      },
-  { src: "/assets/images/event-3.jpg",     label: "PRIME Hub Activity"     },
+  { src: "/assets/sectors.jpg",        label: "PRIME Funding Ceremony",   position: "center 40%" },
+  { src: "/assets/partnership-bfs.jpg", label: "Entrepreneurs at Work",   position: "center center" },
+  { src: "/assets/dsc00767.jpg",        label: "Mentorship in Action",    position: "center center" },
+  { src: "/assets/bfs.jpg",             label: "BFS Training Session",    position: "center center" },
 ];
 
 export default function About() {
@@ -115,6 +115,7 @@ export default function About() {
               alt={photos[0].label}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              style={{ objectPosition: photos[0].position }}
               sizes="(max-width: 768px) 50vw, 58vw"
               quality={90}
             />
@@ -131,6 +132,7 @@ export default function About() {
               alt={photos[1].label}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              style={{ objectPosition: photos[1].position }}
               sizes="(max-width: 768px) 50vw, 42vw"
               quality={90}
             />
@@ -147,6 +149,7 @@ export default function About() {
               alt={photos[2].label}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              style={{ objectPosition: photos[2].position }}
               sizes="(max-width: 768px) 50vw, 25vw"
               quality={90}
             />
