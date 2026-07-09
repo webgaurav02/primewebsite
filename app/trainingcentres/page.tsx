@@ -94,6 +94,20 @@ export default function TrainingCentresPage() {
         </div>
       </section>
 
+      {/* Training images */}
+      <section className="bg-[#f5f5f5] pb-24 md:pb-36">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div className="aspect-[4/3] overflow-hidden">
+              <Image src="/assets/dsc02064.jpg" alt="PRIME training participants" width={700} height={525} quality={90} className="w-full h-full object-cover object-top" />
+            </div>
+            <div className="aspect-[4/3] overflow-hidden">
+              <Image src="/assets/partnership-bfs.jpg" alt="PRIME co-working training session" width={700} height={525} quality={90} className="w-full h-full object-cover object-top" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Categories */}
       <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">

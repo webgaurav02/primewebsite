@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHero from "@/components/ui/PageHero";
+import Image from "next/image";
 import { HiChartBar, HiClipboardList, HiDatabase, HiEye, HiSearch, HiDocumentText } from "react-icons/hi";
 import type { IconType } from "react-icons";
 import HoverCard from "@/components/ui/HoverCard";
@@ -62,6 +63,20 @@ export default function MonitoringEvaluationPage() {
                   <p className="text-black/45 leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>{f.desc}</p>
                 </HoverCard>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* M&E field images */}
+        <section className="bg-white pb-24 md:pb-36">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <div className="aspect-[4/3] overflow-hidden">
+                <Image src="/assets/me.jpg" alt="PRIME M&E diagnostic consultation" width={700} height={525} quality={90} className="w-full h-full object-cover" />
+              </div>
+              <div className="aspect-[4/3] overflow-hidden">
+                <Image src="/assets/me-team.jpg" alt="PRIME M&E team" width={700} height={525} quality={90} className="w-full h-full object-cover object-top" />
+              </div>
             </div>
           </div>
         </section>

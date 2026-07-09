@@ -90,6 +90,15 @@ export default function FundingSchemesPage() {
         </div>
       </section>
 
+      {/* Entrepreneurs receiving funding */}
+      <section className="bg-white pb-24 md:pb-36">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="w-full aspect-[16/7] overflow-hidden">
+            <Image src="/assets/sectors.jpg" alt="PRIME entrepreneurs receiving funding cheques" width={1400} height={612} quality={90} className="w-full h-full object-cover object-top" />
+          </div>
+        </div>
+      </section>
+
       {/* Schemes grid */}
       <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">

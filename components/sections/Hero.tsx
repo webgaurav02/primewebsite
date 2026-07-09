@@ -6,10 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 const HERO_IMAGES = [
-  { src: "/assets/home-5.jpg", position: "center 30%" },
-  { src: "/assets/home-7.jpg", position: "center 20%" },
-  { src: "/assets/home-1.jpg", position: "center 45%" },
-  { src: "/assets/home-2.jpg", position: "center 35%" },
+  { src: "/assets/sectors.jpg",    position: "center 40%" },
+  { src: "/assets/bfs.jpg",        position: "center 35%" },
+  { src: "/assets/incubation.jpg", position: "center 30%" },
+  { src: "/assets/home-7.jpg",     position: "center 20%" },
 ];
 
 const EASE = [0.22, 1, 0.36, 1] as const;

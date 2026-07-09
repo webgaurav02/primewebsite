@@ -129,6 +129,23 @@ export default function PartnersPage() {
           </div>
         </section>
 
+        {/* Partnership in action */}
+        <section className="bg-[#f5f5f5] pb-24 md:pb-36">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10">
+            <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <div className="aspect-[4/3] overflow-hidden">
+                <Image src="/assets/partnership-1.jpg" alt="PRIME international partnership meeting" width={600} height={450} quality={90} className="w-full h-full object-cover object-top" />
+              </div>
+              <div className="aspect-[4/3] overflow-hidden">
+                <Image src="/assets/partnership-mou.jpg" alt="PRIME MoU signing ceremony" width={600} height={450} quality={90} className="w-full h-full object-cover object-top" />
+              </div>
+              <div className="aspect-[4/3] overflow-hidden">
+                <Image src="/assets/photo42.jpg" alt="PRIME at International Purple Fest Goa 2025" width={600} height={450} quality={90} className="w-full h-full object-cover object-top" />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Registration form */}
         <section className="bg-white texture-grid py-24 md:py-36 border-t border-black/[0.06]">
           <div className="max-w-7xl mx-auto px-6 lg:px-10">

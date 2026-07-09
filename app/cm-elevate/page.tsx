@@ -117,6 +117,20 @@ export default function CMElevatePage() {
         </div>
       </section>
 
+      {/* Programme images */}
+      <section className="bg-white pb-24 md:pb-36">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div className="aspect-[16/10] overflow-hidden">
+              <Image src="/assets/cm-elevate-1.jpg" alt="CM Elevate field programme" width={800} height={500} quality={90} className="w-full h-full object-cover" />
+            </div>
+            <div className="aspect-[16/10] overflow-hidden">
+              <Image src="/assets/mda-gov.jpg" alt="CM Elevate government award ceremony" width={800} height={500} quality={90} className="w-full h-full object-cover object-top" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Objectives */}
       <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">

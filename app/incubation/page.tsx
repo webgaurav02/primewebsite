@@ -110,6 +110,15 @@ export default function IncubationPage() {
         </div>
       </section>
 
+      {/* Award ceremony image */}
+      <section className="bg-[#f5f5f5] pb-24 md:pb-36">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="w-full aspect-[16/7] overflow-hidden">
+            <Image src="/assets/dsc00880.jpg" alt="PRIME Entrepreneur of the Month award ceremony" width={1400} height={612} quality={90} className="w-full h-full object-cover object-top" />
+          </div>
+        </div>
+      </section>
+
       {/* Benefits + Objectives */}
       <section className="bg-white texture-grid py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 gap-16">

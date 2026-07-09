@@ -104,6 +104,23 @@ export default function BusinessFacilitationPage() {
         </div>
       </section>
 
+      {/* Diagnostic visit images */}
+      <section className="bg-white pb-24 md:pb-36">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            <div className="aspect-[4/3] overflow-hidden">
+              <Image src="/assets/diagnostic-visit.jpg" alt="PRIME field diagnostic visit" width={600} height={450} quality={90} className="w-full h-full object-cover" />
+            </div>
+            <div className="aspect-[4/3] overflow-hidden">
+              <Image src="/assets/diagnostic-visit-1.jpg" alt="BFS consultant with entrepreneur" width={600} height={450} quality={90} className="w-full h-full object-cover" />
+            </div>
+            <div className="aspect-[4/3] overflow-hidden">
+              <Image src="/assets/diagnostic-visit-2.jpg" alt="Product consultation session" width={600} height={450} quality={90} className="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Entrepreneur of the Month */}
       <section className="bg-[#f5f5f5] texture-dots py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
