@@ -129,7 +129,7 @@ export default function InvestorsPage() {
               Back the next generation of Northeast founders.
             </h2>
             <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
-              Whether you are an angel, a VC, or a development finance institution — PRIME can connect you with curated deal flow from Meghalaya's most promising founders.
+              Whether you are an angel, a VC, or a development finance institution — PRIME can connect you with curated deal flow from Meghalaya&apos;s most promising founders.
             </p>
             <a
               href="mailto:info@primemeghalaya.com"

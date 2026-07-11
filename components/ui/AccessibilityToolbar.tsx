@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { HiX, HiRefresh } from "react-icons/hi";
+
+const emptySubscribe = () => () => {};
+function useIsClient() {
+  return useSyncExternalStore(emptySubscribe, () => true, () => false);
+}
 
 type Settings = {
   fontSize: -1 | 0 | 1 | 2;
@@ -43,33 +48,47 @@ function applyToDOM(s: Settings) {
   h.classList.toggle("a11y-no-motion", s.reduceMotion);
 }
 
-export default function AccessibilityToolbar() {
-  const [open, setOpen]       = useState(false);
-  const [settings, setSettings] = useState<Settings>(DEFAULT);
-  const [guideY, setGuideY]   = useState(0);
-  const [mounted, setMounted] = useState(false);
+function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-pressed={on}
+      className={`flex items-center justify-between px-4 py-3 border text-left transition-all duration-150 w-full ${
+        on
+          ? "bg-[#1B4332] text-white border-[#1B4332]"
+          : "bg-white text-black/60 border-black/[0.1] hover:border-[#2D6A4F] hover:text-black"
+      }`}
+      style={{ fontSize: "var(--text-label)" }}
+    >
+      <span className="font-semibold">{label}</span>
+      <span className={`w-8 h-4 rounded-full flex items-center px-0.5 transition-colors duration-200 shrink-0 ${on ? "bg-[#74C69D]" : "bg-black/15"}`}>
+        <span className={`w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200 ${on ? "translate-x-4" : "translate-x-0"}`} />
+      </span>
+    </button>
+  );
+}
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    setMounted(true);
+export default function AccessibilityToolbar() {
+  const isClient = useIsClient();
+  const [open, setOpen]         = useState(false);
+  const [settings, setSettings] = useState<Settings>(() => {
     try {
-      const raw = localStorage.getItem(LS_KEY);
+      const raw = typeof localStorage !== "undefined" ? localStorage.getItem(LS_KEY) : null;
       if (raw) {
         const parsed = JSON.parse(raw) as Settings;
-        // Clamp fontSize to values the UI exposes; stale -1 (A−) maps to default
         if (![0, 1, 2].includes(parsed.fontSize)) parsed.fontSize = DEFAULT.fontSize;
-        setSettings(parsed);
-        applyToDOM(parsed);
+        return parsed;
       }
     } catch { /* ignore */ }
-  }, []);
+    return DEFAULT;
+  });
+  const [guideY, setGuideY] = useState(0);
 
-  // Sync to DOM + localStorage whenever settings change
+  // Sync settings → DOM + localStorage (write-only side effect)
   useEffect(() => {
-    if (!mounted) return;
     applyToDOM(settings);
     try { localStorage.setItem(LS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
-  }, [settings, mounted]);
+  }, [settings]);
 
   // Reading guide mouse tracking
   useEffect(() => {
@@ -89,7 +108,7 @@ export default function AccessibilityToolbar() {
     try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
   }, []);
 
-  if (!mounted) return null;
+  if (!isClient) return null;
 
   const hasActive =
     settings.fontSize !== DEFAULT.fontSize ||
@@ -98,27 +117,6 @@ export default function AccessibilityToolbar() {
     settings.highlightLinks ||
     settings.reduceMotion ||
     settings.readingGuide;
-
-  const Toggle = ({ keyName, label }: { keyName: "highContrast" | "grayscale" | "highlightLinks" | "reduceMotion" | "readingGuide"; label: string }) => {
-    const on = settings[keyName] as boolean;
-    return (
-      <button
-        onClick={() => toggle(keyName)}
-        aria-pressed={on}
-        className={`flex items-center justify-between px-4 py-3 border text-left transition-all duration-150 w-full ${
-          on
-            ? "bg-[#1B4332] text-white border-[#1B4332]"
-            : "bg-white text-black/60 border-black/[0.1] hover:border-[#2D6A4F] hover:text-black"
-        }`}
-        style={{ fontSize: "var(--text-label)" }}
-      >
-        <span className="font-semibold">{label}</span>
-        <span className={`w-8 h-4 rounded-full flex items-center px-0.5 transition-colors duration-200 shrink-0 ${on ? "bg-[#74C69D]" : "bg-black/15"}`}>
-          <span className={`w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200 ${on ? "translate-x-4" : "translate-x-0"}`} />
-        </span>
-      </button>
-    );
-  };
 
   const fontSizes: { val: Settings["fontSize"]; label: string; size: string }[] = [
     { val:  0, label: "A",   size: "12px" },
@@ -206,9 +204,9 @@ export default function AccessibilityToolbar() {
                 Vision
               </p>
               <div className="flex flex-col gap-1.5">
-                <Toggle keyName="highContrast"   label="High Contrast"    />
-                <Toggle keyName="grayscale"       label="Grayscale"        />
-                <Toggle keyName="highlightLinks"  label="Highlight Links"  />
+                <Toggle label="High Contrast"   on={settings.highContrast}   onToggle={() => toggle("highContrast")}   />
+                <Toggle label="Grayscale"        on={settings.grayscale}       onToggle={() => toggle("grayscale")}       />
+                <Toggle label="Highlight Links"  on={settings.highlightLinks}  onToggle={() => toggle("highlightLinks")}  />
               </div>
             </div>
 
@@ -218,8 +216,8 @@ export default function AccessibilityToolbar() {
                 Motion & Navigation
               </p>
               <div className="flex flex-col gap-1.5">
-                <Toggle keyName="reduceMotion"  label="Reduce Motion"  />
-                <Toggle keyName="readingGuide"  label="Reading Guide"  />
+                <Toggle label="Reduce Motion"  on={settings.reduceMotion}  onToggle={() => toggle("reduceMotion")}  />
+                <Toggle label="Reading Guide"  on={settings.readingGuide}  onToggle={() => toggle("readingGuide")}  />
               </div>
             </div>
 

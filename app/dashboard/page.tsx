@@ -678,87 +678,88 @@ function KnowledgeBase() {
   );
 }
 
+/* ── Sidebar ────────────────────────────────────────────────────────────── */
+function Sidebar({ active, setActive, onClose }: { active: Section; setActive: (s: Section) => void; onClose?: () => void }) {
+  return (
+    <aside className="w-64 bg-[#1B4332] flex flex-col h-full">
+      {/* Logo row */}
+      <div className="px-5 py-5 border-b border-white/[0.08] flex items-center justify-between">
+        <Link href="/" onClick={onClose}>
+          <Image
+            src="/logo-white.png"
+            alt="PRIME Meghalaya"
+            width={120}
+            height={38}
+            className="h-7 w-auto object-contain object-left"
+          />
+        </Link>
+        {onClose && (
+          <button className="text-white/40 hover:text-white transition-colors" onClick={onClose}>
+            <HiX size={20} />
+          </button>
+        )}
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 py-3 overflow-y-auto">
+        {NAV.map(({ id, label, Icon }) => {
+          const isActive = active === id;
+          return (
+            <button
+              key={id}
+              onClick={() => { setActive(id); onClose?.(); }}
+              className={`w-full flex items-center gap-3 px-5 py-3 font-semibold transition-all text-left group ${
+                isActive
+                  ? "bg-white/[0.1] text-white border-l-2 border-[#74C69D]"
+                  : "text-white/40 hover:text-white/80 hover:bg-white/[0.05] border-l-2 border-transparent"
+              }`}
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              <Icon size={17} className={isActive ? "text-[#74C69D]" : "group-hover:text-white/60"} />
+              {label}
+              {isActive && <HiChevronRight size={13} className="ml-auto text-white/20" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* User footer */}
+      <div className="border-t border-white/[0.08] p-4 flex items-center gap-3">
+        <div className="relative w-9 h-9 overflow-hidden bg-[#2D6A4F] flex-shrink-0 ring-1 ring-white/10">
+          <Image src={USER.avatar} alt={USER.name} fill className="object-cover object-top" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-semibold truncate leading-tight" style={{ fontSize: "var(--text-label)" }}>
+            {USER.shortName}
+          </p>
+          <p className="text-white/30 truncate" style={{ fontSize: "var(--text-label)" }}>{USER.business}</p>
+        </div>
+        <Link href="/" className="text-white/25 hover:text-white/60 transition-colors flex-shrink-0" title="Back to site">
+          <HiLogout size={16} />
+        </Link>
+      </div>
+    </aside>
+  );
+}
+
 /* ── Dashboard shell ────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const [active, setActive]       = useState<Section>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  function Sidebar({ onClose }: { onClose?: () => void }) {
-    return (
-      <aside className="w-64 bg-[#1B4332] flex flex-col h-full">
-        {/* Logo row */}
-        <div className="px-5 py-5 border-b border-white/[0.08] flex items-center justify-between">
-          <Link href="/" onClick={onClose}>
-            <Image
-              src="/logo-white.png"
-              alt="PRIME Meghalaya"
-              width={120}
-              height={38}
-              className="h-7 w-auto object-contain object-left"
-            />
-          </Link>
-          {onClose && (
-            <button className="text-white/40 hover:text-white transition-colors" onClick={onClose}>
-              <HiX size={20} />
-            </button>
-          )}
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 py-3 overflow-y-auto">
-          {NAV.map(({ id, label, Icon }) => {
-            const isActive = active === id;
-            return (
-              <button
-                key={id}
-                onClick={() => { setActive(id); onClose?.(); }}
-                className={`w-full flex items-center gap-3 px-5 py-3 font-semibold transition-all text-left group ${
-                  isActive
-                    ? "bg-white/[0.1] text-white border-l-2 border-[#74C69D]"
-                    : "text-white/40 hover:text-white/80 hover:bg-white/[0.05] border-l-2 border-transparent"
-                }`}
-                style={{ fontSize: "var(--text-sm)" }}
-              >
-                <Icon size={17} className={isActive ? "text-[#74C69D]" : "group-hover:text-white/60"} />
-                {label}
-                {isActive && <HiChevronRight size={13} className="ml-auto text-white/20" />}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* User footer */}
-        <div className="border-t border-white/[0.08] p-4 flex items-center gap-3">
-          <div className="relative w-9 h-9 overflow-hidden bg-[#2D6A4F] flex-shrink-0 ring-1 ring-white/10">
-            <Image src={USER.avatar} alt={USER.name} fill className="object-cover object-top" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold truncate leading-tight" style={{ fontSize: "var(--text-label)" }}>
-              {USER.shortName}
-            </p>
-            <p className="text-white/30 truncate" style={{ fontSize: "var(--text-label)" }}>{USER.business}</p>
-          </div>
-          <Link href="/" className="text-white/25 hover:text-white/60 transition-colors flex-shrink-0" title="Back to site">
-            <HiLogout size={16} />
-          </Link>
-        </div>
-      </aside>
-    );
-  }
 
   return (
     <div className="min-h-screen flex bg-[#f5f5f5]">
 
       {/* Desktop sidebar */}
       <div className="hidden lg:flex flex-col w-64 flex-shrink-0 h-screen sticky top-0">
-        <Sidebar />
+        <Sidebar active={active} setActive={setActive} />
       </div>
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="w-64 h-full flex flex-col shadow-2xl">
-            <Sidebar onClose={() => setSidebarOpen(false)} />
+            <Sidebar active={active} setActive={setActive} onClose={() => setSidebarOpen(false)} />
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setSidebarOpen(false)} />
         </div>

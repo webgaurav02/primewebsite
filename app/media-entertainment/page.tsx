@@ -119,7 +119,7 @@ export default function MonitoringEvaluationPage() {
               </p>
             </div>
             <h2 className="font-black text-white leading-[0.9] tracking-tight mb-8 max-w-2xl" style={{ fontSize: "var(--text-heading)" }}>
-              Access PRIME's impact data.
+              Access PRIME&apos;s impact data.
             </h2>
             <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
               For data requests, evaluation reports, or programme performance information, reach out to the PRIME M&E team.

@@ -177,7 +177,7 @@ export default function PartnersPage() {
               </p>
             </div>
             <h2 className="font-black text-white leading-[0.9] tracking-tight mb-8 max-w-2xl" style={{ fontSize: "var(--text-heading)" }}>
-              Build Meghalaya's entrepreneurship future, together.
+              Build Meghalaya&apos;s entrepreneurship future, together.
             </h2>
             <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
               Whether you are an institution, a corporate, or an international body — if your mission aligns with building entrepreneurs, we would like to hear from you.

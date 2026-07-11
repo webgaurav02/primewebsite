@@ -13,8 +13,8 @@ export default function PageLoader() {
 
   useEffect(() => {
     if (sessionStorage.getItem("prime-loaded")) {
-      setVisible(false);
-      return;
+      const id = requestAnimationFrame(() => setVisible(false));
+      return () => cancelAnimationFrame(id);
     }
 
     const start    = performance.now();

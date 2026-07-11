@@ -22,14 +22,14 @@ type FormData = {
   stage: string;        yearEstablished: string; address: string; description: string;
   employment: string;   livesImpacted: string;   turnover: string;
   govtFunding: string;  externalFunding: string; products: string; socialImpact: string;
-  declared: boolean;
+  declared: boolean;    refNum: string;
 };
 
 const empty: FormData = {
   firstName: "", lastName: "", email: "", phone: "", district: "", gender: "",
   businessName: "", sector: "", entityType: "", stage: "", yearEstablished: "", address: "", description: "",
   employment: "", livesImpacted: "", turnover: "", govtFunding: "", externalFunding: "", products: "", socialImpact: "",
-  declared: false,
+  declared: false, refNum: "",
 };
 
 /* ── Shared field components ───────────────────────────────────────────── */
@@ -258,6 +258,8 @@ export default function RegisterPage() {
   }
 
   function handleSubmit() {
+    const ref = String(Math.floor(Math.random() * 9000) + 1000);
+    setData((d) => ({ ...d, refNum: ref }));
     setLoading(true);
     setTimeout(() => { setLoading(false); setSubmitted(true); }, 1200);
   }
@@ -279,7 +281,7 @@ export default function RegisterPage() {
           <div className="bg-white border border-black/[0.08] p-5 mb-8 text-left">
             <p className="text-black/40 font-medium mb-1" style={{ fontSize: "var(--text-label)" }}>Your application reference</p>
             <p className="font-black text-[#2D6A4F]" style={{ fontSize: "var(--text-body)" }}>
-              PRIME-{data.district.toUpperCase().slice(0, 2)}-2026-{String(Math.floor(Math.random() * 9000) + 1000)}
+              PRIME-{data.district.toUpperCase().slice(0, 2)}-2026-{data.refNum}
             </p>
           </div>
           <button

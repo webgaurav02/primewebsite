@@ -153,7 +153,7 @@ export default function WhatPrimeDoes() {
           <div />
           <AnimateIn direction="right" delay={0.1}>
             <p className="text-black/45 leading-[1.75] mb-6" style={{ fontSize: "var(--text-lead)" }}>
-              Seven sectors make up the PRIME ecosystem — each playing a distinct role in Meghalaya's entrepreneurship mission.
+              Seven sectors make up the PRIME ecosystem — each playing a distinct role in Meghalaya&apos;s entrepreneurship mission.
             </p>
             <Link
               href="/about-us"
