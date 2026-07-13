@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiCheck, HiArrowRight, HiArrowLeft, HiCheckCircle } from "react-icons/hi";
 import { SECTOR_LABELS, DISTRICT_LABELS } from "@/lib/entrepreneurs-data";
+import { applyAction } from "./actions";
 
 /* ── Steps config ──────────────────────────────────────────────────────── */
 const STEPS = [
@@ -244,6 +245,7 @@ export default function RegisterPage() {
   const [data, setData] = useState<FormData>(empty);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function set(key: keyof FormData, value: string) {
     setData((d) => ({ ...d, [key]: value }));
@@ -257,11 +259,18 @@ export default function RegisterPage() {
     return true;
   }
 
-  function handleSubmit() {
-    const ref = String(Math.floor(Math.random() * 9000) + 1000);
-    setData((d) => ({ ...d, refNum: ref }));
+  async function handleSubmit() {
+    setError(null);
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); }, 1200);
+    const res = await applyAction({ ...data });
+    setLoading(false);
+    if (!res.ok) {
+      const first = Object.values(res.fieldErrors)[0]?.[0];
+      setError(first ?? "Something went wrong. Please review your details and try again.");
+      return;
+    }
+    setData((d) => ({ ...d, refNum: res.reference }));
+    setSubmitted(true);
   }
 
   if (submitted) {
@@ -412,6 +421,12 @@ export default function RegisterPage() {
           {step === 3 && <Step3 data={data} set={set} />}
           {step === 4 && <Step4 data={data} setDeclared={(v) => setData((d) => ({ ...d, declared: v }))} />}
         </div>
+
+        {error && (
+          <p className="mb-4 text-[#b91c1c]" style={{ fontSize: "var(--text-sm)" }} role="alert">
+            {error}
+          </p>
+        )}
 
         {/* ── Navigation buttons ───────────────────────────── */}
         <div className="flex items-center justify-between">

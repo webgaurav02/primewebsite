@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from "react-icons/hi";
+import { signInAction } from "./actions";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,11 +13,19 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    setTimeout(() => router.push("/dashboard"), 900);
+    const res = await signInAction({ email, password });
+    if (!res.ok) {
+      setLoading(false);
+      setError(res.error);
+      return;
+    }
+    router.push("/dashboard");
   }
 
   return (
@@ -128,6 +137,12 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
+            {error && (
+              <p className="text-[#b91c1c]" style={{ fontSize: "var(--text-sm)" }} role="alert">
+                {error}
+              </p>
+            )}
+
             {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label
@@ -166,7 +181,7 @@ export default function LoginPage() {
                   Password
                 </label>
                 <Link
-                  href="#"
+                  href="/forgot-password"
                   className="text-[#2D6A4F] hover:text-[#1B4332] transition-colors"
                   style={{ fontSize: "var(--text-label)" }}
                 >
