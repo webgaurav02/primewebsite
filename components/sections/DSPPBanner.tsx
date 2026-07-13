@@ -33,7 +33,7 @@ export default function DSPPBanner() {
             Visit PRIME DSPP <span>→</span>
           </a>
           <Link
-            href="/prime-rural"
+            href="/prime-dspp"
             className="inline-flex items-center gap-3 px-8 py-4 border border-white/15 text-white/50 font-semibold hover:border-white/40 hover:text-white transition-all duration-300"
             style={{ fontSize: "var(--text-sm)" }}
           >
