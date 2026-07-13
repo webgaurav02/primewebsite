@@ -17,7 +17,7 @@ export default function DSPPBanner() {
             PRIME DSPP
           </h2>
           <p className="text-white/40 mt-3 max-w-md leading-relaxed" style={{ fontSize: "var(--text-sm)" }}>
-            District Startup Promotion Programme — supporting grassroots entrepreneurs across every district in Meghalaya.
+            Meghalaya&apos;s doorstep services platform — book verified professionals for cleaning, electrical, plumbing, carpentry, and more.
           </p>
         </div>
 
