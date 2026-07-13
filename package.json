@@ -6,14 +6,23 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "node --env-file=.env.local db/migrate.ts",
+    "db:seed": "node --env-file=.env.local db/seed-dev.ts",
+    "test:db:setup": "createdb prime_portal_test 2>/dev/null; DATABASE_URL_MIGRATOR=postgres://$USER@localhost:5432/prime_portal_test NODE_ENV=development node db/migrate.ts",
+    "pretest": "npm run test:db:setup",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "framer-motion": "^12.42.0",
     "next": "16.2.9",
+    "postgres": "^3.4.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-icons": "^5.7.0"
+    "react-icons": "^5.7.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -23,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
