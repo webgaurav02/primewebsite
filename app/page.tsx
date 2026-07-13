@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import WhatPrimeDoes from "@/components/sections/WhatPrimeDoes";
+import DSPPBanner from "@/components/sections/DSPPBanner";
 import Stats from "@/components/sections/Stats";
 import EntrepreneursOfPrime from "@/components/sections/EntrepreneursOfPrime";
 import Gallery from "@/components/sections/Gallery";
@@ -18,6 +19,7 @@ export default function Home() {
         <Stats />
         <About />
         <WhatPrimeDoes />
+        <DSPPBanner />
         <EntrepreneursOfPrime />
         <Gallery />
         <FAQ />
