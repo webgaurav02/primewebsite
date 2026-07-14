@@ -7,7 +7,8 @@ import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { newToken } from "@/lib/auth/tokens";
 import { sendEmail, appBaseUrl } from "@/lib/email";
 import { decryptPII } from "@/lib/crypto/pii";
-import type { Persona, UserStatus } from "@/lib/users/types";
+import { imageDataUrl } from "@/lib/storage";
+import type { Persona, RegistrantType, UserStatus } from "@/lib/users/types";
 
 /**
  * Admin-facing Data Access Layer for the unified user database (applicants +
@@ -26,7 +27,8 @@ export interface UserListItem {
   id: string;
   fullName: string;
   email: string;
-  persona: Persona;
+  persona: Persona | null;
+  registrantType: RegistrantType | null;
   status: UserStatus;
   district: string | null;
   businessName: string | null;
@@ -34,10 +36,34 @@ export interface UserListItem {
   createdAt: string;
 }
 
+export interface BusinessDetail {
+  businessName: string | null;
+  sector: string | null;
+  entityType: string | null;
+  stage: string | null;
+  yearEstablished: number | null;
+  address: string | null;
+  description: string | null;
+  employmentCount: number | null;
+  livesImpacted: number | null;
+  turnover: string | null;
+  govtFunding: string | null;
+  externalFunding: string | null;
+  products: string | null;
+  socialImpact: string | null;
+}
+
 export interface UserDetail extends UserListItem {
+  source: string | null;
   mobile: string | null;
   gender: string | null;
-  organizationId: string | null;
+  dateOfBirth: string | null;
+  preferredLanguage: string | null;
+  howHeard: string | null;
+  guardianName: string | null;
+  guardianRelationship: string | null;
+  photoDataUrl: string | null;
+  business: BusinessDetail | null;
 }
 
 export async function listUsers(filters?: {
@@ -56,7 +82,8 @@ export async function listUsers(filters?: {
         id: string;
         fullName: string;
         email: string;
-        persona: Persona;
+        persona: Persona | null;
+        registrantType: RegistrantType | null;
         status: UserStatus;
         district: string | null;
         businessName: string | null;
@@ -64,7 +91,8 @@ export async function listUsers(filters?: {
         createdAt: Date;
       }[]
     >`
-      SELECT u.id, u.full_name AS "fullName", u.email, u.persona, u.status,
+      SELECT u.id, u.full_name AS "fullName", u.email, u.persona,
+             u.registrant_type AS "registrantType", u.status,
              u.district, ep.business_name AS "businessName",
              (u.email_verified_at IS NOT NULL) AS activated,
              u.created_at AS "createdAt"
@@ -96,28 +124,38 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
   assertCan(viewer, "user:manage");
   if (!UUID_RE.test(id)) return null;
 
-  return withAdminContext(viewer, async (tx) => {
+  const detail = await withAdminContext(viewer, async (tx) => {
     const [row] = await tx<
       {
-        id: string;
-        fullName: string;
-        email: string;
-        persona: Persona;
-        status: UserStatus;
-        district: string | null;
-        businessName: string | null;
-        activated: boolean;
-        createdAt: Date;
-        mobileEnc: Buffer | null;
-        gender: string | null;
-        organizationId: string | null;
+        id: string; fullName: string; email: string;
+        persona: Persona | null; registrantType: RegistrantType | null;
+        status: UserStatus; district: string | null; activated: boolean;
+        createdAt: Date; source: string | null; mobileEnc: Buffer | null;
+        gender: string | null; dateOfBirth: Date | null;
+        preferredLanguage: string | null; howHeard: string | null;
+        guardianName: string | null; guardianRelationship: string | null;
+        photoPath: string | null;
+        businessName: string | null; sector: string | null; entityType: string | null;
+        stage: string | null; yearEstablished: number | null; address: string | null;
+        description: string | null; employmentCount: number | null; livesImpacted: number | null;
+        turnover: string | null; govtFunding: string | null; externalFunding: string | null;
+        products: string | null; socialImpact: string | null;
       }[]
     >`
-      SELECT u.id, u.full_name AS "fullName", u.email, u.persona, u.status,
-             u.district, ep.business_name AS "businessName",
+      SELECT u.id, u.full_name AS "fullName", u.email, u.persona,
+             u.registrant_type AS "registrantType", u.status, u.district,
              (u.email_verified_at IS NOT NULL) AS activated,
-             u.created_at AS "createdAt", u.mobile_enc AS "mobileEnc",
-             u.gender::text AS gender, u.organization_id AS "organizationId"
+             u.created_at AS "createdAt", u.source::text AS source,
+             u.mobile_enc AS "mobileEnc", u.gender::text AS gender,
+             u.date_of_birth AS "dateOfBirth", u.preferred_language AS "preferredLanguage",
+             u.how_heard AS "howHeard", u.guardian_name AS "guardianName",
+             u.guardian_relationship AS "guardianRelationship", u.photo_path AS "photoPath",
+             ep.business_name AS "businessName", ep.sector, ep.entity_type AS "entityType",
+             ep.stage, ep.year_established AS "yearEstablished", ep.address,
+             ep.description, ep.employment_count AS "employmentCount",
+             ep.lives_impacted AS "livesImpacted", ep.turnover,
+             ep.govt_funding AS "govtFunding", ep.external_funding AS "externalFunding",
+             ep.products, ep.social_impact AS "socialImpact"
       FROM app_user u
       LEFT JOIN entrepreneur_profile ep ON ep.user_id = u.id
       WHERE u.id = ${id}
@@ -129,21 +167,38 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
       tx,
     );
 
+    const business: BusinessDetail | null = row.businessName
+      ? {
+          businessName: row.businessName, sector: row.sector, entityType: row.entityType,
+          stage: row.stage, yearEstablished: row.yearEstablished, address: row.address,
+          description: row.description, employmentCount: row.employmentCount,
+          livesImpacted: row.livesImpacted, turnover: row.turnover,
+          govtFunding: row.govtFunding, externalFunding: row.externalFunding,
+          products: row.products, socialImpact: row.socialImpact,
+        }
+      : null;
+
     return {
-      id: row.id,
-      fullName: row.fullName,
-      email: row.email,
-      persona: row.persona,
-      status: row.status,
-      district: row.district,
-      businessName: row.businessName,
-      activated: row.activated,
-      createdAt: row.createdAt.toISOString(),
-      mobile: row.mobileEnc ? decryptPII(row.mobileEnc) : null,
-      gender: row.gender,
-      organizationId: row.organizationId,
+      photoPath: row.photoPath,
+      detail: {
+        id: row.id, fullName: row.fullName, email: row.email, persona: row.persona,
+        registrantType: row.registrantType, status: row.status, district: row.district,
+        businessName: row.businessName, activated: row.activated,
+        createdAt: row.createdAt.toISOString(), source: row.source,
+        mobile: row.mobileEnc ? decryptPII(row.mobileEnc) : null, gender: row.gender,
+        dateOfBirth: row.dateOfBirth ? row.dateOfBirth.toISOString().slice(0, 10) : null,
+        preferredLanguage: row.preferredLanguage, howHeard: row.howHeard,
+        guardianName: row.guardianName, guardianRelationship: row.guardianRelationship,
+        photoDataUrl: null as string | null, business,
+      },
     };
   });
+
+  if (!detail) return null;
+  // Fetch the photo AFTER the DB txn (network call); inline as a data URL for the
+  // admin CSP (img-src 'self' blob: data:).
+  const photoDataUrl = detail.photoPath ? await imageDataUrl(detail.photoPath) : null;
+  return { ...detail.detail, photoDataUrl };
 }
 
 /** Set an app_user's status (approve / suspend / reactivate) with audit. */

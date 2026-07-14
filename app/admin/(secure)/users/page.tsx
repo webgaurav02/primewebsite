@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { listUsers } from "@/lib/dal/users";
 import type { Persona, UserStatus } from "@/lib/users/types";
+import { REGISTRANT_TYPE_LABELS } from "@/lib/users/types";
 import {
   approveUserAction,
   suspendUserAction,
@@ -39,10 +41,10 @@ export default async function UsersPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Users &amp; Applicants</h1>
+      <h1 className="text-2xl font-semibold">Users</h1>
       <p className="mt-1 text-sm text-zinc-500">
-        {users.length} record(s). Approving a pending applicant emails them a
-        set-password link.
+        {users.length} member(s). Members register themselves and are active
+        immediately — click a name for full details, or suspend / reactivate access.
       </p>
 
       <div className="mt-4 flex gap-2">
@@ -67,7 +69,7 @@ export default async function UsersPage({
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Persona</th>
+              <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3">Venture</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Login</th>
@@ -77,9 +79,11 @@ export default async function UsersPage({
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-b border-zinc-100 last:border-0">
-                <td className="px-4 py-3 font-medium text-zinc-900">{u.fullName}</td>
+                <td className="px-4 py-3 font-medium text-zinc-900">
+                  <Link href={`/admin/users/${u.id}`} className="hover:underline">{u.fullName}</Link>
+                </td>
                 <td className="px-4 py-3 text-zinc-600">{u.email}</td>
-                <td className="px-4 py-3 capitalize">{u.persona}</td>
+                <td className="px-4 py-3">{u.registrantType ? REGISTRANT_TYPE_LABELS[u.registrantType] : (u.persona ?? "—")}</td>
                 <td className="px-4 py-3 text-zinc-600">{u.businessName ?? "—"}</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLE[u.status]}`}>
