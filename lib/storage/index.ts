@@ -60,7 +60,11 @@ export async function uploadUserImage(
   if (!kind) return { ok: false, error: "Upload a JPEG, PNG, or WebP image." };
 
   const key = `${prefix}/${userId}/${crypto.randomUUID()}.${kind.ext}`;
-  await r2Put(key, buffer, kind.mime);
+  try {
+    await r2Put(key, buffer, kind.mime);
+  } catch {
+    return { ok: false, error: "Upload failed. Please try again." };
+  }
   return { ok: true, key };
 }
 
@@ -90,7 +94,11 @@ export async function uploadUserFile(
   if (!kind) return { ok: false, error: "Upload a PDF, JPEG, PNG, or WebP file." };
 
   const key = `${prefix}/${userId}/${crypto.randomUUID()}.${kind.ext}`;
-  await r2Put(key, buffer, kind.mime);
+  try {
+    await r2Put(key, buffer, kind.mime);
+  } catch {
+    return { ok: false, error: "Upload failed. Please try again." };
+  }
   return { ok: true, key, mime: kind.mime, size: buffer.length };
 }
 

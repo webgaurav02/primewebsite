@@ -33,14 +33,21 @@ export const PURPOSE_LABELS: Record<ConsentPurpose, string> = {
 /** Age of majority for the DPDP minor (guardian-consent) flow. */
 export const AGE_OF_MAJORITY = 18;
 
-/** Completed years of age from an ISO date-of-birth string (UTC-safe enough for a gate). */
+// PRIME operates in Meghalaya; the age gate is decided on the Indian Standard
+// Time (UTC+5:30) civil calendar so the boundary flips at IST midnight of the
+// 18th birthday — not at UTC midnight, which would be off by up to a day.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+/** Completed years of age from an ISO date-of-birth string, on the IST civil date. */
 export function ageFromDob(dob: string): number {
-  const d = new Date(dob);
-  if (Number.isNaN(d.getTime())) return NaN;
-  const now = new Date();
-  let age = now.getUTCFullYear() - d.getUTCFullYear();
-  const m = now.getUTCMonth() - d.getUTCMonth();
-  if (m < 0 || (m === 0 && now.getUTCDate() < d.getUTCDate())) age--;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dob.trim());
+  if (!m) return NaN;
+  const [by, bm, bd] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  // "Today" as an IST civil date: shift the instant by +5:30 then read UTC parts.
+  const ist = new Date(Date.now() + IST_OFFSET_MS);
+  const ty = ist.getUTCFullYear(), tm = ist.getUTCMonth() + 1, td = ist.getUTCDate();
+  let age = ty - by;
+  if (tm < bm || (tm === bm && td < bd)) age--;
   return age;
 }
 

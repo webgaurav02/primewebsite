@@ -205,17 +205,26 @@ export async function registerUser(
     return { ok: true }; // uniform response — no session, no enumeration
   }
 
-  // Upload the (already-validated) photo AFTER commit, bound to the real user id.
+  // Verify email first — its delivery must not depend on object storage.
+  await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
+
+  // Best-effort: upload the (already-validated) photo AFTER commit, bound to the
+  // real user id. A storage failure must NEVER sink a registration that already
+  // durably committed — the photo is optional and can be added later from the
+  // account area, so we swallow any error here.
   if (photoBuffer) {
-    const up = await uploadUserImage("avatars", outcome.userId, photoBuffer);
-    if (up.ok) {
-      await withAuthContext(
-        (tx) => tx`UPDATE app_user SET photo_path = ${up.key} WHERE id = ${outcome.userId}`,
-      );
+    try {
+      const up = await uploadUserImage("avatars", outcome.userId, photoBuffer);
+      if (up.ok) {
+        await withAuthContext(
+          (tx) => tx`UPDATE app_user SET photo_path = ${up.key} WHERE id = ${outcome.userId}`,
+        );
+      }
+    } catch {
+      // ignore — account + session already succeeded; photo can be set later.
     }
   }
 
-  await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
   return { ok: true, session: { token: outcome.sessionToken, maxAge: USER_SESSION_MAX_AGE } };
 }
 
