@@ -57,9 +57,18 @@ export default function PrimeIdCard({ card }: { card: PrimeIdCardDTO }) {
         </div>
 
         <div className="px-6 py-5 text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#1B4332]/10 text-2xl font-bold text-[#1B4332]">
-            {card.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-          </div>
+          {card.photoDataUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={card.photoDataUrl}
+              alt={card.fullName}
+              className="mx-auto h-24 w-24 rounded-full object-cover ring-2 ring-[#1B4332]/15"
+            />
+          ) : (
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#1B4332]/10 text-2xl font-bold text-[#1B4332]">
+              {card.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+            </div>
+          )}
           <p className="mt-3 text-lg font-bold text-black">{card.fullName}</p>
           <p className="text-sm text-black/50">{role}</p>
           {card.category && (

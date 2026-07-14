@@ -18,6 +18,7 @@ import {
   revokeSchema,
   rejectSchema,
 } from "@/lib/validation/prime-id";
+import { imageDataUrl } from "@/lib/storage";
 
 /**
  * Data Access Layer for PRIME ID credentials. Issuance is the security-critical
@@ -68,12 +69,12 @@ export async function requestPrimeId(raw: unknown): Promise<RequestResult> {
     await tx`
       INSERT INTO prime_id_request
         (user_id, holder_type, custom_role_label, category, venture_name,
-         district, full_name, custom_details, status)
+         district, full_name, photo_path, custom_details, status)
       VALUES
         (${user.id}, ${d.holderType}, ${d.customRoleLabel || null}, ${d.category},
          ${d.ventureName || profile?.ventureName || null},
          ${profile?.district ?? ""}, ${profile?.fullName ?? ""},
-         ${JSON.stringify(d.customDetails)}::jsonb, 'pending')`;
+         ${d.photoPath || null}, ${JSON.stringify(d.customDetails)}::jsonb, 'pending')`;
 
     await recordAudit(
       { actor: { kind: "system", id: user.id, email: user.email },
@@ -105,50 +106,61 @@ export interface PrimeIdCardDTO {
   customDetails: { label: string; value: string }[];
   verifyUrl: string;
   tokenFingerprint: string;
+  photoDataUrl: string | null;
 }
 
 export async function getMyPrimeId(): Promise<MyPrimeIdState> {
   const user = await requireUser();
-  return withUserContext(user.id, async (tx) => {
+
+  const { request, cred } = await withUserContext(user.id, async (tx) => {
     const [req] = await tx<{ status: RequestStatus; rejectionReason: string | null }[]>`
       SELECT status, rejection_reason AS "rejectionReason"
       FROM prime_id_request WHERE user_id = ${user.id}
       ORDER BY requested_at DESC LIMIT 1`;
 
-    const [cred] = await tx<
+    const [c] = await tx<
       {
         id: string; fullName: string; holderType: HolderType;
         customRoleLabel: string | null; category: Category | null;
         ventureName: string | null; district: string; issueDate: Date;
         validThru: Date; status: CredStatus; customDetails: { label: string; value: string }[];
-        token: string; tokenFingerprint: string;
+        token: string; tokenFingerprint: string; photoPath: string | null;
       }[]
     >`
       SELECT id, full_name AS "fullName", holder_type AS "holderType",
              custom_role_label AS "customRoleLabel", category,
              venture_name AS "ventureName", district, issue_date AS "issueDate",
              valid_thru AS "validThru", status, custom_details AS "customDetails",
-             token, token_fingerprint AS "tokenFingerprint"
+             token, token_fingerprint AS "tokenFingerprint", photo_path AS "photoPath"
       FROM prime_id_credential
       WHERE user_id = ${user.id}
       ORDER BY created_at DESC LIMIT 1`;
 
     return {
       request: req ? { status: req.status, rejectionReason: req.rejectionReason } : null,
-      credential: cred
-        ? {
-            id: cred.id, fullName: cred.fullName, holderType: cred.holderType,
-            customRoleLabel: cred.customRoleLabel, category: cred.category,
-            ventureName: cred.ventureName, district: cred.district,
-            issueDate: cred.issueDate.toISOString().slice(0, 10),
-            validThru: cred.validThru.toISOString().slice(0, 10),
-            status: cred.status, customDetails: cred.customDetails,
-            verifyUrl: buildVerifyUrl(cred.token),
-            tokenFingerprint: cred.tokenFingerprint,
-          }
-        : null,
+      cred: c ?? null,
     };
   });
+
+  // Fetch the photo AFTER the DB transaction (network call, don't hold the conn).
+  const photoDataUrl = cred?.photoPath ? await imageDataUrl(cred.photoPath) : null;
+
+  return {
+    request,
+    credential: cred
+      ? {
+          id: cred.id, fullName: cred.fullName, holderType: cred.holderType,
+          customRoleLabel: cred.customRoleLabel, category: cred.category,
+          ventureName: cred.ventureName, district: cred.district,
+          issueDate: cred.issueDate.toISOString().slice(0, 10),
+          validThru: cred.validThru.toISOString().slice(0, 10),
+          status: cred.status, customDetails: cred.customDetails,
+          verifyUrl: buildVerifyUrl(cred.token),
+          tokenFingerprint: cred.tokenFingerprint,
+          photoDataUrl,
+        }
+      : null,
+  };
 }
 
 // ── Admin: review queue ───────────────────────────────────────────────────────
@@ -323,6 +335,7 @@ export interface PublicVerifyResult {
     issueDate: string;
     validThru: string;
     status: CredStatus;
+    photoDataUrl: string | null;
   };
 }
 
@@ -338,18 +351,20 @@ export async function verifyPrimeIdToken(token: string): Promise<PublicVerifyRes
   const [row] = await getSql()<
     {
       id: string; fullName: string; holderType: HolderType; category: Category | null;
-      ventureName: string | null; district: string; issueDate: Date; validThru: Date;
-      status: CredStatus;
+      ventureName: string | null; district: string; photoPath: string | null;
+      issueDate: Date; validThru: Date; status: CredStatus;
     }[]
   >`
     SELECT id, full_name AS "fullName", holder_type AS "holderType", category,
-           venture_name AS "ventureName", district, issue_date AS "issueDate",
-           valid_thru AS "validThru", status
+           venture_name AS "ventureName", district, photo_path AS "photoPath",
+           issue_date AS "issueDate", valid_thru AS "validThru", status
     FROM prime_id_public_lookup(${tokenHash(token)})`;
 
   if (!row) return { valid: false, reason: "Credential not found" };
   if (row.status === "revoked") return { valid: false, reason: "Credential revoked" };
   if (row.status === "expired") return { valid: false, reason: "Credential expired" };
+
+  const photoDataUrl = row.photoPath ? await imageDataUrl(row.photoPath) : null;
 
   return {
     valid: true,
@@ -358,7 +373,7 @@ export async function verifyPrimeIdToken(token: string): Promise<PublicVerifyRes
       category: row.category, ventureName: row.ventureName, district: row.district,
       issueDate: row.issueDate.toISOString().slice(0, 10),
       validThru: row.validThru.toISOString().slice(0, 10),
-      status: row.status,
+      status: row.status, photoDataUrl,
     },
   };
 }

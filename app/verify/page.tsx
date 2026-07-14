@@ -75,6 +75,16 @@ export default async function VerifyPage({
 
           {c && (
             <div className="px-6 py-5">
+              {c.photoDataUrl && (
+                <div className="mb-4 flex justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={c.photoDataUrl}
+                    alt={c.fullName}
+                    className="h-28 w-28 rounded-full object-cover ring-2 ring-[#1B4332]/15"
+                  />
+                </div>
+              )}
               <Row label="Holder" value={c.fullName} />
               <Row label="PRIME ID" value={c.id} />
               <Row label="Role" value={HOLDER_LABEL[c.holderType] ?? c.holderType} />

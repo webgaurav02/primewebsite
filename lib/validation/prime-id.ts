@@ -11,6 +11,8 @@ export const primeIdRequestSchema = z.object({
   customRoleLabel: z.string().trim().max(40).optional().default(""),
   category: z.enum(["startup", "nano", "livelihood"]).nullable().optional().default(null),
   ventureName: z.string().trim().max(120).optional().default(""),
+  // Opaque R2 object key from the photo upload route (not a URL).
+  photoPath: z.string().trim().max(300).optional().default(""),
   customDetails: z
     .array(
       z.object({

@@ -62,13 +62,16 @@ describe("credential RLS — the token is not world-readable", () => {
 });
 
 describe("public verify lookup (SECURITY DEFINER)", () => {
-  test("returns safe fields by token hash — and never the token", async () => {
+  test("returns safe fields by token hash — but never the token itself", async () => {
     const rows = await appSql`SELECT * FROM prime_id_public_lookup(${HASH})`;
     expect(rows.length).toBe(1);
     expect(rows[0].id).toBe("PRM-ML-2026-000001");
     expect(rows[0].status).toBe("active");
+    // photo_path is exposed (helps a verifier match the holder); the secret
+    // token and its hash are NOT.
+    expect("photo_path" in rows[0]).toBe(true);
     expect("token" in rows[0]).toBe(false);
-    expect("photo_path" in rows[0]).toBe(false);
+    expect("token_hash" in rows[0]).toBe(false);
   });
 
   test("an unknown hash returns nothing", async () => {

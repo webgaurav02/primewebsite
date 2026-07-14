@@ -15,6 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1086.0",
     "framer-motion": "^12.42.0",
     "html-to-image": "^1.11.13",
     "jsbarcode": "^3.12.3",
