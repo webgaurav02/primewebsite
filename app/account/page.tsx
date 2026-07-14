@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/user-session";
 import { unreadNotificationCount } from "@/lib/dal/events";
 import { REGISTRANT_TYPE_LABELS, PERSONAS } from "@/lib/users/types";
+import VerifyBanner from "./_components/VerifyBanner";
 import { logoutAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -53,11 +54,15 @@ export default async function AccountPage() {
       </div>
 
       <p className="mt-2 text-sm text-zinc-600">
-        Welcome, {user.fullName.split(" ")[0]}. Your profile is{" "}
-        {user.status === "active" ? "active" : "pending review by PRIME"}.
+        Welcome, {user.fullName.split(" ")[0]}. Your PRIME account is active — apply for programmes, a
+        PRIME ID, and more below.
       </p>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6">
+        <VerifyBanner email={user.email} verified={user.emailVerified} />
+      </div>
+
+      <div className="mt-2 grid gap-3 sm:grid-cols-3">
         {NAV.map((n) => (
           <Link
             key={n.href}
