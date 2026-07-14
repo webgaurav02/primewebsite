@@ -23,6 +23,9 @@ export const appSql = postgres(APP_URL, { max: 4, onnotice: () => {} });
 /** Every mutable table, child-first, so TRUNCATE ... CASCADE is deterministic. */
 const TABLES = [
   "audit_log",
+  "email_outbox",
+  "notification",
+  "timeline_event",
   "grievance_status_history",
   "grievance",
   "ticket_sequence",

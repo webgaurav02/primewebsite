@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/user-session";
+import { unreadNotificationCount } from "@/lib/dal/events";
 import { PERSONAS } from "@/lib/users/types";
 import { logoutAction } from "./actions";
 
@@ -8,13 +9,19 @@ export const metadata: Metadata = {
   title: "My account — PRIME Meghalaya",
 };
 
+const NAV: { href: string; label: string; desc: string }[] = [
+  { href: "/account/id-card", label: "PRIME ID", desc: "Request or download your ID card" },
+  { href: "/account/timeline", label: "Timeline", desc: "Your PRIME journey & announcements" },
+  { href: "/account/notifications", label: "Notifications", desc: "Approvals & updates" },
+];
+
 /**
- * Minimal authenticated landing. Proves the session works end-to-end; the full
- * member dashboard (timeline, ID card, programs, …) is built on top of this in
- * later phases.
+ * Member hub — links into the ID card, timeline, and notifications. The full
+ * dashboard (programs, funding, …) is built on top of this in later phases.
  */
 export default async function AccountPage() {
   const user = await requireUser("/account");
+  const unread = await unreadNotificationCount();
   const personaLabel =
     PERSONAS.find((p) => p.value === user.persona)?.label ?? user.persona;
 
@@ -45,7 +52,25 @@ export default async function AccountPage() {
         {user.status === "active" ? "active" : "pending review by PRIME"}.
       </p>
 
-      <dl className="mt-8 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {NAV.map((n) => (
+          <Link
+            key={n.href}
+            href={n.href}
+            className="rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-zinc-900">{n.label}</span>
+              {n.href === "/account/notifications" && unread > 0 && (
+                <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-medium text-white">{unread}</span>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-zinc-500">{n.desc}</p>
+          </Link>
+        ))}
+      </div>
+
+      <dl className="mt-6 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
         {rows.map((r) => (
           <div key={r.label} className="flex justify-between px-5 py-3.5 text-sm">
             <dt className="text-zinc-500">{r.label}</dt>
@@ -55,8 +80,6 @@ export default async function AccountPage() {
       </dl>
 
       <p className="mt-6 text-sm text-zinc-500">
-        A government-recognized PRIME ID can be issued once your profile is
-        reviewed.{" "}
         <Link href="/" className="font-medium text-zinc-900 underline">
           Back to home
         </Link>

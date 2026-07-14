@@ -5,6 +5,7 @@ import { assertCan } from "@/lib/auth/rbac";
 import { requireUser } from "@/lib/auth/user-session";
 import { withAdminContext, withUserContext, getSql } from "@/lib/db/client";
 import { recordAudit } from "@/lib/audit/log";
+import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { allocatePrimeIdNumber } from "@/lib/prime-id/id-number";
 import {
   signPrimeToken,
@@ -81,6 +82,12 @@ export async function requestPrimeId(raw: unknown): Promise<RequestResult> {
         action: "prime_id.request", resourceType: "prime_id_request" },
       tx,
     );
+    await emitTimelineEvent(tx, {
+      userId: user.id,
+      type: "id.requested",
+      title: "PRIME ID requested",
+      body: "Your PRIME ID request was submitted for review.",
+    });
     return { ok: true };
   });
 }
@@ -266,6 +273,20 @@ export async function approveAndIssuePrimeId(requestId: string): Promise<{ ok: b
         resourceId: id, metadata: { requestId, userId: req.userId } },
       tx,
     );
+    await emitTimelineEvent(tx, {
+      userId: req.userId,
+      type: "id.issued",
+      title: "PRIME ID issued",
+      body: `Your PRIME ID ${id} has been issued.`,
+      metadata: { id },
+    });
+    await emitNotification(tx, {
+      userId: req.userId,
+      type: "id.issued",
+      title: "Your PRIME ID is ready",
+      body: `Credential ${id} has been issued. Download your card from your account.`,
+      link: "/account/id-card",
+    });
     return { ok: true, id };
   });
 }
@@ -278,8 +299,8 @@ export async function rejectPrimeIdRequest(raw: unknown): Promise<{ ok: boolean;
   const { requestId, reason } = parsed.data;
 
   return withAdminContext(admin, async (tx) => {
-    const [req] = await tx<{ status: RequestStatus }[]>`
-      SELECT status FROM prime_id_request WHERE id = ${requestId} FOR UPDATE`;
+    const [req] = await tx<{ status: RequestStatus; userId: string }[]>`
+      SELECT status, user_id AS "userId" FROM prime_id_request WHERE id = ${requestId} FOR UPDATE`;
     if (!req) return { ok: false, error: "Request not found" };
     if (req.status !== "pending") return { ok: false, error: `Request is already ${req.status}.` };
     await tx`
@@ -292,6 +313,13 @@ export async function rejectPrimeIdRequest(raw: unknown): Promise<{ ok: boolean;
         resourceId: requestId, metadata: { reason } },
       tx,
     );
+    await emitTimelineEvent(tx, {
+      userId: req.userId, type: "id.rejected", title: "PRIME ID request declined", body: reason,
+    });
+    await emitNotification(tx, {
+      userId: req.userId, type: "id.rejected", title: "PRIME ID request declined",
+      body: reason, link: "/account/id-card",
+    });
     return { ok: true };
   });
 }
@@ -304,8 +332,8 @@ export async function revokePrimeIdCredential(raw: unknown): Promise<{ ok: boole
   const { credentialId, reason } = parsed.data;
 
   return withAdminContext(admin, async (tx) => {
-    const [cred] = await tx<{ status: CredStatus }[]>`
-      SELECT status FROM prime_id_credential WHERE id = ${credentialId} FOR UPDATE`;
+    const [cred] = await tx<{ status: CredStatus; userId: string }[]>`
+      SELECT status, user_id AS "userId" FROM prime_id_credential WHERE id = ${credentialId} FOR UPDATE`;
     if (!cred) return { ok: false, error: "Credential not found" };
     await tx`
       UPDATE prime_id_credential
@@ -316,6 +344,12 @@ export async function revokePrimeIdCredential(raw: unknown): Promise<{ ok: boole
         resourceId: credentialId, metadata: { reason } },
       tx,
     );
+    await emitTimelineEvent(tx, {
+      userId: cred.userId, type: "id.revoked", title: "PRIME ID revoked", body: reason,
+    });
+    await emitNotification(tx, {
+      userId: cred.userId, type: "id.revoked", title: "PRIME ID revoked", body: reason,
+    });
     return { ok: true };
   });
 }

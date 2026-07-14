@@ -3,6 +3,7 @@ import { z } from "zod";
 import { withAuthContext } from "@/lib/db/client";
 import { encryptPII } from "@/lib/crypto/pii";
 import { recordAudit } from "@/lib/audit/log";
+import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { DISTRICT_LABELS, SECTOR_LABELS } from "@/lib/entrepreneurs-data";
 import {
   entrepreneurApplicationSchema,
@@ -112,6 +113,20 @@ export async function applyAsEntrepreneur(
       },
       tx,
     );
+
+    await emitTimelineEvent(tx, {
+      userId: user.id,
+      type: "user.registered",
+      title: "Application submitted",
+      body: `Applied to PRIME as an entrepreneur — ${d.businessName}.`,
+    });
+    await emitNotification(tx, {
+      userId: user.id,
+      type: "user.registered",
+      title: "Application received",
+      body: "PRIME is reviewing your application. We'll email you once it's approved.",
+      link: "/account",
+    });
 
     // Cosmetic reference tied to the real record (admins identify by name/email).
     const reference = user.id.replace(/-/g, "").slice(0, 4).toUpperCase();

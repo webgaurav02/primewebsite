@@ -108,3 +108,19 @@ export async function withAuthContext<T>(
   });
   return result as T;
 }
+
+/**
+ * Context for a system/background operation with no human actor — the email
+ * outbox worker and scheduled jobs. Sets app.system_op = '1', which RLS uses to
+ * gate the email_outbox queue. Only lib/email opens this context.
+ */
+export async function withSystemContext<T>(
+  fn: (tx: postgres.TransactionSql) => Promise<T>,
+): Promise<T> {
+  const sql = getSql();
+  const result = await sql.begin(async (tx) => {
+    await tx`SELECT set_config('app.system_op', '1', true)`;
+    return await fn(tx);
+  });
+  return result as T;
+}

@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { assertCan } from "@/lib/auth/rbac";
 import { withAdminContext, withAuthContext } from "@/lib/db/client";
 import { recordAudit } from "@/lib/audit/log";
+import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { newToken } from "@/lib/auth/tokens";
 import { sendEmail, appBaseUrl } from "@/lib/email";
 import { decryptPII } from "@/lib/crypto/pii";
@@ -172,7 +173,25 @@ async function setStatus(id: string, status: UserStatus): Promise<{ email: strin
  * credential.
  */
 export async function approveUser(id: string): Promise<void> {
+  const admin = await requireAdmin();
+  assertCan(admin, "user:manage");
   const { email, fullName } = await setStatus(id, "active");
+
+  await withAdminContext(admin, async (tx) => {
+    await emitTimelineEvent(tx, {
+      userId: id,
+      type: "user.approved",
+      title: "Application approved",
+      body: "Your PRIME application was approved.",
+    });
+    await emitNotification(tx, {
+      userId: id,
+      type: "user.approved",
+      title: "Application approved",
+      body: "Set your password from the activation email to access your dashboard.",
+      link: "/login",
+    });
+  });
 
   const sent = await withAuthContext(async (tx) => {
     // Already activated? (credential rows are only visible in the auth context.)

@@ -43,6 +43,9 @@ const nextConfig: NextConfig = {
     ...(allowedOrigins.length > 0 ? { serverActions: { allowedOrigins } } : {}),
   },
 
+  // nodemailer has dynamic requires — keep it external (Node runtime), don't bundle.
+  serverExternalPackages: ["nodemailer"],
+
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
