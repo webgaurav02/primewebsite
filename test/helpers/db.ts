@@ -43,6 +43,7 @@ const TABLES = [
   "entrepreneur_profile",
   "mentor_profile",
   "investor_profile",
+  "user_consent",
   "user_email_token",
   "user_session",
   "user_credential",

@@ -74,14 +74,64 @@ export const USER_STATUSES: { value: UserStatus; label: string }[] = [
   { value: "suspended", label: "Suspended" },
 ];
 
+// Alphabetical, per the registration spec. Used by registerSchema z.enum(LANGUAGES).
 export const LANGUAGES: readonly string[] = [
   "English",
-  "Khasi",
   "Garo",
-  "Pnar (Jaintia)",
   "Hindi",
-  "Other",
+  "Jaintia",
+  "Khasi",
 ];
+
+/**
+ * The self-declared "Who are you?" identity chosen at registration. This is the
+ * source of truth; the narrower `persona` enum is DERIVED from it (see
+ * registrantTypeToPersona) for the subsystems that need it (mentorship, filters).
+ */
+export type RegistrantType =
+  | "entrepreneur_existing"
+  | "aspiring_entrepreneur"
+  | "student"
+  | "mentor"
+  | "government_official"
+  | "corporate_professional"
+  | "prime_staff"
+  | "other";
+
+export const REGISTRANT_TYPES: { value: RegistrantType; label: string }[] = [
+  { value: "entrepreneur_existing", label: "Entrepreneur with Existing Business" },
+  { value: "aspiring_entrepreneur", label: "Aspiring Entrepreneur / Just Starting" },
+  { value: "student", label: "Student" },
+  { value: "mentor", label: "Mentor" },
+  { value: "government_official", label: "Government Official" },
+  { value: "corporate_professional", label: "Corporate / Professional" },
+  { value: "prime_staff", label: "PRIME Team / Staff" },
+  { value: "other", label: "Other" },
+];
+
+export const REGISTRANT_TYPE_LABELS: Record<RegistrantType, string> =
+  Object.fromEntries(REGISTRANT_TYPES.map((r) => [r.value, r.label])) as Record<
+    RegistrantType,
+    string
+  >;
+
+/** Derive the internal persona (nullable) that subsystems key off. */
+export function registrantTypeToPersona(rt: RegistrantType): Persona | null {
+  switch (rt) {
+    case "mentor":
+      return "mentor";
+    case "entrepreneur_existing":
+    case "aspiring_entrepreneur":
+      return "entrepreneur";
+    default:
+      return null;
+  }
+}
+
+/** Only an existing-business entrepreneur is asked for business + impact details. */
+export function collectsBusinessDetails(rt: RegistrantType): boolean {
+  return rt === "entrepreneur_existing";
+}
 
 export const HOW_HEARD: readonly string[] = [
   "Social media",
