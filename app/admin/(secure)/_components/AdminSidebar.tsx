@@ -25,11 +25,12 @@ function Icon({ d }: { d: string }) {
   );
 }
 
-// More sections are added here as they are rebuilt server-side:
-// Organisations (Phase 2), PRIME ID review (Phase 3).
+// More sections are added here as they are rebuilt server-side (Organisations,
+// Programs, Documents in later phases).
 const NAV: Item[] = [
   { href: "/admin", label: "Dashboard", perm: null, icon: <Icon d="M4 13h7V4H4zM13 9h7V4h-7zM13 20h7v-9h-7zM4 20h7v-5H4z" /> },
   { href: "/admin/users", label: "Users", perm: "user:manage", icon: <Icon d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7|2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6|17 4.5a3 3 0 0 1 0 6|18.5 14c2 .5 3 2.4 3 5" /> },
+  { href: "/admin/prime-id", label: "PRIME ID", perm: "prime_id:review", icon: <Icon d="M3 6h18v12H3z|8 10.5a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6|5.5 16c.4-1.8 1.5-2.6 2.5-2.6s2.1.8 2.5 2.6|13.5 9h5M13.5 12h5M13.5 15h3" /> },
   { href: "/admin/grievances", label: "Grievances", perm: "grievance:read", icon: <Icon d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z" /> },
 ];
 

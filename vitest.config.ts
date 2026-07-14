@@ -34,6 +34,12 @@ export default defineConfig({
       // Fixed dev/test key (base64 of 32 bytes) — never used outside tests.
       PII_ENCRYPTION_KEY: "FJ202uLa10UnYYn0DHrHP3NiaPyxyoOMC+4OHMHldpo=",
       APP_BASE_URL: "http://localhost:3000",
+      // Ed25519 PRIME ID signing keys (base64 PEM) — dev/test only.
+      PRIME_ID_SIGNING_KID: "prime-ed25519-2026",
+      PRIME_ID_SIGNING_PRIVATE_KEY:
+        "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1DNENBUUF3QlFZREsyVndCQ0lFSUlZL1pVV0xzYmpWUkJqRXpEM3plNVdzdk4vTlRkbkxCVmN3ZnJWeUNZdXEKLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLQ==",
+      PRIME_ID_SIGNING_PUBLIC_KEY:
+        "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQWo0czNSdGlkWUFZOW1HSTV3RysrQndjMTRpQlQ3TzlSWTNEbmdhMW1nR0U9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==",
     },
   },
 });
