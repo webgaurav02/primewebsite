@@ -20,12 +20,20 @@ const APP_URL =
 export const migratorSql = postgres(MIGRATOR_URL, { max: 2, onnotice: () => {} });
 export const appSql = postgres(APP_URL, { max: 4, onnotice: () => {} });
 
-/** Every mutable table, child-first, so TRUNCATE ... CASCADE is deterministic. */
+/** Every mutable table, child-first, so TRUNCATE ... CASCADE is deterministic.
+ * `program` is reference data seeded by migration 0009 — deliberately NOT wiped. */
 const TABLES = [
   "audit_log",
   "email_outbox",
   "notification",
   "timeline_event",
+  "document",
+  "mentor_certificate",
+  "mentor_certificate_sequence",
+  "mentorship_session",
+  "mentorship_assignment",
+  "program_application",
+  "program_cycle",
   "grievance_status_history",
   "grievance",
   "ticket_sequence",
