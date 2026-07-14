@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/user-session";
 import { unreadNotificationCount } from "@/lib/dal/events";
-import { PERSONAS } from "@/lib/users/types";
+import { REGISTRANT_TYPE_LABELS, PERSONAS } from "@/lib/users/types";
 import { logoutAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -26,17 +26,18 @@ const NAV: { href: string; label: string; desc: string }[] = [
 export default async function AccountPage() {
   const user = await requireUser("/account");
   const unread = await unreadNotificationCount();
-  const personaLabel =
-    PERSONAS.find((p) => p.value === user.persona)?.label ?? user.persona;
+  const registeredAs = user.registrantType
+    ? REGISTRANT_TYPE_LABELS[user.registrantType]
+    : (PERSONAS.find((p) => p.value === user.persona)?.label ?? "Member");
 
   const rows: { label: string; value: string }[] = [
     { label: "Name", value: user.fullName },
     { label: "Email", value: user.email },
-    { label: "Registered as", value: personaLabel },
+    { label: "Registered as", value: registeredAs },
     { label: "District", value: user.district ?? "—" },
     {
-      label: "Account status",
-      value: user.status === "active" ? "Active" : "Pending review",
+      label: "Email status",
+      value: user.emailVerified ? "Verified" : "Unverified",
     },
   ];
 

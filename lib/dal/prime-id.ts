@@ -45,6 +45,10 @@ export type RequestResult =
 
 export async function requestPrimeId(raw: unknown): Promise<RequestResult> {
   const user = await requireUser();
+  // Soft-gate: verifying email is required before this high-trust action.
+  if (!user.emailVerified) {
+    return { ok: false, error: "Please verify your email before requesting a PRIME ID." };
+  }
   const parsed = primeIdRequestSchema.safeParse(raw);
   if (!parsed.success) {
     return {

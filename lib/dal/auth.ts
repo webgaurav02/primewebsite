@@ -10,7 +10,17 @@ import {
 import { newToken, hashSessionToken } from "@/lib/auth/tokens";
 import { USER_SESSION_MAX_AGE } from "@/lib/auth/user-cookie";
 import { recordAudit } from "@/lib/audit/log";
+import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { sendEmail, appBaseUrl } from "@/lib/email";
+import { slidingWindow } from "@/lib/security/rate-limit";
+import { detectImage, uploadUserImage, MAX_IMAGE_BYTES } from "@/lib/storage";
+import { SECTOR_LABELS } from "@/lib/entrepreneurs-data";
+import {
+  registrantTypeToPersona,
+  collectsBusinessDetails,
+  type RegistrantType,
+} from "@/lib/users/types";
+import { POLICY_VERSION, CONSENT_PURPOSES, isMinorDob } from "@/lib/legal/policy";
 import {
   registerSchema,
   loginSchema,
@@ -43,66 +53,170 @@ function flatten(err: z.ZodError): FieldErrors {
 // ── Registration ──────────────────────────────────────────────────────────────
 
 export type RegisterResult =
-  | { ok: true }
+  | { ok: true; session?: { token: string; maxAge: number } }
   | { ok: false; fieldErrors: FieldErrors };
 
-export async function registerUser(raw: unknown): Promise<RegisterResult> {
+function intOrNull(s: string): number | null {
+  const n = Number.parseInt(s, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Decode a `data:image/...;base64,...` URL to bytes (magic bytes validate it next). */
+function decodeImageDataUrl(s: string): Buffer | null {
+  const m = /^data:image\/[a-z+.-]+;base64,([A-Za-z0-9+/=]+)$/i.exec(s);
+  if (!m) return null;
+  try {
+    const buf = Buffer.from(m[1], "base64");
+    return buf.length > 0 ? buf : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Self-serve credentialed registration. Creates an ACTIVE account immediately
+ * (soft-gate: email verification is a banner, not a login block), records DPDP
+ * consent, and opens a session so the new member lands on their dashboard.
+ *
+ * Enumeration-safe: a duplicate email returns the SAME uniform `ok` (no session)
+ * and quietly emails that address a "you already have an account" reset link —
+ * the response never reveals whether the email exists.
+ */
+export async function registerUser(
+  raw: unknown,
+  meta: { ip: string | null; userAgent: string | null },
+): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, fieldErrors: flatten(parsed.error) };
   const d = parsed.data;
 
+  // Validate an optional profile photo by MAGIC BYTES + size before any DB work.
+  let photoBuffer: Buffer | null = null;
+  if (d.photoDataUrl) {
+    const decoded = decodeImageDataUrl(d.photoDataUrl);
+    if (!decoded || !detectImage(decoded)) {
+      return { ok: false, fieldErrors: { photoDataUrl: ["Upload a valid JPEG, PNG, or WebP image."] } };
+    }
+    if (decoded.length > MAX_IMAGE_BYTES) {
+      return { ok: false, fieldErrors: { photoDataUrl: ["Photo must be under 5 MB."] } };
+    }
+    photoBuffer = decoded;
+  }
+
+  const registrantType = d.registrantType as RegistrantType;
+  const persona = registrantTypeToPersona(registrantType);
+  const minor = isMinorDob(d.dateOfBirth);
   const passwordHash = await hashPassword(d.password);
   const mobileEnc = encryptPII(d.mobile);
 
   const outcome = await withAuthContext(async (tx) => {
-    const existing = await tx`SELECT 1 FROM app_user WHERE email = ${d.email}`;
-    if (existing.length > 0) return { duplicate: true as const };
+    const [existing] = await tx<{ id: string; fullName: string }[]>`
+      SELECT id, full_name AS "fullName" FROM app_user WHERE email = ${d.email}`;
+    if (existing) {
+      // Enumeration-safe: don't reveal existence in the response. Do NOT touch the
+      // user's outstanding reset tokens — an unauthenticated caller must not be able
+      // to consume a victim's pending reset link. Just notify out-of-band (below).
+      return { duplicate: true as const, name: existing.fullName };
+    }
 
     const [user] = await tx<{ id: string }[]>`
       INSERT INTO app_user
-        (email, full_name, persona, gender, date_of_birth, mobile_enc,
-         preferred_language, district, how_heard, status, source)
+        (email, full_name, registrant_type, persona, gender, date_of_birth,
+         mobile_enc, preferred_language, district, how_heard, guardian_name,
+         guardian_relationship, status, source)
       VALUES
-        (${d.email}, ${d.fullName}, ${d.persona}, ${d.gender}, ${d.dateOfBirth},
-         ${mobileEnc}, ${d.preferredLanguage}, ${d.district}, ${d.howHeard},
-         'pending', 'public')
-      RETURNING id
-    `;
+        (${d.email}, ${d.fullName}, ${registrantType}, ${persona}, ${d.gender},
+         ${d.dateOfBirth}, ${mobileEnc}, ${d.preferredLanguage}, ${d.district},
+         ${d.howHeard}, ${minor ? d.guardianName : null},
+         ${minor ? d.guardianRelationship : null}, 'active', 'public')
+      RETURNING id`;
+
+    await tx`INSERT INTO user_credential (user_id, password_hash) VALUES (${user.id}, ${passwordHash})`;
 
     await tx`
-      INSERT INTO user_credential (user_id, password_hash)
-      VALUES (${user.id}, ${passwordHash})
-    `;
+      INSERT INTO user_consent (user_id, policy_version, purposes, is_minor, ip, user_agent)
+      VALUES (${user.id}, ${POLICY_VERSION}, ${JSON.stringify(CONSENT_PURPOSES)}::jsonb,
+              ${minor}, ${meta.ip}, ${meta.userAgent})`;
 
-    const { token, hash } = newToken();
+    // Existing-business entrepreneurs also get an organisation + profile snapshot.
+    if (collectsBusinessDetails(registrantType)) {
+      const sectorLabel = SECTOR_LABELS[d.sector] ?? d.sector;
+      const year = intOrNull(d.yearEstablished);
+      const employment = intOrNull(d.employment);
+      const lives = intOrNull(d.livesImpacted);
+      const [org] = await tx<{ id: string }[]>`
+        INSERT INTO organization
+          (name, sector, district, entity_type, stage, year_started, address,
+           description, employment_count, turnover, created_by)
+        VALUES
+          (${d.businessName}, ${sectorLabel}, ${d.district}, ${d.entityType},
+           ${d.stage}, ${year}, ${d.address || null}, ${d.description},
+           ${employment}, ${d.turnover || null}, ${user.id})
+        RETURNING id`;
+      await tx`UPDATE app_user SET organization_id = ${org.id} WHERE id = ${user.id}`;
+      await tx`
+        INSERT INTO entrepreneur_profile
+          (user_id, business_name, sector, entity_type, stage, year_established,
+           address, description, employment_count, lives_impacted, turnover,
+           govt_funding, external_funding, products, social_impact)
+        VALUES
+          (${user.id}, ${d.businessName}, ${sectorLabel}, ${d.entityType},
+           ${d.stage}, ${year}, ${d.address || null}, ${d.description},
+           ${employment}, ${lives}, ${d.turnover || null}, ${d.govtFunding || null},
+           ${d.externalFunding || null}, ${d.products}, ${d.socialImpact || null})`;
+    }
+
+    const { token: verifyToken, hash: verifyHash } = newToken();
     await tx`
       INSERT INTO user_email_token (token_hash, user_id, kind, expires_at)
-      VALUES (${hash}, ${user.id}, 'verify', now() + ${`${VERIFY_TTL_MS} milliseconds`}::interval)
-    `;
+      VALUES (${verifyHash}, ${user.id}, 'verify', now() + ${`${VERIFY_TTL_MS} milliseconds`}::interval)`;
+
+    // Active immediately → open a session so the member reaches their dashboard.
+    const { token: sessionToken, hash: sessionHash } = newToken();
+    await tx`
+      INSERT INTO user_session (token_hash, user_id, expires_at, user_agent, ip)
+      VALUES (${sessionHash}, ${user.id}, now() + ${`${USER_SESSION_MAX_AGE} seconds`}::interval,
+              ${meta.userAgent}, ${meta.ip})`;
 
     await recordAudit(
-      {
-        actor: { kind: "system", id: user.id, email: d.email },
-        action: "user.register",
-        resourceType: "app_user",
-        resourceId: user.id,
-        metadata: { persona: d.persona },
-      },
+      { actor: { kind: "system", id: user.id, email: d.email }, action: "user.register",
+        resourceType: "app_user", resourceId: user.id, metadata: { registrantType, minor } },
       tx,
     );
+    await emitTimelineEvent(tx, {
+      userId: user.id, type: "user.registered", title: "Welcome to PRIME",
+      body: "Your PRIME account was created.",
+    });
+    await emitNotification(tx, {
+      userId: user.id, type: "user.registered", title: "Welcome to PRIME",
+      body: "Verify your email to unlock applications, then explore your dashboard.",
+      link: "/account",
+    });
 
-    return { duplicate: false as const, verifyToken: token, name: d.fullName };
+    return { duplicate: false as const, userId: user.id, name: d.fullName, verifyToken, sessionToken };
   });
 
   if (outcome.duplicate) {
-    return {
-      ok: false,
-      fieldErrors: { email: ["That email is already registered. Try signing in."] },
-    };
+    // Throttle the "account exists" mail PER ADDRESS so it can't be weaponised for
+    // email bombing (independent of the IP limiter, which is best-effort).
+    if (slidingWindow(`acct-exists-mail:${d.email}`, 3, 60 * 60 * 1000).ok) {
+      await sendAccountExistsEmail(d.email, outcome.name);
+    }
+    return { ok: true }; // uniform response — no session, no enumeration
+  }
+
+  // Upload the (already-validated) photo AFTER commit, bound to the real user id.
+  if (photoBuffer) {
+    const up = await uploadUserImage("avatars", outcome.userId, photoBuffer);
+    if (up.ok) {
+      await withAuthContext(
+        (tx) => tx`UPDATE app_user SET photo_path = ${up.key} WHERE id = ${outcome.userId}`,
+      );
+    }
   }
 
   await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
-  return { ok: true };
+  return { ok: true, session: { token: outcome.sessionToken, maxAge: USER_SESSION_MAX_AGE } };
 }
 
 // ── Email verification ──────────────────────────────────────────────────────
@@ -169,7 +283,7 @@ export async function resendVerification(rawEmail: unknown): Promise<void> {
 
 export type LoginResult =
   | { ok: true; token: string; maxAge: number }
-  | { ok: false; error: "invalid" | "unverified" | "locked" | "suspended" };
+  | { ok: false; error: "invalid" | "locked" | "suspended" };
 
 export async function loginUser(
   raw: unknown,
@@ -234,7 +348,8 @@ export async function loginUser(
     }
 
     if (row.status === "suspended") return { ok: false, error: "suspended" };
-    if (!row.emailVerifiedAt) return { ok: false, error: "unverified" };
+    // Soft-gate: an unverified email no longer blocks login — the dashboard shows
+    // a verify banner and high-trust actions (PRIME ID, program apply) enforce it.
 
     // Success — clear the failure counter and open a session.
     await tx`
@@ -380,6 +495,28 @@ async function sendVerificationEmail(
       url,
       "",
       "This link expires in 24 hours. If you didn't create this account, ignore this email.",
+    ].join("\n"),
+  });
+}
+
+/**
+ * Sent when someone tries to register with an email that already has an account.
+ * Links to the (enumeration-safe) forgot-password page rather than embedding a
+ * reset token, so this path never issues or consumes the user's reset tokens.
+ */
+async function sendAccountExistsEmail(to: string, name: string): Promise<void> {
+  const url = `${appBaseUrl()}/forgot-password`;
+  await sendEmail({
+    to,
+    subject: "You already have a PRIME account",
+    text: [
+      `Hi ${name.split(" ")[0]},`,
+      "",
+      "Someone just tried to create a PRIME account with this email, but you",
+      "already have one. You can sign in, or reset your password here:",
+      url,
+      "",
+      "If this wasn't you, you can safely ignore this email.",
     ].join("\n"),
   });
 }

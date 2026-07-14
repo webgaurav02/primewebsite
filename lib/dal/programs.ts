@@ -121,6 +121,10 @@ export async function getMyApplications(): Promise<MyApplication[]> {
 
 export async function applyToProgram(raw: unknown): Promise<Result> {
   const user = await requireUser();
+  // Soft-gate: verifying email is required before applying to a programme.
+  if (!user.emailVerified) {
+    return { ok: false, error: "Please verify your email before applying." };
+  }
   const parsed = applyToProgramSchema.safeParse(raw);
   if (!parsed.success) {
     return {

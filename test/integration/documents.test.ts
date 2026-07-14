@@ -85,6 +85,14 @@ describe("upload", () => {
     const res = await uploadDocument("passport", PDF, "p.pdf");
     expect(res.ok).toBe(false);
   });
+
+  test("an unverified email cannot upload (soft-gate)", async () => {
+    state.user = { ...OWNER, emailVerified: false };
+    const res = await uploadDocument("pan", PDF, "pan.pdf");
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/verify/i);
+    state.user = OWNER;
+  });
 });
 
 describe("admin verification state machine", () => {

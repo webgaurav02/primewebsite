@@ -7,11 +7,11 @@ import {
 import { publicSubmissionSchema } from "@/lib/validation/grievance";
 
 const validRegister = {
+  registrantType: "aspiring_entrepreneur",
   fullName: "Kyrsoibor Nongrum",
   email: "k@example.com",
   password: "correct-horse-8",
   confirmPassword: "correct-horse-8",
-  persona: "entrepreneur",
   gender: "male",
   dateOfBirth: "1994-03-11",
   mobile: "9876500011",
@@ -46,9 +46,28 @@ describe("registerSchema", () => {
     expect(registerSchema.safeParse({ ...validRegister, consent: false }).success).toBe(false);
   });
 
-  test("rejects an unknown district / persona", () => {
+  test("rejects an unknown district / registrant type", () => {
     expect(registerSchema.safeParse({ ...validRegister, district: "Nowhere" }).success).toBe(false);
-    expect(registerSchema.safeParse({ ...validRegister, persona: "wizard" }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...validRegister, registrantType: "wizard" }).success).toBe(false);
+  });
+
+  test("requires guardian consent for an under-18 registrant", () => {
+    const minor = { ...validRegister, dateOfBirth: "2015-06-15" };
+    expect(registerSchema.safeParse(minor).success).toBe(false);
+    expect(
+      registerSchema.safeParse({
+        ...minor,
+        guardianName: "A Parent",
+        guardianRelationship: "Parent",
+        guardianConsent: true,
+      }).success,
+    ).toBe(true);
+  });
+
+  test("existing-business entrepreneur requires business fields", () => {
+    expect(
+      registerSchema.safeParse({ ...validRegister, registrantType: "entrepreneur_existing" }).success,
+    ).toBe(false);
   });
 });
 

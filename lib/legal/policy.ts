@@ -32,3 +32,20 @@ export const PURPOSE_LABELS: Record<ConsentPurpose, string> = {
 
 /** Age of majority for the DPDP minor (guardian-consent) flow. */
 export const AGE_OF_MAJORITY = 18;
+
+/** Completed years of age from an ISO date-of-birth string (UTC-safe enough for a gate). */
+export function ageFromDob(dob: string): number {
+  const d = new Date(dob);
+  if (Number.isNaN(d.getTime())) return NaN;
+  const now = new Date();
+  let age = now.getUTCFullYear() - d.getUTCFullYear();
+  const m = now.getUTCMonth() - d.getUTCMonth();
+  if (m < 0 || (m === 0 && now.getUTCDate() < d.getUTCDate())) age--;
+  return age;
+}
+
+/** True when the DOB indicates an under-18 data principal (guardian consent required). */
+export function isMinorDob(dob: string): boolean {
+  const age = ageFromDob(dob);
+  return Number.isFinite(age) && age < AGE_OF_MAJORITY;
+}

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { withAuthContext } from "@/lib/db/client";
 import { USER_SESSION_COOKIE_NAME } from "./user-cookie";
 import { hashSessionToken } from "./tokens";
-import type { Persona, UserStatus } from "@/lib/users/types";
+import type { Persona, RegistrantType, UserStatus } from "@/lib/users/types";
 
 /**
  * THE public-user authentication seam — the member counterpart to
@@ -20,7 +20,10 @@ export interface AppUser {
   id: string;
   email: string;
   fullName: string;
-  persona: Persona;
+  /** Derived internal persona (mentorship/subsystems); NULL for many registrant types. */
+  persona: Persona | null;
+  /** The self-declared identity chosen at registration. */
+  registrantType: RegistrantType | null;
   status: UserStatus;
   emailVerified: boolean;
   district: string | null;
@@ -39,13 +42,15 @@ export const getCurrentUser = cache(async (): Promise<AppUser | null> => {
         id: string;
         email: string;
         fullName: string;
-        persona: Persona;
+        persona: Persona | null;
+        registrantType: RegistrantType | null;
         status: UserStatus;
         emailVerifiedAt: Date | null;
         district: string | null;
       }[]
     >`
-      SELECT u.id, u.email, u.full_name AS "fullName", u.persona, u.status,
+      SELECT u.id, u.email, u.full_name AS "fullName", u.persona,
+             u.registrant_type AS "registrantType", u.status,
              u.email_verified_at AS "emailVerifiedAt", u.district
       FROM user_session s
       JOIN app_user u ON u.id = s.user_id
@@ -65,6 +70,7 @@ export const getCurrentUser = cache(async (): Promise<AppUser | null> => {
       email: row.email,
       fullName: row.fullName,
       persona: row.persona,
+      registrantType: row.registrantType,
       status: row.status,
       emailVerified: row.emailVerifiedAt !== null,
       district: row.district,

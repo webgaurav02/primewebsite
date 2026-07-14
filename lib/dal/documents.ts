@@ -63,6 +63,10 @@ export async function uploadDocument(
   originalName: string,
 ): Promise<UploadResult> {
   const user = await requireUser();
+  // Soft-gate: verifying email is required before this resource-consuming action.
+  if (!user.emailVerified) {
+    return { ok: false, error: "Please verify your email before uploading documents." };
+  }
   const parsedKind = documentKindSchema.safeParse(rawKind);
   if (!parsedKind.success) return { ok: false, error: "Pick a valid document type." };
   const kind = parsedKind.data;

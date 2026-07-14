@@ -7,6 +7,7 @@ import {
   USER_SESSION_COOKIE_OPTIONS,
 } from "@/lib/auth/user-cookie";
 import { slidingWindow } from "@/lib/security/rate-limit";
+import { clientIp } from "@/lib/security/client-ip";
 
 export type SignInResult = { ok: true } | { ok: false; error: string };
 
@@ -20,9 +21,9 @@ export async function signInAction(input: {
   password: string;
 }): Promise<SignInResult> {
   const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  const ip = clientIp(h);
 
-  const rl = slidingWindow(`login:${ip ?? "unknown"}`, 10, 10 * 60 * 1000);
+  const rl = slidingWindow(`login:${ip ?? "shared"}`, 10, 10 * 60 * 1000);
   if (!rl.ok) {
     return { ok: false, error: `Too many attempts. Try again in ${rl.retryAfterSeconds}s.` };
   }
@@ -35,8 +36,6 @@ export async function signInAction(input: {
   if (!res.ok) {
     const messages: Record<typeof res.error, string> = {
       invalid: "Invalid email or password.",
-      unverified:
-        "Set your password from the activation email we sent, then sign in.",
       locked: "Too many failed attempts. Try again later, or reset your password.",
       suspended: "This account is suspended. Please contact PRIME support.",
     };
