@@ -58,3 +58,15 @@ export function decryptPII(data: Buffer | Uint8Array): string {
     "utf8",
   );
 }
+
+/**
+ * Keyed blind index for equality lookups on an encrypted value without
+ * decrypting it (HMAC-SHA256 over the normalized value). Used so public
+ * grievance tracking can require the ticket ref AND the submitter's email.
+ */
+export function blindIndex(value: string): string {
+  return crypto
+    .createHmac("sha256", getKey())
+    .update(value.trim().toLowerCase())
+    .digest("hex");
+}

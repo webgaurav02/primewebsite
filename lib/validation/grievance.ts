@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { REGIONS } from "@/lib/auth/rbac";
-import { GRIEVANCE_STATUSES } from "@/lib/grievance/types";
+import { GRIEVANCE_STATUSES, GRIEVANCE_CATEGORIES } from "@/lib/grievance/types";
 
 /**
  * All untrusted input (searchParams, form data, action args) is parsed through
@@ -35,6 +35,7 @@ export type UpdateStatusInput = z.infer<typeof updateStatusSchema>;
  */
 export const publicSubmissionSchema = z.object({
   region: regionSchema,
+  category: z.enum(GRIEVANCE_CATEGORIES).optional().default("general"),
   subject: z.string().trim().min(5).max(200),
   description: z.string().trim().min(20).max(5000),
   complainantName: z.string().trim().min(2).max(120),
@@ -45,3 +46,19 @@ export const publicSubmissionSchema = z.object({
     .regex(/^[+0-9 ()-]{7,20}$/, "Invalid phone number"),
 });
 export type PublicSubmission = z.infer<typeof publicSubmissionSchema>;
+
+/** Public tracking: ticket ref + the email used (prevents enumeration). */
+export const trackSchema = z.object({
+  ref: z.string().trim().min(3).max(40),
+  email: z.email().max(254),
+});
+
+/** Admin: assign a grievance to an officer. */
+export const assignSchema = z.object({
+  grievanceId: z.string().uuid(),
+  assigneeId: z.string().uuid(),
+});
+
+export const escalateSchema = z.object({
+  grievanceId: z.string().uuid(),
+});

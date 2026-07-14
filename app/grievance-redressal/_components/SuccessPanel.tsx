@@ -97,13 +97,21 @@ export default function SuccessPanel({
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-5 text-sm font-medium text-zinc-700 underline underline-offset-2 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-      >
-        File another grievance
-      </button>
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        <a
+          href={`/grievance-redressal/track?ref=${encodeURIComponent(ticketRef)}`}
+          className="text-sm font-medium text-[#2D6A4F] underline underline-offset-2 hover:text-[#1B4332] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+        >
+          Track this grievance
+        </a>
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-sm font-medium text-zinc-700 underline underline-offset-2 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+        >
+          File another grievance
+        </button>
+      </div>
     </div>
   );
 }

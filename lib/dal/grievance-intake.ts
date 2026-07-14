@@ -1,9 +1,11 @@
 import "server-only";
 import crypto from "node:crypto";
-import { withPublicContext } from "@/lib/db/client";
-import { encryptPII } from "@/lib/crypto/pii";
+import { withPublicContext, withUserContext, type Db } from "@/lib/db/client";
+import { encryptPII, blindIndex } from "@/lib/crypto/pii";
 import { recordAudit, PUBLIC_SYSTEM_ACTOR } from "@/lib/audit/log";
 import { allocateTicketRef } from "@/lib/grievance/ticket";
+import { computeSla } from "@/lib/grievance/sla";
+import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import {
   publicSubmissionSchema,
   type PublicSubmission,
@@ -11,50 +13,48 @@ import {
 import type { Region } from "@/lib/auth/rbac";
 
 /**
- * Isolated UNAUTHENTICATED write boundary — the ONLY place the public grievance
- * form may write. Deliberately separate from lib/dal/grievances.ts (which
- * requires an authenticated admin) so the trust zones never blur.
+ * Isolated grievance write boundary — never trusts the action layer (re-parses),
+ * encrypts complainant PII, computes SLA windows, and stores a keyed blind index
+ * of the email so public tracking needs the ticket ref AND the email.
  *
- * It re-parses the input (defense in depth — never trusts the action layer),
- * encrypts complainant PII before it touches the database, writes the row +
- * the initial status-history entry, audits as the system actor, and returns
- * ONLY the ticket reference + region. Complainant PII is NEVER echoed back.
- *
- * Runs in withPublicContext (no admin GUCs): RLS confines this path to
- * INSERTs with status 'submitted' and system-actor history rows — even a bug
- * here could not update or read existing grievances.
+ * If a logged-in user submits, the grievance is linked to them (user context),
+ * added to their timeline, and they get a notification. Anonymous submissions
+ * run in the locked-down public context (RLS confines them to INSERTs with
+ * status 'submitted'). Complainant PII is NEVER echoed back.
  */
 export async function createPublicGrievance(
   input: PublicSubmission,
-  meta: { ip: string | null },
+  meta: { ip: string | null; userId?: string | null },
 ): Promise<{ ticketRef: string; region: Region }> {
-  // Re-validate at the boundary regardless of what the action already did.
   const data = publicSubmissionSchema.parse(input);
   const region = data.region as Region;
+  const userId = meta.userId ?? null;
+  const now = new Date();
+  const { ackDue, resolveDue } = computeSla(now);
+  const emailBidx = blindIndex(data.complainantEmail);
 
-  return withPublicContext(async (tx) => {
+  const run = async (tx: Db) => {
     const ticketRef = await allocateTicketRef(tx, region);
-    // Generated app-side so no RETURNING (and thus no SELECT policy) is needed
-    // on this locked-down path.
     const id = crypto.randomUUID();
 
     await tx`
       INSERT INTO grievance
-        (id, ticket_ref, region, subject, description, status,
-         complainant_name_enc, complainant_email_enc, complainant_phone_enc)
+        (id, ticket_ref, region, category, subject, description, status,
+         complainant_name_enc, complainant_email_enc, complainant_phone_enc,
+         complainant_email_bidx, user_id, sla_ack_due, sla_resolve_due)
       VALUES
-        (${id}, ${ticketRef}, ${region}, ${data.subject}, ${data.description},
-         'submitted',
+        (${id}, ${ticketRef}, ${region}, ${data.category}, ${data.subject},
+         ${data.description}, 'submitted',
          ${encryptPII(data.complainantName)},
          ${encryptPII(data.complainantEmail)},
-         ${encryptPII(data.complainantPhone)})
+         ${encryptPII(data.complainantPhone)},
+         ${emailBidx}, ${userId}, ${ackDue}, ${resolveDue})
     `;
 
     await tx`
       INSERT INTO grievance_status_history
         (grievance_id, from_status, to_status, note, changed_by)
-      VALUES
-        (${id}, NULL, 'submitted', 'Submitted via public portal', NULL)
+      VALUES (${id}, NULL, 'submitted', 'Submitted via public portal', NULL)
     `;
 
     await recordAudit(
@@ -63,12 +63,30 @@ export async function createPublicGrievance(
         action: "grievance.create_public",
         resourceType: "grievance",
         resourceId: ticketRef,
-        // Metadata is non-PII only — region + a coarse IP marker for abuse triage.
-        metadata: { region, hasIp: Boolean(meta.ip) },
+        metadata: { region, category: data.category, linked: Boolean(userId) },
       },
       tx,
     );
 
+    if (userId) {
+      await emitTimelineEvent(tx, {
+        userId,
+        type: "grievance.submitted",
+        title: "Grievance submitted",
+        body: `Ticket ${ticketRef} — PRIME will review it.`,
+        metadata: { ticketRef },
+      });
+      await emitNotification(tx, {
+        userId,
+        type: "grievance.submitted",
+        title: "Grievance received",
+        body: `Your grievance ${ticketRef} was submitted and is under review.`,
+        link: "/account/grievances",
+      });
+    }
+
     return { ticketRef, region };
-  });
+  };
+
+  return userId ? withUserContext(userId, run) : withPublicContext(run);
 }

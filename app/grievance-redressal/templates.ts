@@ -137,3 +137,22 @@ export const CUSTOM_TEMPLATE_ID = "custom";
 export function getTemplate(id: string | undefined): Template | undefined {
   return TEMPLATES.find((t) => t.id === id);
 }
+
+/** Map a template to the DB grievance category (grievance_category enum). */
+export function dbCategoryFor(
+  templateId: string | undefined,
+): "data_protection" | "programme" | "website" | "general" | "procurement" {
+  switch (templateId) {
+    case "portal":
+      return "website";
+    case "incubation":
+    case "funding":
+    case "hub_access":
+    case "mentorship":
+    case "events":
+    case "scheme":
+      return "programme";
+    default:
+      return "general";
+  }
+}

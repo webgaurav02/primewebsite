@@ -13,6 +13,7 @@ const NAV: { href: string; label: string; desc: string }[] = [
   { href: "/account/id-card", label: "PRIME ID", desc: "Request or download your ID card" },
   { href: "/account/timeline", label: "Timeline", desc: "Your PRIME journey & announcements" },
   { href: "/account/notifications", label: "Notifications", desc: "Approvals & updates" },
+  { href: "/account/grievances", label: "Grievances", desc: "Track grievances you filed" },
 ];
 
 /**

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { publicSubmissionSchema } from "@/lib/validation/grievance";
 import { checkRateLimit } from "@/lib/grievance/rate-limit";
 import { createPublicGrievance } from "@/lib/dal/grievance-intake";
+import { getCurrentUser } from "@/lib/auth/user-session";
 import type { Region } from "@/lib/auth/rbac";
 
 /**
@@ -55,6 +56,7 @@ export async function submitGrievanceAction(
   // (4) Server-side validation (the client never decides validity).
   const parsed = publicSubmissionSchema.safeParse({
     region: formData.get("region"),
+    category: formData.get("category") ?? undefined,
     subject: formData.get("subject"),
     description: formData.get("description"),
     complainantName: formData.get("complainantName"),
@@ -72,8 +74,13 @@ export async function submitGrievanceAction(
     };
   }
 
-  // (5) Write via the isolated, unauthenticated intake boundary. Only the ticket
-  //     reference + region come back — never the PII that was just submitted.
-  const { ticketRef, region } = await createPublicGrievance(parsed.data, { ip });
+  // (5) Link to the submitter if signed in (adds it to their timeline + lets
+  //     them track it from their account), else write anonymously.
+  const user = await getCurrentUser();
+
+  const { ticketRef, region } = await createPublicGrievance(parsed.data, {
+    ip,
+    userId: user?.id ?? null,
+  });
   return { status: "success", ticketRef, region };
 }

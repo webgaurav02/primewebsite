@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitGrievanceAction, type SubmitState } from "../actions";
-import { getTemplate, CUSTOM_TEMPLATE_ID, type Template } from "../templates";
+import { getTemplate, dbCategoryFor, CUSTOM_TEMPLATE_ID, type Template } from "../templates";
 import type { Zone } from "../zones";
 import { getZone } from "../zones";
 import type { Region } from "@/lib/auth/rbac";
@@ -486,6 +486,7 @@ export default function GrievanceWizard({
       </div>
 
       <Honeypot />
+      <input type="hidden" name="category" value={dbCategoryFor(templateId)} />
 
       <StickyActionBar
         step={step}
