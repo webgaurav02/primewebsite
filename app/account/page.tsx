@@ -3,7 +3,6 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/user-session";
 import { unreadNotificationCount } from "@/lib/dal/events";
 import { REGISTRANT_TYPE_LABELS, PERSONAS } from "@/lib/users/types";
-import VerifyBanner from "./_components/VerifyBanner";
 import { logoutAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 
 const NAV: { href: string; label: string; desc: string }[] = [
   { href: "/account/id-card", label: "PRIME ID", desc: "Request or download your ID card" },
-  { href: "/account/programs", label: "Programs", desc: "Apply to PRIME programs & track" },
+  { href: "/account/programs", label: "Programs", desc: "Pre-Incubation, Funding, Office Space & more" },
   { href: "/account/mentorship", label: "Mentorship", desc: "Your mentor, mentees & sessions" },
   { href: "/account/documents", label: "Documents", desc: "Upload & verify your documents" },
   { href: "/account/timeline", label: "Timeline", desc: "Your PRIME journey & announcements" },
@@ -54,15 +53,11 @@ export default async function AccountPage() {
       </div>
 
       <p className="mt-2 text-sm text-zinc-600">
-        Welcome, {user.fullName.split(" ")[0]}. Your PRIME account is active — apply for programmes, a
-        PRIME ID, and more below.
+        Welcome, {user.fullName.split(" ")[0]}. Your PRIME account is active — apply for a PRIME ID,
+        programmes, and more below.
       </p>
 
-      <div className="mt-6">
-        <VerifyBanner email={user.email} verified={user.emailVerified} />
-      </div>
-
-      <div className="mt-2 grid gap-3 sm:grid-cols-3">
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
         {NAV.map((n) => (
           <Link
             key={n.href}
