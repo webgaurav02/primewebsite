@@ -12,7 +12,7 @@ export default function AuthCard({
   children: ReactNode;
 }) {
   return (
-    <main className="flex flex-1 items-center justify-center bg-zinc-50 px-6 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-6 py-12">
       <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
         <Image
           src="/logo-color.png"
@@ -30,6 +30,9 @@ export default function AuthCard({
         )}
         <div className="mt-6">{children}</div>
       </div>
+      <p className="mt-5 text-center text-xs text-zinc-400">
+        Government of Meghalaya · PRIME Programme
+      </p>
     </main>
   );
 }
