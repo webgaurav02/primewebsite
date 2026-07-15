@@ -36,6 +36,7 @@ const NAV: Item[] = [
   { href: "/admin/documents", label: "Documents", perm: "document:verify", icon: <Icon d="M6 3h8l4 4v14H6z|14 3v4h4|9 13h6M9 16h6M9 10h3" /> },
   { href: "/admin/events", label: "Events", perm: "event:publish", icon: <Icon d="M4 5h16v15H4z|4 9h16|8 3v4M16 3v4" /> },
   { href: "/admin/grievances", label: "Grievances", perm: "grievance:read", icon: <Icon d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z" /> },
+  { href: "/admin/admins", label: "Admins", perm: "admin:manage", icon: <Icon d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z|9.5 12l1.8 1.8L15 10" /> },
   { href: "/admin/audit", label: "Audit log", perm: "audit:read", icon: <Icon d="M9 4h7l3 3v13H5V4h4|13 4v4h4M8 13h6M8 16h6M8 10h2" /> },
 ];
 
