@@ -1,0 +1,25 @@
+# Keep the build context minimal and free of secrets.
+node_modules
+.next
+.git
+.github
+.vscode
+.DS_Store
+
+# env + credentials — runtime config comes from App Service settings, never the image
+.env*
+!.env.example
+*.PublishSettings
+*.pem
+
+# dev/test-only
+test
+coverage
+docs
+vitest.config.ts
+docker-compose.yml
+README.md
+AGENTS.md
+CLAUDE.md
+*.tsbuildinfo
+npm-debug.log*
