@@ -23,11 +23,13 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and test
+      - name: npm install and build
+        # No `npm run test` here: the suite's pretest hook runs createdb +
+        # migrations against a local Postgres the GitHub runner lacks (ECONNREFUSED),
+        # which fails the deploy. Tests run in a separate CI.
         run: |
           npm install
           npm run build --if-present
-          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
