@@ -19,6 +19,7 @@ import {
 } from "@/lib/email/templates";
 import { slidingWindow } from "@/lib/security/rate-limit";
 import { finalizeAvatar } from "@/lib/storage";
+import { log, maskEmail, errInfo } from "@/lib/observability/log";
 import { SECTOR_LABELS } from "@/lib/entrepreneurs-data";
 import {
   registrantTypeToPersona,
@@ -184,13 +185,28 @@ export async function registerUser(
     // Throttle the "account exists" mail PER ADDRESS so it can't be weaponised for
     // email bombing (independent of the IP limiter, which is best-effort).
     if (slidingWindow(`acct-exists-mail:${d.email}`, 3, 60 * 60 * 1000).ok) {
-      await sendAccountExistsEmail(d.email, outcome.name);
+      // Best-effort — a mail hiccup must not change the uniform duplicate response.
+      try {
+        await sendAccountExistsEmail(d.email, outcome.name);
+      } catch (err) {
+        log.error("register.exists_email_failed", { email: maskEmail(d.email), ...errInfo(err) });
+      }
     }
+    log.info("register.duplicate", { email: maskEmail(d.email) });
     return { ok: true }; // uniform response — no session, no enumeration
   }
 
-  // Verify email first — its delivery must not depend on object storage.
-  await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
+  log.info("register.committed", { email: maskEmail(d.email), registrantType, minor });
+
+  // Best-effort: the account + session are already durably committed, so a
+  // verification-email failure must NOT sink the registration (the dashboard
+  // shows a "verify your email" banner and the outbox processor retries). Log
+  // it so a broken mail pipeline is visible instead of silently swallowed.
+  try {
+    await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
+  } catch (err) {
+    log.error("register.verify_email_failed", { email: maskEmail(d.email), ...errInfo(err) });
+  }
 
   // Best-effort: bind the browser-uploaded staging avatar to the new user AFTER
   // commit. finalizeAvatar re-downloads it, re-validates by magic bytes + size
@@ -205,9 +221,12 @@ export async function registerUser(
         await withAuthContext(
           (tx) => tx`UPDATE app_user SET photo_path = ${key} WHERE id = ${outcome.userId}`,
         );
+      } else {
+        log.warn("register.photo_finalize_skipped", { email: maskEmail(d.email) });
       }
-    } catch {
-      // ignore — account + session already succeeded; photo can be set later.
+    } catch (err) {
+      // account + session already succeeded; photo can be set later from account.
+      log.error("register.photo_finalize_failed", { email: maskEmail(d.email), ...errInfo(err) });
     }
   }
 

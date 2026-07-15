@@ -16,6 +16,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Client-side Sentry DSN is a NEXT_PUBLIC_* value, so it is inlined into the
+# browser bundle at BUILD time (not read at runtime). Pass it with
+# `--build-arg NEXT_PUBLIC_SENTRY_DSN=...` to enable browser error capture; when
+# absent the client SDK simply stays disabled. The SERVER-side SENTRY_DSN is a
+# runtime App Service setting and needs no build arg.
+ARG NEXT_PUBLIC_SENTRY_DSN=""
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
 RUN npm run build
 
 # ── runner: minimal runtime image, non-root ──────────────────────────────────

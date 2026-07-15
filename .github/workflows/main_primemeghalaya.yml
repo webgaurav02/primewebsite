@@ -51,6 +51,12 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest
+          # Client-side Sentry DSN, inlined into the browser bundle at build time.
+          # Set repo variable NEXT_PUBLIC_SENTRY_DSN (Settings → Secrets and
+          # variables → Actions → Variables). Empty ⇒ client SDK stays disabled;
+          # server-side capture uses the runtime SENTRY_DSN App Service setting.
+          build-args: |
+            NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

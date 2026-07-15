@@ -14,6 +14,7 @@ import {
   LANGUAGES,
   HOW_HEARD,
 } from "@/lib/users/types";
+import * as Sentry from "@sentry/nextjs";
 import { isMinorDob } from "@/lib/legal/policy";
 import { registerAction, createAvatarUploadUrlAction } from "./actions";
 
@@ -133,9 +134,11 @@ export default function RegisterPage() {
         headers: { "Content-Type": res.contentType },
         body: f,
       });
-      if (!put.ok) throw new Error(`upload ${put.status}`);
+      if (!put.ok) throw new Error(`R2 PUT failed: ${put.status}`);
       set("photoKey", res.key);
-    } catch {
+    } catch (err) {
+      // Surfaces R2/CORS/network failures on the direct upload (invisible server-side).
+      Sentry.captureException(err, { tags: { flow: "register_photo_upload" } });
       setError("We couldn't upload your photo. You can continue without it, or try a different image.");
     }
   }
@@ -206,10 +209,12 @@ export default function RegisterPage() {
       // A new account's session cookie is already set (the dashboard opens); a
       // duplicate has no session and got a "you already have an account" email.
       setSubmitted(true);
-    } catch {
-      // A rejected Server Action (e.g. an oversized photo payload, a 5xx, or a
-      // dropped connection) must surface — otherwise the button hangs on
-      // "Creating account…" forever. Show a recoverable message instead.
+    } catch (err) {
+      // A rejected Server Action (transport error / dropped connection) must
+      // surface — otherwise the button hangs on "Creating account…" forever.
+      // (Server-side failures now return {ok:false} and are logged/captured in
+      // the action; this catch is the client transport net.)
+      Sentry.captureException(err, { tags: { flow: "register_submit" } });
       setError(
         "We couldn't create your account just now. Please check your connection and try again — if you added a photo, try a smaller one or continue without it.",
       );

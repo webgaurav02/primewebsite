@@ -20,6 +20,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1086.0",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.1.0",
+    "@sentry/nextjs": "^10.65.0",
     "framer-motion": "^12.42.0",
     "html-to-image": "^1.11.13",
     "jsbarcode": "^3.12.3",
