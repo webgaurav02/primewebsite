@@ -6,11 +6,12 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  HiInformationCircle, HiUsers, HiOfficeBuilding, HiGlobe,
+  HiInformationCircle, HiUsers, HiOfficeBuilding,
   HiBriefcase, HiAcademicCap, HiStar, HiLightBulb, HiLink,
   HiCurrencyRupee, HiExternalLink, HiBookOpen, HiMail,
   HiClipboardList, HiHome, HiSpeakerphone, HiCog,
   HiLightningBolt, HiDocumentText, HiTrendingUp,
+  HiNewspaper, HiVideoCamera,
 } from "react-icons/hi";
 import type { IconType } from "react-icons";
 
@@ -70,30 +71,11 @@ const navLinks: NavLink[] = [
           ],
         },
         {
-          heading: "Programmes",
-          items: [
-            { label: "Incubation",            subtitle: "CM's E-Championship",  href: "/incubation",            icon: HiOfficeBuilding },
-            { label: "Market Linkage",        subtitle: "Trade & exhibitions",  href: "/market-linkage",        icon: HiGlobe          },
-            { label: "Business Facilitation", subtitle: "Startup handholding",  href: "/business-facilitation", icon: HiBriefcase      },
-            { label: "Training Centres",      subtitle: "Skill development",    href: "/trainingcentres",       icon: HiAcademicCap    },
-            { label: "Fellowship",            subtitle: "Deep-dive programme",  href: "/fellowship",            icon: HiStar           },
-          ],
-        },
-        {
           heading: "Our Network",
           items: [
             { label: "Mentors",   subtitle: "Experts guiding our founders",     href: "/mentors",   icon: HiLightBulb      },
             { label: "Partners",  subtitle: "Institutional & ecosystem allies",  href: "/partners",  icon: HiLink           },
             { label: "Investors", subtitle: "Funding connections for startups",  href: "/investors", icon: HiCurrencyRupee  },
-          ],
-        },
-        {
-          heading: "Connect",
-          items: [
-            { label: "PRIME Portal",   subtitle: "Register your startup", href: "/register",       icon: HiExternalLink  },
-            { label: "Knowledge Base", subtitle: "Answers & guides",      href: "/knowledge-base", icon: HiBookOpen      },
-            { label: "Contact Us",     subtitle: "Reach our team",        href: "/contact",        icon: HiMail          },
-            { label: "Grievance",      subtitle: "File a complaint",      href: "/grievance",      icon: HiClipboardList },
           ],
         },
       ],
@@ -119,14 +101,16 @@ const navLinks: NavLink[] = [
             { label: "CM Elevate",                    subtitle: "Subsidy across 15 sectors", href: "/cm-elevate",            icon: HiTrendingUp     },
             { label: "PRIME Rural",                   subtitle: "Village-level enterprise",  href: "/prime-rural",           icon: HiHome           },
             { label: "Business Facilitation Service", subtitle: "Handholding & liaison",     href: "/business-facilitation", icon: HiBriefcase      },
-            { label: "Partnership",                   subtitle: "Institutional alliances",   href: "#",                      icon: HiLink           },
+            { label: "Partnership",                   subtitle: "Institutional alliances",   href: "/partners",              icon: HiLink           },
+            { label: "Funding",                       subtitle: "Grants, loans & subsidies", href: "/funding-schemes",       icon: HiCurrencyRupee  },
           ],
         },
         {
           heading: "Support Sectors",
           items: [
-            { label: "Monitoring & Evaluation", subtitle: "Impact tracking & reporting", href: "/media-entertainment", icon: HiSpeakerphone },
+            { label: "Media & Comms",           subtitle: "Press, stories & outreach",   href: "/media-comms",         icon: HiNewspaper    },
             { label: "Admin",                   subtitle: "Operations & governance",     href: "/admin-governance",    icon: HiCog          },
+            { label: "Monitoring & Evaluation", subtitle: "Impact tracking & reporting", href: "/media-entertainment", icon: HiSpeakerphone },
           ],
         },
       ],
@@ -148,18 +132,31 @@ const navLinks: NavLink[] = [
         {
           heading: "Grants & Subsidies",
           items: [
-            { label: "Kick Start Grant",       subtitle: "Up to ₹10L non-returnable",  href: "/funding-schemes",        icon: HiLightningBolt },
-            { label: "Small Support Grant",    subtitle: "Up to ₹3L seed support",     href: "/funding-schemes",        icon: HiStar          },
-            { label: "InnoVenture Grant",      subtitle: "Up to ₹35L for innovators",  href: "/funding-schemes",        icon: HiLightBulb     },
-            { label: "Student Tinkering Fund", subtitle: "Youth & campus innovation",  href: "/student-tinkering-fund", icon: HiAcademicCap   },
+            { label: "Kick Start Grant",      subtitle: "Up to ₹10L non-returnable",   href: "/funding-schemes",                icon: HiLightningBolt },
+            { label: "Small Support Grant",   subtitle: "Up to ₹3L seed support",      href: "/funding-schemes",                icon: HiStar          },
+            { label: "InnoVenture Grant",     subtitle: "Up to ₹35L for innovators",   href: "/funding-schemes",                icon: HiLightBulb     },
+            { label: "Entrepreneurship Fund", subtitle: "Up to ₹75L zero-interest",    href: "/prime-entrepreneurship-funding", icon: HiTrendingUp    },
+            { label: "All Schemes",           subtitle: "Full overview & eligibility", href: "/funding-schemes",                icon: HiDocumentText  },
           ],
         },
         {
-          heading: "Loans & Investment",
+          heading: "CM Elevate",
           items: [
-            { label: "Entrepreneurship Fund",        subtitle: "Up to ₹75L zero-interest",     href: "/prime-entrepreneurship-funding", icon: HiTrendingUp    },
-            { label: "Training Centre Establishment",subtitle: "Up to ₹50L for training hubs", href: "/trainingcentres",               icon: HiOfficeBuilding},
-            { label: "All Schemes",                  subtitle: "Full overview & eligibility",  href: "/funding-schemes",               icon: HiDocumentText  },
+            { label: "About CM-ELEVATE",         subtitle: "The CM's flagship programme",  href: "/cm-elevate", icon: HiTrendingUp   },
+            { label: "Sector Subsidies",         subtitle: "35–75% across 15+ sectors",    href: "/cm-elevate", icon: HiCurrencyRupee },
+            { label: "E-Championship Challenge", subtitle: "₹2L grants for 75 founders",   href: "/incubation", icon: HiStar          },
+          ],
+        },
+        {
+          heading: "Academia",
+          items: [
+            { label: "Student Tinkering Fund", subtitle: "Youth & campus innovation", href: "/student-tinkering-fund", icon: HiAcademicCap },
+          ],
+        },
+        {
+          heading: "Training Centre Establishment",
+          items: [
+            { label: "Training Centres", subtitle: "Up to ₹50L for training hubs", href: "/trainingcentres", icon: HiOfficeBuilding },
           ],
         },
       ],
@@ -174,7 +171,52 @@ const navLinks: NavLink[] = [
     },
   },
   { label: "Entrepreneurs", href: "/entrepreneurs", mega: null },
-  { label: "Updates", href: "/updates", mega: null },
+  {
+    label: "Updates",
+    href: "/updates",
+    mega: {
+      columns: [
+        {
+          heading: "Stories & News",
+          items: [
+            { label: "Success Stories", subtitle: "Entrepreneur journeys",        href: "/updates#success-stories", icon: HiStar      },
+            { label: "Updates",         subtitle: "Programme news & milestones",  href: "/updates",                 icon: HiNewspaper },
+          ],
+        },
+        {
+          heading: "Publications",
+          items: [
+            { label: "Newsletter", subtitle: "Ecosystem round-ups",        href: "/updates#newsletter", icon: HiMail         },
+            { label: "Catalogue",  subtitle: "Entrepreneur products",      href: "/updates#catalogue",  icon: HiBookOpen     },
+            { label: "Brochure",   subtitle: "Programme publications",     href: "/updates#brochure",   icon: HiDocumentText },
+            { label: "Videos",     subtitle: "Films & event coverage",     href: "/updates#videos",     icon: HiVideoCamera  },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    label: "Connect",
+    href: "/contact",
+    mega: {
+      columns: [
+        {
+          heading: "Reach Us",
+          items: [
+            { label: "Contact Us", subtitle: "Reach our team",   href: "/contact",   icon: HiMail          },
+            { label: "Grievance",  subtitle: "File a complaint", href: "/grievance", icon: HiClipboardList },
+          ],
+        },
+        {
+          heading: "Engage",
+          items: [
+            { label: "PRIME Portal",   subtitle: "Register your startup", href: "/register",       icon: HiExternalLink },
+            { label: "Knowledge Base", subtitle: "Answers & guides",      href: "/knowledge-base", icon: HiBookOpen     },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default function Navbar() {
@@ -183,6 +225,7 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen]     = useState<string | null>(null);
   const [scrolled, setScrolled]         = useState(false);
+  const [eventItems, setEventItems]     = useState<string[]>([]);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -190,6 +233,24 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Upcoming events for the homepage ticker
+  useEffect(() => {
+    if (pathname !== "/") return;
+    fetch("/api/events/upcoming")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((events: { title: string; at: string }[]) => {
+        if (!Array.isArray(events) || events.length === 0) return;
+        setEventItems(events.map((e) =>
+          `Upcoming: ${e.title} — ${new Date(e.at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`
+        ));
+      })
+      .catch(() => {});
+  }, [pathname]);
+
+  const ticker = eventItems.length > 0
+    ? `${eventItems.join("   ·   ")}   ·   ${tickerText}`
+    : tickerText;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -527,7 +588,7 @@ export default function Navbar() {
       {/* Green ticker — homepage only */}
       {pathname === "/" && <div className="bg-[#2D6A4F] rounded-xl overflow-hidden py-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.10)]">
         <div className="animate-marquee select-none flex">
-          {[tickerText, tickerText].map((t, i) => (
+          {[ticker, ticker].map((t, i) => (
             <span key={i} className="flex items-center pr-20 text-[11px] font-bold tracking-[0.2em] uppercase text-white whitespace-nowrap">
               {t}
             </span>

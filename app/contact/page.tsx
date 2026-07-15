@@ -365,7 +365,7 @@ export default function ContactPage() {
             {/* Map */}
             <div className="h-[420px] lg:h-[480px]">
               <iframe
-                src="https://www.openstreetmap.org/export/embed.html?bbox=91.8600%2C25.5580%2C91.9200%2C25.6000&layer=mapnik&marker=25.5788%2C91.8933"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=91.8760%2C25.5720%2C91.8870%2C25.5815&layer=mapnik&marker=25.5767%2C91.8815"
                 width="100%"
                 height="100%"
                 style={{ border: 0, display: "block", height: "100%" }}
