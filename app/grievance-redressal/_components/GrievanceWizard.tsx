@@ -18,6 +18,8 @@ import ReviewStep from "./ReviewStep";
 import StickyActionBar from "./StickyActionBar";
 import SuccessPanel from "./SuccessPanel";
 import Honeypot from "./Honeypot";
+import AttachmentInput from "./AttachmentInput";
+import { CONSENT_VERSION } from "@/lib/grievance/consent";
 
 const STEP_LABELS = ["Topic & zone", "Describe the issue", "Your information", "Review"];
 const TOTAL = STEP_LABELS.length;
@@ -29,18 +31,26 @@ const FIELD_STEP: Record<string, number> = {
   region: 1,
   subject: 2,
   description: 2,
+  attachments: 2,
   complainantName: 3,
   complainantEmail: 3,
   complainantPhone: 3,
+  businessName: 3,
+  primeId: 3,
+  consent: 4,
 };
 const FIELD_LABEL: Record<string, string> = {
   topic: "Topic",
   region: "Zone",
   subject: "Subject",
   description: "Description",
+  attachments: "Attachments",
   complainantName: "Name",
   complainantEmail: "Email",
   complainantPhone: "Phone",
+  businessName: "Business name",
+  primeId: "PRIME ID",
+  consent: "Consent",
 };
 
 const PHONE_RE = /^[+0-9 ()-]{7,20}$/;
@@ -66,7 +76,11 @@ export default function GrievanceWizard({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [primeId, setPrimeId] = useState("");
+  const [attachmentNames, setAttachmentNames] = useState<string[]>([]);
   const [ack, setAck] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   // Fields edited since the last submit — their (stale) server errors are
   // suppressed so we don't nag while the user fixes them; reset on each submit.
@@ -198,7 +212,11 @@ export default function GrievanceWizard({
     setName("");
     setEmail("");
     setPhone("");
+    setBusinessName("");
+    setPrimeId("");
+    setAttachmentNames([]);
     setAck(false);
+    setConsent(false);
     setClientErrors({});
   }
 
@@ -236,7 +254,7 @@ export default function GrievanceWizard({
       t.keywords.some((k) => k.includes(query.toLowerCase())),
   );
   const hasPlaceholder = description.includes(PLACEHOLDER);
-  const submitDisabled = !ack || hasPlaceholder;
+  const submitDisabled = !ack || !consent || hasPlaceholder;
 
   return (
     <form
@@ -382,6 +400,11 @@ export default function GrievanceWizard({
               Reset to template prompts
             </button>
           )}
+
+          <AttachmentInput
+            error={errFor("attachments")}
+            onFilesChange={setAttachmentNames}
+          />
         </fieldset>
 
         {/* STEP 3 — Your information */}
@@ -452,6 +475,51 @@ export default function GrievanceWizard({
             )}
           </Field>
 
+          <Field
+            id="businessName"
+            label="Business name"
+            helper="Optional — the name of your startup or business, if this grievance relates to one."
+            error={errFor("businessName")}
+          >
+            {(a) => (
+              <input
+                {...a}
+                name="businessName"
+                type="text"
+                autoComplete="organization"
+                value={businessName}
+                maxLength={200}
+                onChange={(e) => {
+                  setBusinessName(e.target.value);
+                  clearError("businessName");
+                }}
+                className="h-12 w-full rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900 focus-visible:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-[invalid]:border-2 aria-[invalid]:border-black aria-[invalid]:bg-zinc-50"
+              />
+            )}
+          </Field>
+
+          <Field
+            id="primeId"
+            label="PRIME ID"
+            helper="Optional — if you have a PRIME ID, add it so we can link your grievance faster."
+            error={errFor("primeId")}
+          >
+            {(a) => (
+              <input
+                {...a}
+                name="primeId"
+                type="text"
+                value={primeId}
+                maxLength={40}
+                onChange={(e) => {
+                  setPrimeId(e.target.value);
+                  clearError("primeId");
+                }}
+                className="h-12 w-full rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-900 focus-visible:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-[invalid]:border-2 aria-[invalid]:border-black aria-[invalid]:bg-zinc-50"
+              />
+            )}
+          </Field>
+
           <p className="text-sm text-zinc-500">
             We use this only to send your ticket reference and updates, handled
             under the DPDP Act.
@@ -471,10 +539,19 @@ export default function GrievanceWizard({
               complainantName: name,
               complainantEmail: email,
               complainantPhone: phone,
+              businessName,
+              primeId,
+              attachmentNames,
             }}
             onEdit={(s) => setStep(s)}
             ack={ack}
             onAckChange={setAck}
+            consent={consent}
+            onConsentChange={(v) => {
+              setConsent(v);
+              clearError("consent");
+            }}
+            consentError={errFor("consent")}
           />
           {hasPlaceholder && (
             <p className="text-sm font-semibold text-zinc-900">
@@ -487,6 +564,8 @@ export default function GrievanceWizard({
 
       <Honeypot />
       <input type="hidden" name="category" value={dbCategoryFor(templateId)} />
+      <input type="hidden" name="consent" value={consent ? "true" : "false"} />
+      <input type="hidden" name="consentVersion" value={CONSENT_VERSION} />
 
       <StickyActionBar
         step={step}

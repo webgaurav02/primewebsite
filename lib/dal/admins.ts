@@ -2,12 +2,14 @@ import "server-only";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
 import { assertCan, type Region, type Role } from "@/lib/auth/rbac";
-import { withAdminContext } from "@/lib/db/client";
+import { withAdminContext, withAdminAuthContext } from "@/lib/db/client";
+import { hashPassword } from "@/lib/auth/password";
 import { recordAudit } from "@/lib/audit/log";
 import {
   createAdminSchema,
   updateAdminSchema,
   setAdminActiveSchema,
+  setAdminPasswordSchema,
   normaliseRegions,
 } from "@/lib/admins/types";
 
@@ -17,10 +19,10 @@ import {
  * withAdminContext (RLS additionally requires current_admin_role='super_admin'
  * for every write, per migration 0019) → audit.
  *
- * Manages WHO is an admin, their role, region scope, and active flag. It does
- * not grant login (admin auth is fail-closed until passkeys land) — see
- * lib/admins/types.ts. Guardrails below make it impossible to lock the org out
- * of super-admin control.
+ * Manages WHO is an admin, their role, region scope, active flag, and sign-in
+ * password (createAdmin's optional password / setAdminPassword). Login itself is
+ * verified by lib/dal/admin-auth.ts. Guardrails below make it impossible to lock
+ * the org out of super-admin control.
  */
 
 export interface AdminListItem {
@@ -89,6 +91,10 @@ export async function createAdmin(raw: unknown): Promise<MutationResult> {
   const email = parsed.data.email.toLowerCase();
   const { name, role } = parsed.data;
   const regions = normaliseRegions(role, parsed.data.regions);
+  // Hash outside the tx (scrypt is CPU-heavy) — empty password = no sign-in yet.
+  const passwordHash = parsed.data.password
+    ? await hashPassword(parsed.data.password)
+    : null;
 
   return withAdminContext(viewer, async (tx) => {
     const [dupe] = await tx`SELECT 1 FROM admin_user WHERE lower(email) = ${email}`;
@@ -116,13 +122,19 @@ export async function createAdmin(raw: unknown): Promise<MutationResult> {
       await tx`INSERT INTO admin_region (admin_id, region) VALUES (${createdId}, ${region})`;
     }
 
+    // Optional initial sign-in credential (RLS admin_credential_all allows the
+    // super_admin console context to write). Atomic with the admin_user row.
+    if (passwordHash) {
+      await tx`INSERT INTO admin_credential (admin_id, password_hash) VALUES (${createdId}, ${passwordHash})`;
+    }
+
     await recordAudit(
       {
         actor: viewer,
         action: "admin.create",
         resourceType: "admin_user",
         resourceId: createdId,
-        metadata: { email, role, regions },
+        metadata: { email, role, regions, hasPassword: Boolean(passwordHash) },
       },
       tx,
     );
@@ -224,4 +236,56 @@ export async function setAdminActive(raw: unknown): Promise<MutationResult> {
 
     return { ok: true };
   });
+}
+
+/**
+ * Set or rotate an admin's sign-in password (super_admin only, by RBAC). Clears
+ * any lockout, and revokes that admin's existing sessions so the new password
+ * takes effect immediately. This is how a console-created admin (created without
+ * a password) is granted login, and how a locked-out admin is recovered.
+ */
+export async function setAdminPassword(raw: unknown): Promise<MutationResult> {
+  const viewer = await requireAdmin();
+  assertCan(viewer, "admin:manage");
+
+  const parsed = setAdminPasswordSchema.safeParse(raw);
+  if (!parsed.success) return { ok: false, fieldErrors: flatten(parsed.error) };
+
+  const { adminId } = parsed.data;
+  const passwordHash = await hashPassword(parsed.data.password);
+
+  const result = await withAdminContext(viewer, async (tx): Promise<MutationResult> => {
+    const [target] = await tx`SELECT 1 FROM admin_user WHERE id = ${adminId}`;
+    if (!target) return { ok: false, error: "Admin not found." };
+
+    await tx`
+      INSERT INTO admin_credential (admin_id, password_hash)
+      VALUES (${adminId}, ${passwordHash})
+      ON CONFLICT (admin_id)
+      DO UPDATE SET password_hash = ${passwordHash},
+                    failed_attempts = 0, locked_until = NULL, updated_at = now()
+    `;
+
+    await recordAudit(
+      {
+        actor: viewer,
+        action: "admin.set_password",
+        resourceType: "admin_user",
+        resourceId: adminId,
+      },
+      tx,
+    );
+
+    return { ok: true };
+  });
+
+  // Force re-login: revoke existing sessions (needs the admin-auth context, as
+  // admin_session is gated to it). Best-effort — the password already changed.
+  if (result.ok) {
+    await withAdminAuthContext(
+      (tx) => tx`DELETE FROM admin_session WHERE admin_id = ${adminId}`,
+    );
+  }
+
+  return result;
 }

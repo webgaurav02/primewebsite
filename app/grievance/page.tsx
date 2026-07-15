@@ -224,16 +224,31 @@ export default function GrievancePage() {
               Ready to raise a concern?
             </h2>
             <p className="text-white/40 leading-[1.75] mb-10 max-w-lg" style={{ fontSize: "var(--text-lead)" }}>
-              Email us directly — we are a government body and take every complaint seriously.
+              File your grievance online to get a tracked ticket reference, or email
+              us directly — we are a government body and take every complaint seriously.
             </p>
-            <a
-              href="mailto:grievance@primemeghalaya.com"
-              className="inline-flex items-center gap-3 px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
-              style={{ fontSize: "var(--text-sm)" }}
-            >
-              <HiMail size={16} />
-              grievance@primemeghalaya.com
-            </a>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link
+                href="/grievance-redressal"
+                className="inline-flex items-center gap-3 px-9 py-4 bg-white text-[#1B4332] font-bold hover:bg-[#74C69D] transition-colors"
+                style={{ fontSize: "var(--text-sm)" }}
+              >
+                <HiClipboardList size={16} />
+                File a grievance online
+              </Link>
+              <a
+                href="mailto:grievance@primemeghalaya.com"
+                className="inline-flex items-center gap-3 px-9 py-4 border border-white/25 text-white font-bold hover:bg-white/6 transition-colors"
+                style={{ fontSize: "var(--text-sm)" }}
+              >
+                <HiMail size={16} />
+                Email instead
+              </a>
+            </div>
+
+            <p className="mt-8 text-white/40" style={{ fontSize: "var(--text-sm)" }}>
+              <span className="text-[#74C69D] font-bold">42</span> grievances redressed in 2023–24.
+            </p>
 
             <div className="mt-10 flex flex-wrap gap-6" style={{ fontSize: "var(--text-sm)" }}>
               <Link href="/privacy-policy" className="text-white/35 hover:text-[#2D6A4F] transition-colors">

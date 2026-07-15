@@ -44,6 +44,9 @@ export const publicSubmissionSchema = z.object({
     .string()
     .trim()
     .regex(/^[+0-9 ()-]{7,20}$/, "Invalid phone number"),
+  // Optional, self-declared identifiers (blank ⇒ omitted). Not contact PII.
+  primeId: z.string().trim().max(40).optional(),
+  businessName: z.string().trim().max(200).optional(),
 });
 export type PublicSubmission = z.infer<typeof publicSubmissionSchema>;
 

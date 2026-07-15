@@ -69,6 +69,14 @@ describe("registerSchema", () => {
       registerSchema.safeParse({ ...validRegister, registrantType: "entrepreneur_existing" }).success,
     ).toBe(false);
   });
+
+  test("impact financials must be whole-rupee digits (no free text)", () => {
+    expect(registerSchema.safeParse({ ...validRegister, turnover: "500000" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...validRegister, turnover: "" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...validRegister, turnover: "5 Lakh" }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...validRegister, govtFunding: "₹2,00,000" }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...validRegister, externalFunding: "abc" }).success).toBe(false);
+  });
 });
 
 describe("loginSchema", () => {
@@ -102,5 +110,25 @@ describe("publicSubmissionSchema (grievance intake)", () => {
 
   test("rejects an unknown region and too-short fields", () => {
     expect(publicSubmissionSchema.safeParse({ region: "nowhere", subject: "x", description: "y", complainantName: "a", complainantEmail: "b@c.d", complainantPhone: "12345" }).success).toBe(false);
+  });
+
+  const base = {
+    region: "ri_bhoi",
+    subject: "Water connection for the Nongpoh hub kitchen",
+    description: "The shared kitchen has had no running water for over a week now.",
+    complainantName: "Test Complainant",
+    complainantEmail: "test@example.com",
+    complainantPhone: "+91 90000 00099",
+  };
+
+  test("accepts optional PRIME ID + business name, rejects over-long ones", () => {
+    const r = publicSubmissionSchema.safeParse({ ...base, primeId: "PRM-123", businessName: "Khasi Weaves LLP" });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.primeId).toBe("PRM-123");
+      expect(r.data.businessName).toBe("Khasi Weaves LLP");
+    }
+    expect(publicSubmissionSchema.safeParse({ ...base, primeId: "x".repeat(41) }).success).toBe(false);
+    expect(publicSubmissionSchema.safeParse({ ...base, businessName: "y".repeat(201) }).success).toBe(false);
   });
 });

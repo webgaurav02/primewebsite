@@ -387,14 +387,14 @@ export default function RegisterPage() {
               <Field label="Lives indirectly impacted">
                 <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} type="number" min="0" value={data.livesImpacted} onChange={(e) => set("livesImpacted", e.target.value)} />
               </Field>
-              <Field label="Annual turnover (FY24–25)">
-                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} placeholder="e.g. ₹5 Lakh" value={data.turnover} onChange={(e) => set("turnover", e.target.value)} />
+              <Field label="Annual turnover (FY24–25, ₹)">
+                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} type="number" min="0" step="1" inputMode="numeric" placeholder="Whole rupees, e.g. 500000" value={data.turnover} onChange={(e) => set("turnover", e.target.value)} />
               </Field>
-              <Field label="Government funding received">
-                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} placeholder="e.g. ₹2 Lakh" value={data.govtFunding} onChange={(e) => set("govtFunding", e.target.value)} />
+              <Field label="Government funding received (₹)">
+                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} type="number" min="0" step="1" inputMode="numeric" placeholder="Whole rupees, e.g. 200000" value={data.govtFunding} onChange={(e) => set("govtFunding", e.target.value)} />
               </Field>
-              <Field label="External / private funding received">
-                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} placeholder="N/A if none" value={data.externalFunding} onChange={(e) => set("externalFunding", e.target.value)} />
+              <Field label="External / private funding received (₹)">
+                <input className={inputCls} style={{ fontSize: "var(--text-sm)" }} type="number" min="0" step="1" inputMode="numeric" placeholder="Whole rupees, 0 if none" value={data.externalFunding} onChange={(e) => set("externalFunding", e.target.value)} />
               </Field>
               <div className="sm:col-span-2">
                 <Field label="Products / services offered" required>

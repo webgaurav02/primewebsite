@@ -79,7 +79,7 @@ describe("conditional entrepreneur profile", () => {
         stage: "In Revenue",
         description: "We grow hydroponic greens for Shillong markets.",
         products: "Lettuce, basil, microgreens",
-        turnover: "12 Lakh",
+        turnover: "1200000",
       }),
       meta,
     );

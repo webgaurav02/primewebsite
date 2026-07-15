@@ -12,6 +12,11 @@ import { USER_SESSION_MAX_AGE } from "@/lib/auth/user-cookie";
 import { recordAudit } from "@/lib/audit/log";
 import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { sendEmail, appBaseUrl } from "@/lib/email";
+import {
+  verifyEmail,
+  resetPasswordEmail,
+  accountExistsEmail,
+} from "@/lib/email/templates";
 import { slidingWindow } from "@/lib/security/rate-limit";
 import { detectImage, uploadUserImage, MAX_IMAGE_BYTES } from "@/lib/storage";
 import { SECTOR_LABELS } from "@/lib/entrepreneurs-data";
@@ -144,6 +149,10 @@ export async function registerUser(
       const year = intOrNull(d.yearEstablished);
       const employment = intOrNull(d.employment);
       const lives = intOrNull(d.livesImpacted);
+      // Whole-rupee amounts (bigint columns); digits-only per the schema.
+      const turnover = intOrNull(d.turnover);
+      const govtFunding = intOrNull(d.govtFunding);
+      const externalFunding = intOrNull(d.externalFunding);
       const [org] = await tx<{ id: string }[]>`
         INSERT INTO organization
           (name, sector, district, entity_type, stage, year_started, address,
@@ -151,7 +160,7 @@ export async function registerUser(
         VALUES
           (${d.businessName}, ${sectorLabel}, ${d.district}, ${d.entityType},
            ${d.stage}, ${year}, ${d.address || null}, ${d.description},
-           ${employment}, ${d.turnover || null}, ${user.id})
+           ${employment}, ${turnover}, ${user.id})
         RETURNING id`;
       await tx`UPDATE app_user SET organization_id = ${org.id} WHERE id = ${user.id}`;
       await tx`
@@ -162,8 +171,8 @@ export async function registerUser(
         VALUES
           (${user.id}, ${d.businessName}, ${sectorLabel}, ${d.entityType},
            ${d.stage}, ${year}, ${d.address || null}, ${d.description},
-           ${employment}, ${lives}, ${d.turnover || null}, ${d.govtFunding || null},
-           ${d.externalFunding || null}, ${d.products}, ${d.socialImpact || null})`;
+           ${employment}, ${lives}, ${turnover}, ${govtFunding},
+           ${externalFunding}, ${d.products}, ${d.socialImpact || null})`;
     }
 
     const { token: verifyToken, hash: verifyHash } = newToken();
@@ -486,26 +495,16 @@ export async function resetPassword(raw: unknown): Promise<ResetResult> {
   });
 }
 
-// ── Email bodies ────────────────────────────────────────────────────────────
+// ── Email bodies (branded React Email templates) ─────────────────────────────
 
 async function sendVerificationEmail(
   to: string,
   name: string,
   token: string,
 ): Promise<void> {
-  const url = `${appBaseUrl()}/verify-email?token=${token}`;
-  await sendEmail({
-    to,
-    subject: "Verify your PRIME account",
-    text: [
-      `Hi ${name.split(" ")[0]},`,
-      "",
-      "Confirm your email to activate your PRIME account:",
-      url,
-      "",
-      "This link expires in 24 hours. If you didn't create this account, ignore this email.",
-    ].join("\n"),
-  });
+  const baseUrl = appBaseUrl();
+  const url = `${baseUrl}/verify-email?token=${token}`;
+  await sendEmail({ to, ...(await verifyEmail({ baseUrl, name, url })) });
 }
 
 /**
@@ -514,20 +513,8 @@ async function sendVerificationEmail(
  * reset token, so this path never issues or consumes the user's reset tokens.
  */
 async function sendAccountExistsEmail(to: string, name: string): Promise<void> {
-  const url = `${appBaseUrl()}/forgot-password`;
-  await sendEmail({
-    to,
-    subject: "You already have a PRIME account",
-    text: [
-      `Hi ${name.split(" ")[0]},`,
-      "",
-      "Someone just tried to create a PRIME account with this email, but you",
-      "already have one. You can sign in, or reset your password here:",
-      url,
-      "",
-      "If this wasn't you, you can safely ignore this email.",
-    ].join("\n"),
-  });
+  const baseUrl = appBaseUrl();
+  await sendEmail({ to, ...(await accountExistsEmail({ baseUrl, name })) });
 }
 
 async function sendResetEmail(
@@ -535,17 +522,7 @@ async function sendResetEmail(
   name: string,
   token: string,
 ): Promise<void> {
-  const url = `${appBaseUrl()}/reset-password?token=${token}`;
-  await sendEmail({
-    to,
-    subject: "Reset your PRIME password",
-    text: [
-      `Hi ${name.split(" ")[0]},`,
-      "",
-      "Reset your PRIME password using the link below:",
-      url,
-      "",
-      "This link expires in 1 hour. If you didn't request this, you can ignore it.",
-    ].join("\n"),
-  });
+  const baseUrl = appBaseUrl();
+  const url = `${baseUrl}/reset-password?token=${token}`;
+  await sendEmail({ to, ...(await resetPasswordEmail({ baseUrl, name, url })) });
 }

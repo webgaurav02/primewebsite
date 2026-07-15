@@ -20,8 +20,11 @@ import { sendViaResend } from "./resend";
 export interface EmailMessage {
   to: string;
   subject: string;
-  /** Plain-text body. HTML is layered on with the real transport. */
+  /** Plain-text fallback body (also what the dev console transport prints). */
   text: string;
+  /** Branded HTML body, rendered from a React Email template. Optional so a
+   *  bare text message (or an older queued row) still sends. */
+  html?: string;
 }
 
 export type EmailTransport = (msg: EmailMessage) => Promise<void>;
@@ -43,8 +46,8 @@ function resolveTransport(): EmailTransport {
 export async function enqueueEmail(msg: EmailMessage): Promise<void> {
   await withSystemContext(
     (tx) => tx`
-      INSERT INTO email_outbox (to_email, subject, body)
-      VALUES (${msg.to}, ${msg.subject}, ${msg.text})
+      INSERT INTO email_outbox (to_email, subject, body, body_html)
+      VALUES (${msg.to}, ${msg.subject}, ${msg.text}, ${msg.html ?? null})
     `,
   );
 }
@@ -70,9 +73,17 @@ export async function processEmailOutbox(
 
   await withSystemContext(async (tx) => {
     const rows = await tx<
-      { id: string; toEmail: string; subject: string; body: string; attempts: number }[]
+      {
+        id: string;
+        toEmail: string;
+        subject: string;
+        body: string;
+        bodyHtml: string | null;
+        attempts: number;
+      }[]
     >`
-      SELECT id, to_email AS "toEmail", subject, body, attempts
+      SELECT id, to_email AS "toEmail", subject, body,
+             body_html AS "bodyHtml", attempts
       FROM email_outbox
       WHERE status = 'pending' AND attempts < ${MAX_ATTEMPTS}
       ORDER BY created_at
@@ -82,7 +93,12 @@ export async function processEmailOutbox(
 
     for (const r of rows) {
       try {
-        await transport({ to: r.toEmail, subject: r.subject, text: r.body });
+        await transport({
+          to: r.toEmail,
+          subject: r.subject,
+          text: r.body,
+          html: r.bodyHtml ?? undefined,
+        });
         await tx`UPDATE email_outbox SET status = 'sent', sent_at = now() WHERE id = ${r.id}`;
         sent++;
       } catch (e) {

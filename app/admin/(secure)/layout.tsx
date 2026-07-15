@@ -1,8 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireAdmin, getCurrentAdmin } from "@/lib/auth/session";
+import { adminLogout } from "@/lib/dal/admin-auth";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/cookie";
 import AdminSidebar from "./_components/AdminSidebar";
+
+// Authenticated + DB-backed. Force dynamic so the build never tries to
+// prerender these pages (which would run DAL queries with no DATABASE_URL in CI).
+export const dynamic = "force-dynamic";
 
 /**
  * Authenticated admin shell with a left sidebar. requireAdmin() is the SECOND,
@@ -19,7 +24,10 @@ export default async function SecureAdminLayout({
   async function logout() {
     "use server";
     await getCurrentAdmin(); // re-resolve so a forged POST can't be repurposed
-    (await cookies()).delete({ name: SESSION_COOKIE_NAME, path: "/admin" });
+    const jar = await cookies();
+    const token = jar.get(SESSION_COOKIE_NAME)?.value;
+    if (token) await adminLogout(token); // invalidate the server session too
+    jar.delete({ name: SESSION_COOKIE_NAME, path: "/admin" });
     redirect("/admin/login");
   }
 

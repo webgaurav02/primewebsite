@@ -10,9 +10,10 @@ import {
   type Region,
 } from "@/lib/auth/rbac";
 import { recordAudit } from "@/lib/audit/log";
-import { withAdminContext, withUserContext, getSql } from "@/lib/db/client";
+import { withAdminContext, withUserContext, getSql, type Db } from "@/lib/db/client";
 import { requireUser } from "@/lib/auth/user-session";
 import { decryptPII, blindIndex } from "@/lib/crypto/pii";
+import { getFileBytes } from "@/lib/storage";
 import { isAckOverdue, isResolveOverdue } from "@/lib/grievance/sla";
 import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import type { GrievanceStatus, GrievanceCategory } from "@/lib/grievance/types";
@@ -59,8 +60,17 @@ interface GrievanceDbRow {
   assignedToId: string | null;
   slaAckDue: Date | null;
   slaResolveDue: Date | null;
+  primeIdRef: string | null;
+  businessName: string | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface AttachmentMeta {
+  id: string;
+  name: string | null;
+  mime: string;
+  sizeBytes: number;
 }
 
 export interface GrievanceDTO {
@@ -77,6 +87,9 @@ export interface GrievanceDTO {
   slaResolveDue: string | null;
   ackOverdue: boolean;
   resolveOverdue: boolean;
+  primeIdRef: string | null;
+  businessName: string | null;
+  attachments: AttachmentMeta[];
   createdAt: string;
   updatedAt: string;
   complainant: {
@@ -115,11 +128,41 @@ const ROW_SELECT = `
   assigned_to            AS "assignedToId",
   sla_ack_due            AS "slaAckDue",
   sla_resolve_due        AS "slaResolveDue",
+  prime_id_ref           AS "primeIdRef",
+  business_name          AS "businessName",
   created_at             AS "createdAt",
   updated_at             AS "updatedAt"
 `;
 
-function toDTO(row: GrievanceDbRow, viewer: AdminUser): GrievanceDTO {
+/** Fetch attachment metadata for the given grievance ids, grouped by grievance. */
+async function attachmentsByGrievance(
+  tx: Db,
+  ids: string[],
+): Promise<Map<string, AttachmentMeta[]>> {
+  const byId = new Map<string, AttachmentMeta[]>();
+  if (ids.length === 0) return byId;
+  const rows = await tx<
+    { grievanceId: string; id: string; name: string | null; mime: string; sizeBytes: number }[]
+  >`
+    SELECT grievance_id AS "grievanceId", id, original_name AS "name",
+           mime, size_bytes AS "sizeBytes"
+    FROM grievance_attachment
+    WHERE grievance_id = ANY(${ids})
+    ORDER BY created_at
+  `;
+  for (const r of rows) {
+    const list = byId.get(r.grievanceId) ?? [];
+    list.push({ id: r.id, name: r.name, mime: r.mime, sizeBytes: r.sizeBytes });
+    byId.set(r.grievanceId, list);
+  }
+  return byId;
+}
+
+function toDTO(
+  row: GrievanceDbRow,
+  viewer: AdminUser,
+  attachments: AttachmentMeta[] = [],
+): GrievanceDTO {
   // Raw rows carry PII ciphertext — block them from ever crossing to the client.
   taintObjectReference?.(
     "Do not pass raw grievance rows to the client — return the DTO.",
@@ -142,6 +185,9 @@ function toDTO(row: GrievanceDbRow, viewer: AdminUser): GrievanceDTO {
     slaResolveDue: row.slaResolveDue ? row.slaResolveDue.toISOString() : null,
     ackOverdue: isAckOverdue(row.status, row.slaAckDue),
     resolveOverdue: isResolveOverdue(row.status, row.slaResolveDue),
+    primeIdRef: row.primeIdRef,
+    businessName: row.businessName,
+    attachments,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     // Without the permission we never even decrypt — plaintext PII simply does
@@ -194,7 +240,8 @@ export async function listGrievances(
       tx,
     );
 
-    return rows.map((r) => toDTO(r, viewer));
+    const attachments = await attachmentsByGrievance(tx, rows.map((r) => r.id));
+    return rows.map((r) => toDTO(r, viewer, attachments.get(r.id) ?? []));
   });
 }
 
@@ -224,8 +271,56 @@ export async function getGrievance(id: string): Promise<GrievanceDTO | null> {
       tx,
     );
 
-    return toDTO(row, viewer);
+    const attachments = await attachmentsByGrievance(tx, [row.id]);
+    return toDTO(row, viewer, attachments.get(row.id) ?? []);
   });
+}
+
+export interface AttachmentFile {
+  buffer: Buffer;
+  mime: string;
+  name: string;
+}
+
+/**
+ * Serve a grievance attachment to an authorized admin. RLS scopes the lookup to
+ * grievances the caller may read (region-scoped via grievance_attachment_read),
+ * so an out-of-region attachment id returns null (IDOR-safe). Access is audited.
+ */
+export async function getGrievanceAttachmentFileAdmin(
+  attachmentId: string,
+): Promise<AttachmentFile | null> {
+  const viewer = await requireAdmin();
+  assertCan(viewer, "grievance:read");
+  if (!UUID_RE.test(attachmentId)) return null;
+
+  const meta = await withAdminContext(viewer, async (tx) => {
+    const [row] = await tx<
+      { fileKey: string; mime: string; name: string | null; grievanceId: string }[]
+    >`
+      SELECT file_key AS "fileKey", mime, original_name AS "name",
+             grievance_id AS "grievanceId"
+      FROM grievance_attachment WHERE id = ${attachmentId}
+    `;
+    if (row) {
+      await recordAudit(
+        {
+          actor: viewer,
+          action: "grievance.view_attachment",
+          resourceType: "grievance",
+          resourceId: row.grievanceId,
+          metadata: { attachmentId },
+        },
+        tx,
+      );
+    }
+    return row ?? null;
+  });
+  if (!meta) return null;
+
+  const buffer = await getFileBytes(meta.fileKey);
+  if (!buffer) return null;
+  return { buffer, mime: meta.mime, name: meta.name || "attachment" };
 }
 
 export async function updateGrievanceStatus(

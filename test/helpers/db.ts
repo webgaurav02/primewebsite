@@ -49,6 +49,8 @@ const TABLES = [
   "user_credential",
   "app_user",
   "organization",
+  "admin_session",
+  "admin_credential",
   "admin_region",
   "admin_user",
 ];

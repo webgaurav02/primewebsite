@@ -6,11 +6,18 @@ import { recordAudit, PUBLIC_SYSTEM_ACTOR } from "@/lib/audit/log";
 import { allocateTicketRef } from "@/lib/grievance/ticket";
 import { computeSla } from "@/lib/grievance/sla";
 import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
+import { uploadUserFile } from "@/lib/storage";
 import {
   publicSubmissionSchema,
   type PublicSubmission,
 } from "@/lib/validation/grievance";
 import type { Region } from "@/lib/auth/rbac";
+
+/** A validated attachment ready to persist (bytes already checked by the action). */
+export interface PendingAttachment {
+  buffer: Buffer;
+  name: string;
+}
 
 /**
  * Isolated grievance write boundary — never trusts the action layer (re-parses),
@@ -24,7 +31,12 @@ import type { Region } from "@/lib/auth/rbac";
  */
 export async function createPublicGrievance(
   input: PublicSubmission,
-  meta: { ip: string | null; userId?: string | null },
+  meta: {
+    ip: string | null;
+    userId?: string | null;
+    consentVersion?: string | null;
+    attachments?: PendingAttachment[];
+  },
 ): Promise<{ ticketRef: string; region: Region }> {
   const data = publicSubmissionSchema.parse(input);
   const region = data.region as Region;
@@ -33,23 +45,45 @@ export async function createPublicGrievance(
   const { ackDue, resolveDue } = computeSla(now);
   const emailBidx = blindIndex(data.complainantEmail);
 
+  // Generate the grievance id up front so attachments can be uploaded (and
+  // namespaced) against it BEFORE the transaction opens — a failed upload then
+  // never leaves a half-written grievance behind.
+  const id = crypto.randomUUID();
+  const attachments = meta.attachments ?? [];
+  const uploaded: { key: string; mime: string; size: number; name: string }[] = [];
+  for (const att of attachments) {
+    const up = await uploadUserFile("grievance", id, att.buffer);
+    if (!up.ok) throw new Error(up.error); // magic-byte / size already vetted upstream
+    uploaded.push({ key: up.key, mime: up.mime, size: up.size, name: att.name });
+  }
+
   const run = async (tx: Db) => {
     const ticketRef = await allocateTicketRef(tx, region);
-    const id = crypto.randomUUID();
 
     await tx`
       INSERT INTO grievance
         (id, ticket_ref, region, category, subject, description, status,
          complainant_name_enc, complainant_email_enc, complainant_phone_enc,
-         complainant_email_bidx, user_id, sla_ack_due, sla_resolve_due)
+         complainant_email_bidx, user_id, sla_ack_due, sla_resolve_due,
+         prime_id_ref, business_name, consent_version, consent_at)
       VALUES
         (${id}, ${ticketRef}, ${region}, ${data.category}, ${data.subject},
          ${data.description}, 'submitted',
          ${encryptPII(data.complainantName)},
          ${encryptPII(data.complainantEmail)},
          ${encryptPII(data.complainantPhone)},
-         ${emailBidx}, ${userId}, ${ackDue}, ${resolveDue})
+         ${emailBidx}, ${userId}, ${ackDue}, ${resolveDue},
+         ${data.primeId ?? null}, ${data.businessName ?? null},
+         ${meta.consentVersion ?? null}, ${meta.consentVersion ? now : null})
     `;
+
+    for (const f of uploaded) {
+      await tx`
+        INSERT INTO grievance_attachment
+          (grievance_id, file_key, mime, size_bytes, original_name)
+        VALUES (${id}, ${f.key}, ${f.mime}, ${f.size}, ${f.name})
+      `;
+    }
 
     await tx`
       INSERT INTO grievance_status_history
@@ -63,7 +97,12 @@ export async function createPublicGrievance(
         action: "grievance.create_public",
         resourceType: "grievance",
         resourceId: ticketRef,
-        metadata: { region, category: data.category, linked: Boolean(userId) },
+        metadata: {
+          region,
+          category: data.category,
+          linked: Boolean(userId),
+          attachments: uploaded.length,
+        },
       },
       tx,
     );

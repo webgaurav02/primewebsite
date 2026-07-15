@@ -13,6 +13,7 @@ export async function sendViaConsole(msg: EmailMessage): Promise<void> {
       "──────────────── EMAIL (dev console transport) ────────────────",
       `To:      ${msg.to}`,
       `Subject: ${msg.subject}`,
+      msg.html ? `(HTML body: ${msg.html.length} chars — text shown below)` : "",
       "",
       msg.text,
       "───────────────────────────────────────────────────────────────",

@@ -16,8 +16,13 @@
  * PII format mirrors lib/crypto/pii.ts (iv(12) || tag(16) || ciphertext,
  * AES-256-GCM) — inlined here because this script runs under plain Node
  * without the "@/" path alias. Keep the two implementations in sync.
+ *
+ * Every seeded admin also gets a scrypt credential (DEV password below) so you
+ * can exercise the real email+password login locally, and admin@primemeghalaya.com
+ * is seeded as a super_admin. For a production bootstrap admin use db/seed-admin.ts.
  */
 import crypto from "node:crypto";
+import { promisify } from "node:util";
 import postgres from "postgres";
 
 const url = process.env.DATABASE_URL_MIGRATOR ?? process.env.DATABASE_URL;
@@ -39,9 +44,33 @@ function encryptPII(plaintext: string): Buffer {
   return Buffer.concat([iv, cipher.getAuthTag(), ct]);
 }
 
+// ── scrypt password hash (mirror of lib/auth/password.ts) ─────────────────────
+const scrypt = promisify(crypto.scrypt) as (
+  password: string | Buffer,
+  salt: string | Buffer,
+  keylen: number,
+  options: crypto.ScryptOptions,
+) => Promise<Buffer>;
+
+async function hashPassword(pw: string): Promise<string> {
+  const salt = crypto.randomBytes(16);
+  const dk = await scrypt(pw, salt, 64, { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 });
+  return `scrypt$32768$8$1$${salt.toString("base64")}$${dk.toString("base64")}`;
+}
+
+// Shared dev sign-in password for every seeded admin. Override via env.
+const DEV_ADMIN_PASSWORD = process.env.ADMIN_SEED_PASSWORD ?? "prime-admin-dev";
+
 const sql = postgres(url, { max: 1, onnotice: () => {} });
 
 const ADMINS = [
+  {
+    id: "a1111111-1111-4111-8111-111111111111",
+    email: "admin@primemeghalaya.com",
+    name: "PRIME Administrator",
+    role: "super_admin",
+    regions: [] as string[],
+  },
   {
     id: "11111111-1111-4111-8111-111111111111",
     email: "super@primemeghalaya.com",
@@ -133,6 +162,9 @@ const TICKET_SEQUENCES: Record<string, number> = {
 };
 
 async function main(): Promise<void> {
+  // One hash reused across dev admins (same password) — dev convenience only.
+  const devPasswordHash = await hashPassword(DEV_ADMIN_PASSWORD);
+
   for (const a of ADMINS) {
     await sql`
       INSERT INTO admin_user (id, email, name, role)
@@ -146,6 +178,11 @@ async function main(): Promise<void> {
         ON CONFLICT DO NOTHING
       `;
     }
+    await sql`
+      INSERT INTO admin_credential (admin_id, password_hash)
+      VALUES (${a.id}, ${devPasswordHash})
+      ON CONFLICT (admin_id) DO NOTHING
+    `;
   }
 
   for (const g of GRIEVANCES) {
@@ -173,6 +210,9 @@ async function main(): Promise<void> {
   console.log(
     `seeded: ${ADMINS.length} admins, ${GRIEVANCES.length} grievances, ` +
       `${Object.keys(TICKET_SEQUENCES).length} ticket sequences`,
+  );
+  console.log(
+    `admin login: admin@primemeghalaya.com / ${DEV_ADMIN_PASSWORD} (dev password — override with ADMIN_SEED_PASSWORD)`,
   );
 }
 

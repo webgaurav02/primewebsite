@@ -66,14 +66,14 @@ describe("admin user detail", () => {
       base("founder@x.com", {
         registrantType: "entrepreneur_existing", businessName: "Detail Farms",
         sector: "agriculture-horticulture", entityType: "Pvt. Ltd", stage: "In Revenue",
-        description: "We grow greens.", products: "Lettuce", turnover: "10 Lakh",
+        description: "We grow greens.", products: "Lettuce", turnover: "1000000",
       }),
       meta,
     );
     const d = await getUserDetail(await idFor("founder@x.com"));
     expect(d!.business).not.toBeNull();
     expect(d!.business!.businessName).toBe("Detail Farms");
-    expect(d!.business!.turnover).toBe("10 Lakh");
+    expect(d!.business!.turnover).toBe(1000000);
     expect(d!.business!.sector).toMatch(/Agriculture/);
   });
 

@@ -6,6 +6,7 @@ import { recordAudit } from "@/lib/audit/log";
 import { emitTimelineEvent, emitNotification } from "@/lib/dal/events";
 import { newToken } from "@/lib/auth/tokens";
 import { sendEmail, appBaseUrl } from "@/lib/email";
+import { activationEmail } from "@/lib/email/templates";
 import { decryptPII } from "@/lib/crypto/pii";
 import { imageDataUrl } from "@/lib/storage";
 import type { Persona, RegistrantType, UserStatus } from "@/lib/users/types";
@@ -46,9 +47,10 @@ export interface BusinessDetail {
   description: string | null;
   employmentCount: number | null;
   livesImpacted: number | null;
-  turnover: string | null;
-  govtFunding: string | null;
-  externalFunding: string | null;
+  /** Whole-rupee amounts (bigint columns). */
+  turnover: number | null;
+  govtFunding: number | null;
+  externalFunding: number | null;
   products: string | null;
   socialImpact: string | null;
 }
@@ -172,8 +174,11 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
           businessName: row.businessName, sector: row.sector, entityType: row.entityType,
           stage: row.stage, yearEstablished: row.yearEstablished, address: row.address,
           description: row.description, employmentCount: row.employmentCount,
-          livesImpacted: row.livesImpacted, turnover: row.turnover,
-          govtFunding: row.govtFunding, externalFunding: row.externalFunding,
+          livesImpacted: row.livesImpacted,
+          // bigint columns arrive from the driver as strings — coerce to number.
+          turnover: row.turnover == null ? null : Number(row.turnover),
+          govtFunding: row.govtFunding == null ? null : Number(row.govtFunding),
+          externalFunding: row.externalFunding == null ? null : Number(row.externalFunding),
           products: row.products, socialImpact: row.socialImpact,
         }
       : null;
@@ -267,19 +272,11 @@ export async function approveUser(id: string): Promise<void> {
   });
 
   if (sent) {
-    const url = `${appBaseUrl()}/reset-password?token=${sent}`;
+    const baseUrl = appBaseUrl();
+    const url = `${baseUrl}/reset-password?token=${sent}`;
     await sendEmail({
       to: email,
-      subject: "Your PRIME application is approved — set your password",
-      text: [
-        `Hi ${fullName.split(" ")[0]},`,
-        "",
-        "Good news — your PRIME application has been approved. Set a password to",
-        "activate your account and access your dashboard:",
-        url,
-        "",
-        "This link expires in 7 days.",
-      ].join("\n"),
+      ...(await activationEmail({ baseUrl, name: fullName, url })),
     });
   }
 }

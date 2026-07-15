@@ -95,6 +95,27 @@ export default function AdminForm({
         </fieldset>
       )}
 
+      {mode === "create" && (
+        <div>
+          <label htmlFor="password" className={labelCls}>
+            Initial password <span className="font-normal text-zinc-400">· optional</span>
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            className={`mt-1.5 ${inputCls}`}
+            placeholder="Min 8 characters"
+          />
+          {fieldError(state, "password") && <p className={errCls}>{fieldError(state, "password")}</p>}
+          <p className="mt-1 text-xs text-zinc-500">
+            Sets their sign-in password. Leave blank to create a directory record only — you can
+            set a password later from the row.
+          </p>
+        </div>
+      )}
+
       <button type="submit" disabled={pending} className={btnCls}>
         {pending ? "Saving…" : submitLabel}
       </button>

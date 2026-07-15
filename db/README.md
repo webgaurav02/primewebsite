@@ -18,7 +18,17 @@ append-only at the engine level. Mongo has no equivalent.
 createdb prime_portal_dev                    # skip when using docker-compose
 cp .env.example .env.local                   # fill DATABASE_URL(_MIGRATOR), PII_ENCRYPTION_KEY
 npm run db:migrate                           # applies db/migrations/*.sql in order
-npm run db:seed                              # dev admins + sample grievances (idempotent)
+npm run db:seed                              # dev admins (+ credentials) + sample grievances
+```
+
+Admins sign in at `/admin/login` with email + password (hand-rolled scrypt auth
+mirroring the public side; credential/session tables gated by RLS to the
+`app.admin_auth_op` context — see `0020_admin_auth.sql`). `npm run db:seed` gives
+every dev admin a shared dev password and seeds `admin@primemeghalaya.com`. For a
+**production** bootstrap super-admin, set `ADMIN_SEED_PASSWORD` and run:
+
+```bash
+npm run db:seed:admin                        # idempotent; creates/updates one super_admin
 ```
 
 Migrations run as the owner/superuser (`DATABASE_URL_MIGRATOR`); in dev the

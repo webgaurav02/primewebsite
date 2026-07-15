@@ -27,6 +27,7 @@ export async function sendViaResend(msg: EmailMessage): Promise<void> {
       to: [msg.to],
       subject: msg.subject,
       text: msg.text,
+      ...(msg.html ? { html: msg.html } : {}),
     }),
   });
 
