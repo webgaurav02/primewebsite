@@ -5,6 +5,10 @@ import { adminLogout } from "@/lib/dal/admin-auth";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/cookie";
 import AdminSidebar from "./_components/AdminSidebar";
 
+// Authenticated + DB-backed. Force dynamic so the build never tries to
+// prerender these pages (which would run DAL queries with no DATABASE_URL in CI).
+export const dynamic = "force-dynamic";
+
 /**
  * Authenticated admin shell with a left sidebar. requireAdmin() is the SECOND,
  * authoritative gate (the proxy is only an optimistic first pass). Reading
