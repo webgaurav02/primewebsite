@@ -21,6 +21,9 @@ on:
 
 jobs:
   build:
+    # Only the production repo builds + deploys; a fork push is a no-op (deploy
+    # needs: build, so it is skipped too).
+    if: github.repository == 'balajied29/primewebsite'
     runs-on: ubuntu-latest
     permissions:
       contents: read

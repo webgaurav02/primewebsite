@@ -1,0 +1,41 @@
+# The container has no built-in cron, so GitHub Actions POSTs the protected
+# /api/email/flush endpoint on a schedule to send queued mail (with retries).
+#
+# Requires (on balajied29/primewebsite):
+#   - Secret CRON_SECRET matching the App Service CRON_SECRET app setting.
+#   - Optional repo variable APP_BASE_URL to override the default *.azurewebsites.net
+#     host once the custom domain is live (Settings → Secrets and variables →
+#     Actions → Variables → APP_BASE_URL = https://primemeghalaya.com).
+
+name: Flush email outbox
+
+on:
+  schedule:
+    # Every 5 min (GitHub's minimum; runs may be delayed under load — fine for
+    # an outbox with retries).
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  flush:
+    # Never run against the live endpoint from a fork.
+    if: github.repository == 'balajied29/primewebsite'
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /api/email/flush
+        env:
+          BASE_URL: ${{ vars.APP_BASE_URL || 'https://primemeghalaya-e0e0bjgfbfdjfub3.eastasia-01.azurewebsites.net' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -sS -o /tmp/flush-body -w '%{http_code}' \
+            -X POST \
+            -H "x-cron-secret: $CRON_SECRET" \
+            --max-time 120 \
+            "$BASE_URL/api/email/flush")
+          echo "HTTP $code"
+          cat /tmp/flush-body 2>/dev/null || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::email flush returned $code"
+            exit 1
+          fi
