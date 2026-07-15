@@ -137,7 +137,7 @@ export default function UpdatesPage() {
             const posts = articles.filter((a) => a.category === cat);
             if (posts.length === 0) return null;
             return (
-              <div key={cat}>
+              <div key={cat} id={cat.toLowerCase().replace(/\s+/g, "-")} className="scroll-mt-36">
                 {/* Section heading */}
                 <div className="flex items-center gap-6 mb-10">
                   <h2

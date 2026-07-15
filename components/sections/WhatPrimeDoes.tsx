@@ -58,11 +58,11 @@ const services: { num: string; title: string; description: string; href: string;
   },
   {
     num: "06",
-    title: "Monitoring & Evaluation",
-    description: "Impact tracking, field monitoring, and data-driven evaluation ensuring PRIME delivers measurable results.",
-    href: "/media-entertainment",
-    Icon: HiSpeakerphone,
-    color: "#8B5CF6",
+    title: "Media & Comms",
+    description: "Communications, press relations, and media outreach amplifying PRIME's impact and stories.",
+    href: "/media-comms",
+    Icon: HiNewspaper,
+    color: "#EC4899",
   },
   {
     num: "07",
@@ -74,11 +74,11 @@ const services: { num: string; title: string; description: string; href: string;
   },
   {
     num: "08",
-    title: "Media & Comms",
-    description: "Communications, press relations, and media outreach amplifying PRIME's impact and stories.",
-    href: "#",
-    Icon: HiNewspaper,
-    color: "#EC4899",
+    title: "Monitoring & Evaluation",
+    description: "Impact tracking, field monitoring, and data-driven evaluation ensuring PRIME delivers measurable results.",
+    href: "/media-entertainment",
+    Icon: HiSpeakerphone,
+    color: "#8B5CF6",
   },
 ];
 
