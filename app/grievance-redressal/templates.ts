@@ -93,7 +93,7 @@ export const TEMPLATES: readonly Template[] = [
     helper: "Login, forms, document upload, or a broken page on the PRIME portal.",
     subjectPrefix: "Portal issue: ",
     descriptionScaffold:
-      "• Page or feature affected (URL if known): [...]\n• What you were trying to do: [...]\n• What happened / exact error text: [...]\n• Device & browser: [...]\n(No attachments in this version — describe the screen instead. Never share passwords.)",
+      "• Page or feature affected (URL if known): [...]\n• What you were trying to do: [...]\n• What happened / exact error text: [...]\n• Device & browser: [...]\n(A screenshot helps — attach it below. Never share passwords.)",
     keywords: ["portal", "website", "login", "error", "bug", "upload", "technical", "page", "form"],
     iconKey: "portal",
   },

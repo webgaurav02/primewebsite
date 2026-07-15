@@ -9,6 +9,7 @@
     "lint": "eslint",
     "db:migrate": "node --env-file=.env.local db/migrate.ts",
     "db:seed": "node --env-file=.env.local db/seed-dev.ts",
+    "db:seed:admin": "node --env-file=.env.local db/seed-admin.ts",
     "test:db:setup": "createdb prime_portal_test 2>/dev/null; DATABASE_URL_MIGRATOR=postgres://$USER@localhost:5432/prime_portal_test NODE_ENV=development node db/migrate.ts",
     "pretest": "npm run test:db:setup",
     "test": "vitest run",
@@ -16,6 +17,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1086.0",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.1.0",
     "framer-motion": "^12.42.0",
     "html-to-image": "^1.11.13",
     "jsbarcode": "^3.12.3",

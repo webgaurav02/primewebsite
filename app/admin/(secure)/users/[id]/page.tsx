@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUserDetail } from "@/lib/dal/users";
 import { REGISTRANT_TYPE_LABELS } from "@/lib/users/types";
+import { formatINR } from "@/lib/format/display";
 
 /* eslint-disable @next/next/no-img-element -- data-URL photo, admin CSP allows data: */
 
@@ -93,9 +94,9 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           <Row label="Description" value={b.description} />
           <Row label="People employed" value={b.employmentCount != null ? String(b.employmentCount) : null} />
           <Row label="Lives impacted" value={b.livesImpacted != null ? String(b.livesImpacted) : null} />
-          <Row label="Turnover" value={b.turnover} />
-          <Row label="Govt. funding" value={b.govtFunding} />
-          <Row label="External funding" value={b.externalFunding} />
+          <Row label="Turnover" value={b.turnover != null ? formatINR(b.turnover) : null} />
+          <Row label="Govt. funding" value={b.govtFunding != null ? formatINR(b.govtFunding) : null} />
+          <Row label="External funding" value={b.externalFunding != null ? formatINR(b.externalFunding) : null} />
           <Row label="Products / services" value={b.products} />
           <Row label="Social impact" value={b.socialImpact} />
         </Section>

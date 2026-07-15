@@ -509,7 +509,7 @@ export default function Navbar() {
                     onClick={() => setMenuOpen(false)}
                     className="px-4 py-3.5 bg-[#1B4332] text-white text-[14px] font-bold text-center hover:bg-[#2D6A4F] transition-colors"
                   >
-                    Apply for PRIME ID →
+                    Apply Now →
                   </Link>
                   <Link
                     href="/login"

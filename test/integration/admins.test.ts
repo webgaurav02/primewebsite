@@ -20,7 +20,13 @@ vi.mock("@/lib/auth/session", () => ({
   getCurrentAdmin: async () => VIEWER,
 }));
 
-import { createAdmin, updateAdmin, setAdminActive, listAdmins } from "@/lib/dal/admins";
+import {
+  createAdmin,
+  updateAdmin,
+  setAdminActive,
+  setAdminPassword,
+  listAdmins,
+} from "@/lib/dal/admins";
 import { getSql } from "@/lib/db/client";
 import { migratorSql, truncateAll, closeDb } from "../helpers/db";
 
@@ -128,5 +134,65 @@ describe("enable / disable + audit", () => {
       SELECT count(*)::int AS n FROM audit_log
       WHERE action IN ('admin.create', 'admin.deactivate', 'admin.reactivate')`;
     expect(n).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("credentials", () => {
+  test("createAdmin with a password writes a scrypt credential", async () => {
+    const res = await createAdmin({ email: "withpw@x.com", name: "Has Pass", role: "auditor", regions: [], password: "supersecret9" });
+    expect(res.ok).toBe(true);
+    const id = await idByEmail("withpw@x.com");
+    const [c] = await migratorSql`SELECT password_hash FROM admin_credential WHERE admin_id = ${id}`;
+    expect(c.password_hash).toMatch(/^scrypt\$/);
+  });
+
+  test("createAdmin without a password creates no credential", async () => {
+    await createAdmin({ email: "nopw@x.com", name: "No Pass", role: "auditor", regions: [] });
+    const id = await idByEmail("nopw@x.com");
+    expect((await migratorSql`SELECT 1 FROM admin_credential WHERE admin_id = ${id}`).length).toBe(0);
+  });
+
+  test("createAdmin rejects a too-short password and writes nothing", async () => {
+    const res = await createAdmin({ email: "shortpw@x.com", name: "Short Pass", role: "auditor", regions: [], password: "short" });
+    expect(res.ok).toBe(false);
+    expect(res.ok === false && res.fieldErrors?.password).toBeTruthy();
+    expect((await migratorSql`SELECT 1 FROM admin_user WHERE email = 'shortpw@x.com'`).length).toBe(0);
+  });
+
+  test("setAdminPassword sets, then rotates the hash and clears any lockout", async () => {
+    await createAdmin({ email: "reset@x.com", name: "To Reset", role: "auditor", regions: [] });
+    const id = await idByEmail("reset@x.com");
+
+    expect((await setAdminPassword({ adminId: id, password: "firstpass9" })).ok).toBe(true);
+    const [c1] = await migratorSql`SELECT password_hash FROM admin_credential WHERE admin_id = ${id}`;
+    expect(c1.password_hash).toMatch(/^scrypt\$/);
+
+    await migratorSql`
+      UPDATE admin_credential SET failed_attempts = 5, locked_until = now() + interval '1 hour'
+      WHERE admin_id = ${id}`;
+    expect((await setAdminPassword({ adminId: id, password: "secondpass9" })).ok).toBe(true);
+    const [c2] = await migratorSql`
+      SELECT password_hash, failed_attempts, locked_until FROM admin_credential WHERE admin_id = ${id}`;
+    expect(c2.password_hash).not.toBe(c1.password_hash);
+    expect(c2.failed_attempts).toBe(0);
+    expect(c2.locked_until).toBeNull();
+  });
+
+  test("setAdminPassword revokes the admin's existing sessions", async () => {
+    await createAdmin({ email: "revoke@x.com", name: "Revoke Me", role: "auditor", regions: [] });
+    const id = await idByEmail("revoke@x.com");
+    await setAdminPassword({ adminId: id, password: "firstpass9" });
+    await migratorSql`
+      INSERT INTO admin_session (token_hash, admin_id, expires_at)
+      VALUES ('planted-session', ${id}, now() + interval '1 day')`;
+
+    await setAdminPassword({ adminId: id, password: "secondpass9" });
+    expect((await migratorSql`SELECT 1 FROM admin_session WHERE admin_id = ${id}`).length).toBe(0);
+  });
+
+  test("setAdminPassword rejects a missing admin", async () => {
+    const res = await setAdminPassword({ adminId: "bb000000-0000-4000-8000-0000000000ff", password: "whatever9" });
+    expect(res.ok).toBe(false);
+    expect(res.ok === false && res.error).toMatch(/not found/i);
   });
 });

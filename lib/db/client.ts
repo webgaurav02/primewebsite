@@ -110,6 +110,25 @@ export async function withAuthContext<T>(
 }
 
 /**
+ * Context for a deliberate ADMIN pre-auth / credential operation (admin login /
+ * logout / session-verify / set-password). Sets app.admin_auth_op = '1' — the
+ * admin counterpart to withAuthContext. It is the ONLY context in which RLS lets
+ * a query touch the admin_credential / admin_session tables (0020). Only
+ * lib/dal/admin-auth.ts and lib/auth/session.ts open this context; the console's
+ * password writes use the super_admin context (withAdminContext) instead.
+ */
+export async function withAdminAuthContext<T>(
+  fn: (tx: postgres.TransactionSql) => Promise<T>,
+): Promise<T> {
+  const sql = getSql();
+  const result = await sql.begin(async (tx) => {
+    await tx`SELECT set_config('app.admin_auth_op', '1', true)`;
+    return await fn(tx);
+  });
+  return result as T;
+}
+
+/**
  * Context for a system/background operation with no human actor — the email
  * outbox worker and scheduled jobs. Sets app.system_op = '1', which RLS uses to
  * gate the email_outbox queue. Only lib/email opens this context.

@@ -22,10 +22,11 @@ export default async function AdminsPage() {
         </p>
       </div>
 
-      <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Creating an admin provisions their directory record (role, region scope, grievance
-        assignment, and audit identity). Sign-in is provisioned separately per admin via passkey —
-        production admin login stays fail-closed until that is wired.
+      <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+        Set an initial password when creating an admin to grant them sign-in, or leave it blank to
+        provision a directory record only (role, region scope, grievance assignment, audit identity)
+        and set a password later with <span className="font-medium">Reset password</span>. Admins
+        sign in with their email and password at <span className="font-mono text-xs">/admin/login</span>.
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">

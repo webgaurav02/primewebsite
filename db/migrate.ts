@@ -36,6 +36,15 @@ async function ensureDevRoles(): Promise<void> {
       END IF;
     END
     $$;
+
+    -- On managed Postgres (e.g. Neon) the migrator owns objects but is NOT a
+    -- superuser, so it must be a MEMBER of these roles to set object ownership
+    -- to them / SET ROLE. A local superuser doesn't need this. Idempotent.
+    GRANT prime_app, prime_audit TO CURRENT_USER;
+    -- The audit functions are reassigned OWNER TO prime_audit; a role can only
+    -- own objects in a schema where it has CREATE. prime_audit is NOLOGIN, so
+    -- this is safe. (Local superuser installs already allow this implicitly.)
+    GRANT USAGE, CREATE ON SCHEMA public TO prime_audit;
   `);
 }
 

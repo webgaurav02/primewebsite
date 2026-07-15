@@ -23,6 +23,17 @@ const password = z
   .min(8, "Use at least 8 characters.")
   .max(200, "That password is too long.");
 
+// Whole-number string from an <input type="number">. Empty = not provided.
+// Capped at 15 digits so Number() coercion in the DAL stays lossless (< 2^53).
+const wholeNumber = (max: number, msg: string) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .refine((v) => v === "" || /^\d+$/.test(v), msg)
+    .optional()
+    .default("");
+
 const registrantTypeValues = REGISTRANT_TYPES.map((r) => r.value) as [
   string,
   ...string[],
@@ -66,11 +77,11 @@ export const registerSchema = z
     yearEstablished: z.string().trim().max(4).optional().default(""),
     address: z.string().trim().max(300).optional().default(""),
     description: z.string().trim().max(5000).optional().default(""),
-    employment: z.string().trim().max(9).optional().default(""),
-    livesImpacted: z.string().trim().max(9).optional().default(""),
-    turnover: z.string().trim().max(100).optional().default(""),
-    govtFunding: z.string().trim().max(100).optional().default(""),
-    externalFunding: z.string().trim().max(100).optional().default(""),
+    employment: wholeNumber(9, "Enter a whole number."),
+    livesImpacted: wholeNumber(9, "Enter a whole number."),
+    turnover: wholeNumber(15, "Enter the annual turnover in whole rupees (digits only)."),
+    govtFunding: wholeNumber(15, "Enter the amount in whole rupees (digits only)."),
+    externalFunding: wholeNumber(15, "Enter the amount in whole rupees (digits only)."),
     products: z.string().trim().max(2000).optional().default(""),
     socialImpact: z.string().trim().max(2000).optional().default(""),
   })

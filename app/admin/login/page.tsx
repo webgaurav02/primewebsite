@@ -2,6 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getCurrentAdmin } from "@/lib/auth/session";
 import { devLoginAction } from "./actions";
+import AdminLoginForm from "./_components/AdminLoginForm";
 
 export default async function AdminLoginPage() {
   // Already signed in? Skip the login screen.
@@ -22,26 +23,18 @@ export default async function AdminLoginPage() {
         />
         <h1 className="mt-6 text-center text-lg font-semibold">Admin sign in</h1>
         <p className="mt-1 text-center text-sm text-zinc-500">
-          Grievance Redressal portal
+          PRIME Meghalaya console
         </p>
 
-        {/* Production auth — wired to Better Auth passkeys (see docs/admin-security.md). */}
-        <button
-          type="button"
-          disabled
-          className="mt-6 w-full cursor-not-allowed rounded-md bg-black/90 px-4 py-2.5 text-sm font-medium text-white opacity-60"
-          title="Wire Better Auth passkeys to enable"
-        >
-          Sign in with passkey
-        </button>
-        <p className="mt-2 text-center text-xs text-zinc-400">
-          Passkey / WebAuthn sign-in is provisioned per admin (no self-signup).
-        </p>
+        <AdminLoginForm />
 
         {isDev && (
           <div className="mt-8 border-t border-dashed border-zinc-300 pt-6">
             <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-amber-600">
               Dev only — assume a role
+            </p>
+            <p className="mb-3 text-center text-[11px] text-zinc-400">
+              Requires seeded admins (npm run db:seed). Mints a real session.
             </p>
             <div className="space-y-2">
               <form action={devLoginAction}>

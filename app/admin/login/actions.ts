@@ -1,50 +1,69 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createDevSessionToken } from "@/lib/auth/session";
-import { SESSION_COOKIE_NAME } from "@/lib/auth/cookie";
+import { adminLogin, devCreateAdminSession } from "@/lib/dal/admin-auth";
+import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/auth/cookie";
 import { REGIONS, type Region, type Role } from "@/lib/auth/rbac";
+import { slidingWindow } from "@/lib/security/rate-limit";
+import { clientIp } from "@/lib/security/client-ip";
+
+export type AdminSignInResult = { ok: true } | { ok: false; error: string };
 
 /**
- * DEV-ONLY login. Lets you assume a role/region locally to exercise RBAC, the
- * DAL, and the audit trail without a real identity provider. It hard-refuses in
- * production. Replace the whole login route with the Better Auth passkey flow
- * (see docs/admin-security.md §Auth) before going live.
+ * Admin email + password sign-in. Verifies credentials in the admin-auth DAL,
+ * sets the session cookie on success (path "/admin", 8h, httpOnly, strict), and
+ * returns a friendly error otherwise. The client redirects to /admin on ok.
+ * Mirrors app/login/actions.ts (the member counterpart).
+ */
+export async function adminSignInAction(input: {
+  email: string;
+  password: string;
+}): Promise<AdminSignInResult> {
+  const h = await headers();
+  const ip = clientIp(h);
+
+  const rl = slidingWindow(`admin-login:${ip ?? "shared"}`, 10, 10 * 60 * 1000);
+  if (!rl.ok) {
+    return { ok: false, error: `Too many attempts. Try again in ${rl.retryAfterSeconds}s.` };
+  }
+
+  const res = await adminLogin(
+    { email: input.email, password: input.password },
+    { ip, userAgent: h.get("user-agent") },
+  );
+
+  if (!res.ok) {
+    const messages: Record<typeof res.error, string> = {
+      invalid: "Invalid email or password.",
+      locked: "Too many failed attempts. Try again in a few minutes.",
+      disabled: "This admin account is disabled. Contact a super admin.",
+    };
+    return { ok: false, error: messages[res.error] };
+  }
+
+  (await cookies()).set(SESSION_COOKIE_NAME, res.token, {
+    ...SESSION_COOKIE_OPTIONS,
+    maxAge: res.maxAge,
+  });
+  return { ok: true };
+}
+
+/**
+ * DEV-ONLY quick login. Mints a REAL admin_session for a seeded preset admin so
+ * you can assume a role/region locally to exercise RBAC, the DAL, and the audit
+ * trail without typing a password. It hard-refuses in production.
  *
  * The preset ids are FIXED UUIDs matching the admin_user rows created by
- * db/seed-dev.ts — they must exist in the database, because grievance rows
- * reference them (assigned_to FK) and RLS region policies join admin_region
- * by these ids.
+ * db/seed-dev.ts — run `npm run db:seed` first so the rows (and the FK target)
+ * exist. The role/region come from the seeded row, not this token.
  */
-
-const SUPER_ADMIN = {
-  id: "11111111-1111-4111-8111-111111111111",
-  email: "super@primemeghalaya.com",
-  name: "Super Admin",
-};
-const AUDITOR = {
-  id: "22222222-2222-4222-8222-222222222222",
-  email: "auditor@primemeghalaya.com",
-  name: "Auditor",
-};
-/** One seeded officer per region so RLS region scoping is real in dev. */
-const OFFICERS: Record<Region, { id: string; email: string; name: string }> = {
-  khasi_jaintia: {
-    id: "33333333-3333-4333-8333-333333333301",
-    email: "officer.kj@primemeghalaya.com",
-    name: "Grievance Officer (Khasi-Jaintia)",
-  },
-  garo: {
-    id: "33333333-3333-4333-8333-333333333302",
-    email: "officer.gh@primemeghalaya.com",
-    name: "Grievance Officer (Garo)",
-  },
-  ri_bhoi: {
-    id: "33333333-3333-4333-8333-333333333303",
-    email: "officer.rb@primemeghalaya.com",
-    name: "Grievance Officer (Ri-Bhoi)",
-  },
+const SUPER_ADMIN = { id: "11111111-1111-4111-8111-111111111111" };
+const AUDITOR = { id: "22222222-2222-4222-8222-222222222222" };
+const OFFICERS: Record<Region, { id: string }> = {
+  khasi_jaintia: { id: "33333333-3333-4333-8333-333333333301" },
+  garo: { id: "33333333-3333-4333-8333-333333333302" },
+  ri_bhoi: { id: "33333333-3333-4333-8333-333333333303" },
 };
 
 export async function devLoginAction(formData: FormData) {
@@ -58,31 +77,18 @@ export async function devLoginAction(formData: FormData) {
     ? (regionRaw as Region)
     : "garo";
 
-  let preset: { id: string; email: string; name: string };
-  let regions: Region[] | null;
-  switch (role) {
-    case "grievance_officer":
-      preset = OFFICERS[region];
-      regions = [region];
-      break;
-    case "auditor":
-      preset = AUDITOR;
-      regions = null;
-      break;
-    default:
-      preset = SUPER_ADMIN;
-      regions = null;
-      break;
-  }
+  const preset =
+    role === "grievance_officer"
+      ? OFFICERS[region]
+      : role === "auditor"
+        ? AUDITOR
+        : SUPER_ADMIN;
 
-  const token = createDevSessionToken({
-    sub: preset.id,
-    email: preset.email,
-    name: preset.name,
-    role: role === "grievance_officer" || role === "auditor" ? role : "super_admin",
-    regions,
+  const session = await devCreateAdminSession(preset.id);
+  (await cookies()).set(SESSION_COOKIE_NAME, session.token, {
+    ...SESSION_COOKIE_OPTIONS,
+    maxAge: session.maxAge,
   });
-  (await cookies()).set(SESSION_COOKIE_NAME, token.value, token.options);
 
   redirect("/admin");
 }

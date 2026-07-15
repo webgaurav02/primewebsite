@@ -14,6 +14,13 @@ const OFFICER_ID = "99990000-0000-4000-8000-0000000000f3";
 
 vi.mock("@/lib/auth/user-session", () => ({ requireUser: async () => USER, getCurrentUser: async () => USER }));
 vi.mock("@/lib/auth/session", () => ({ requireAdmin: async () => SUPER, getCurrentAdmin: async () => SUPER }));
+// Bypass R2: exercise the DB attachment path (RLS + DAL) without object storage.
+vi.mock("@/lib/storage", () => ({
+  uploadUserFile: async (prefix: string, id: string) => ({
+    ok: true, key: `${prefix}/${id}/file.png`, mime: "image/png", size: 1234,
+  }),
+  getFileBytes: async () => Buffer.from("PNGDATA"),
+}));
 
 import { createPublicGrievance } from "@/lib/dal/grievance-intake";
 import {
@@ -22,6 +29,8 @@ import {
   updateGrievanceStatus,
   assignGrievance,
   escalateGrievance,
+  listGrievances,
+  getGrievanceAttachmentFileAdmin,
 } from "@/lib/dal/grievances";
 import { getMyNotifications } from "@/lib/dal/events";
 import { getSql } from "@/lib/db/client";
@@ -110,6 +119,43 @@ describe("admin workflow: status → notify, assign, escalate", () => {
     // Complainant got a status-change notification.
     const notifs = await getMyNotifications();
     expect(notifs.items.some((n) => n.type === "grievance.status_changed")).toBe(true);
+  });
+
+  test("stores optional fields + consent + attachments; admin lists and fetches them", async () => {
+    const { ticketRef } = await createPublicGrievance(
+      { ...SUBMISSION, primeId: "PRM-777", businessName: "Khasi Weaves LLP" },
+      {
+        ip: null,
+        userId: USER.id,
+        consentVersion: "dpdp-2023-v1",
+        attachments: [{ buffer: Buffer.from("evidence"), name: "evidence.png" }],
+      },
+    );
+    const id = await grievanceIdByRef(ticketRef);
+
+    const [g] = await migratorSql`
+      SELECT prime_id_ref, business_name, consent_version, consent_at
+      FROM grievance WHERE id = ${id}`;
+    expect(g.prime_id_ref).toBe("PRM-777");
+    expect(g.business_name).toBe("Khasi Weaves LLP");
+    expect(g.consent_version).toBe("dpdp-2023-v1");
+    expect(g.consent_at).not.toBeNull();
+
+    // The attachment row was inserted — grievance_is_submitted RLS allowed it.
+    const atts = await migratorSql`
+      SELECT original_name FROM grievance_attachment WHERE grievance_id = ${id}`;
+    expect(atts.map((a) => a.original_name)).toEqual(["evidence.png"]);
+
+    // Admin list surfaces the new metadata + attachment.
+    const listed = (await listGrievances({})).find((x) => x.ticketRef === ticketRef);
+    expect(listed?.primeIdRef).toBe("PRM-777");
+    expect(listed?.businessName).toBe("Khasi Weaves LLP");
+    expect(listed?.attachments.length).toBe(1);
+
+    // Admin can fetch the bytes (IDOR-safe lookup, R2 mocked).
+    const file = await getGrievanceAttachmentFileAdmin(listed!.attachments[0].id);
+    expect(file?.name).toBe("evidence.png");
+    expect(file?.buffer.toString()).toBe("PNGDATA");
   });
 
   test("assign to an officer, and escalate up to L3", async () => {

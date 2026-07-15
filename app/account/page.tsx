@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 const NAV: { href: string; label: string; desc: string }[] = [
+  { href: "/account/profile", label: "Profile", desc: "Edit your details & business" },
   { href: "/account/id-card", label: "PRIME ID", desc: "Request or download your ID card" },
   { href: "/account/programs", label: "Programs", desc: "Pre-Incubation, Funding, Office Space & more" },
   { href: "/account/mentorship", label: "Mentorship", desc: "Your mentor, mentees & sessions" },

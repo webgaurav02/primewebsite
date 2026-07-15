@@ -3,11 +3,10 @@
  * server-only, no I/O — safe to unit-test and to import from client chrome.
  *
  * NOTE: this manages the admin DIRECTORY (who is an admin, their role, region
- * scope, and active flag). It does NOT grant login — admin authentication is
- * fail-closed in production until passkeys are wired (see lib/auth/session.ts).
- * Creating an admin here provisions their record so region scoping, grievance
- * assignment, and the audit actor identity all work, and so the account is ready
- * the moment auth lands.
+ * scope, and active flag). Sign-in is email + password (lib/dal/admin-auth.ts):
+ * a `password` on create, or `setAdminPassword` later, grants login. Leaving the
+ * password blank provisions a directory-only record (region scoping, grievance
+ * assignment, audit identity) that can be given a password afterwards.
  */
 
 import { z } from "zod";
@@ -60,6 +59,20 @@ const regionsSchema = z
   .array(z.enum(REGIONS as [Region, ...Region[]]))
   .default([]);
 
+/** A required admin password (set/reset from the console). */
+const passwordSchema = z
+  .string()
+  .min(8, "Use at least 8 characters.")
+  .max(200, "That password is too long.");
+
+/** Optional initial password on create — empty means "no sign-in yet". */
+const optionalPasswordSchema = z
+  .string()
+  .max(200, "That password is too long.")
+  .refine((v) => v.length === 0 || v.length >= 8, "Use at least 8 characters.")
+  .optional()
+  .default("");
+
 const officerNeedsRegion = (val: { role: Role; regions: Region[] }) =>
   !roleOwnsRegions(val.role) || val.regions.length > 0;
 const officerRegionIssue = {
@@ -73,6 +86,8 @@ export const createAdminSchema = z
     name: z.string().trim().min(2, "Name is required.").max(120),
     role: roleSchema,
     regions: regionsSchema,
+    // Optional: sets an initial sign-in password. Empty = directory record only.
+    password: optionalPasswordSchema,
   })
   .refine(officerNeedsRegion, officerRegionIssue);
 
@@ -88,6 +103,11 @@ export const updateAdminSchema = z
 export const setAdminActiveSchema = z.object({
   adminId: z.string().uuid(),
   isActive: z.boolean(),
+});
+
+export const setAdminPasswordSchema = z.object({
+  adminId: z.string().uuid(),
+  password: passwordSchema,
 });
 
 export type CreateAdminInput = z.infer<typeof createAdminSchema>;

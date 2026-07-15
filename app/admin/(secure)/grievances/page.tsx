@@ -51,9 +51,34 @@ export default async function GrievancesPage({
               ) : (
                 <span title={`${g.complainant.email} · ${g.complainant.phone}`}>{g.complainant.name}</span>
               )}
+              {(g.businessName || g.primeIdRef) && (
+                <>
+                  {" · "}
+                  {[g.businessName, g.primeIdRef && `PRIME ID ${g.primeIdRef}`]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </>
+              )}
               {" · "}
               {g.assignedToId ? `Assigned to ${targetName.get(g.assignedToId) ?? "an officer"}` : "Unassigned"}
             </p>
+
+            {g.attachments.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-zinc-500">Attachments:</span>
+                {g.attachments.map((a) => (
+                  <a
+                    key={a.id}
+                    href={`/admin/grievances/attachment/${a.id}/file`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-700 underline underline-offset-2 hover:bg-zinc-100"
+                  >
+                    {a.name ?? "file"}
+                  </a>
+                ))}
+              </div>
+            )}
 
             <div className="mt-3 flex flex-wrap items-end gap-2">
               {canUpdate && (
