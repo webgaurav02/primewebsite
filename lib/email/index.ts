@@ -122,6 +122,6 @@ export function appBaseUrl(): string {
   return (
     process.env.APP_BASE_URL ??
     process.env.BETTER_AUTH_URL ??
-    "http://localhost:3000"
+    "https://primemeghalaya.com"
   ).replace(/\/$/, "");
 }

@@ -19,10 +19,10 @@ import { brand, fontStack, CARD_WIDTH } from "./theme";
  * the white wordmark, a light-green accent rule, a white card body, and a muted
  * government footer. Templates supply an eyebrow, heading, and body content.
  *
- * `baseUrl` is the absolute site origin (APP_BASE_URL) — needed because email
- * clients can't resolve relative asset paths. In local dev the logo points at
- * localhost and won't load in a real inbox; the green band + alt text still
- * carry the brand, and it renders correctly once deployed behind a public URL.
+ * `baseUrl` is the absolute site origin (APP_BASE_URL) — used for the header
+ * logo and every action link, because email clients can't resolve relative
+ * paths. It must be a public origin (e.g. https://primemeghalaya.com); if it is
+ * ever pointed at localhost, the logo won't load in a real inbox.
  */
 export function EmailShell({
   baseUrl,
@@ -46,7 +46,7 @@ export function EmailShell({
           {/* Header */}
           <Section style={headerStyle}>
             <Img
-              src={`${baseUrl}/logo-white.png`}
+              src={`${baseUrl}/logo-color.png`}
               alt="PRIME Meghalaya"
               height={34}
               style={{ height: "34px", width: "auto", display: "block" }}
