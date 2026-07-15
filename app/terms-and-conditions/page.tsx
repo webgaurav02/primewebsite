@@ -16,7 +16,7 @@ const clauses = [
     heading: "1. Acceptance of Terms",
     body: [
       `By accessing or using primemeghalaya.com (the "Website"), you agree to be bound by these Terms and Conditions ("Terms") and our Privacy Policy. If you do not agree, please do not use the Website.`,
-      `These Terms apply to all visitors, users, and others who access the Website. The Website is operated by the Department of Commerce & Industries, Government of Meghalaya ("PRIME", "we", "us", or "our").`,
+      `These Terms apply to all visitors, users, and others who access the Website. The Website is operated by the Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya ("PRIME", "we", "us", or "our").`,
     ],
   },
   {
@@ -113,7 +113,7 @@ const clauses = [
     body: [`For questions regarding these Terms, please contact:`],
     contact: {
       name: "PRIME Meghalaya",
-      dept: "Department of Commerce & Industries, Government of Meghalaya",
+      dept: "Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya",
       email: "info@primemeghalaya.com",
       address: "3rd Floor, Ri Kynmaw Complex, Nongrim Hills, Shillong – 793003, Meghalaya",
     },

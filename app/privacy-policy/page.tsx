@@ -15,8 +15,8 @@ const sections = [
     id: "who-we-are",
     heading: "1. Who We Are (Data Fiduciary)",
     body: [
-      `This website is operated by the Department of Commerce & Industries, Government of Meghalaya, through the PRIME (Promotion and Incubation of Market-driven Enterprises) programme. PRIME is a government initiative and acts as the Data Fiduciary for personal data collected via this website.`,
-      `Registered address: Department of Commerce & Industries, Government of Meghalaya, Shillong – 793001, Meghalaya, India.`,
+      `This website is operated by the Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya, through the PRIME (Promotion and Incubation of Market-driven Enterprises) programme. PRIME is a government initiative and acts as the Data Fiduciary for personal data collected via this website.`,
+      `Registered address: Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya, Shillong – 793001, Meghalaya, India.`,
       `For data-related queries, contact our Data Protection Officer (see Section 10).`,
     ],
   },
@@ -108,7 +108,7 @@ const sections = [
     ],
     contact: {
       name: "Grievance Officer — PRIME Meghalaya",
-      dept: "Department of Commerce & Industries, Government of Meghalaya",
+      dept: "Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya",
       email: "grievance@primemeghalaya.com",
       address: "3rd Floor, Ri Kynmaw Complex, Nongrim Hills, Shillong – 793003, Meghalaya",
       hours: "Monday – Friday, 10:00 AM – 5:00 PM (excluding public holidays)",

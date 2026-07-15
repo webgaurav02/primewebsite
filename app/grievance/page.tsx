@@ -152,7 +152,7 @@ export default function GrievancePage() {
                 </h2>
                 <dl className="border-t border-white/[0.08]">
                   {[
-                    { label: "Organisation", val: "Department of Commerce & Industries, Government of Meghalaya" },
+                    { label: "Organisation", val: "Planning, Investment Promotion & Sustainable Development Department, Government of Meghalaya" },
                     { label: "Email", val: "grievance@primemeghalaya.com", isEmail: true },
                     { label: "Postal Address", val: "PRIME Meghalaya\n3rd Floor, Ri Kynmaw Complex\nNongrim Hills, Shillong – 793003\nMeghalaya, India" },
                     { label: "Office Hours", val: "Monday – Friday, 10:00 AM – 5:00 PM\n(Excluding public holidays)" },
