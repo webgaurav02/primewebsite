@@ -15,13 +15,16 @@ import {
   HOW_HEARD,
 } from "@/lib/users/types";
 import { isMinorDob } from "@/lib/legal/policy";
-import { registerAction } from "./actions";
+import { registerAction, createAvatarUploadUrlAction } from "./actions";
 
 type Data = {
   registrantType: string;
   firstName: string; lastName: string; email: string; mobile: string;
   district: string; gender: string; dateOfBirth: string;
-  preferredLanguage: string; howHeard: string; photoDataUrl: string;
+  preferredLanguage: string; howHeard: string;
+  // photoDataUrl is a LOCAL preview only; photoKey is the R2 object the browser
+  // uploaded directly (what actually gets submitted).
+  photoDataUrl: string; photoKey: string;
   password: string; confirmPassword: string;
   businessName: string; sector: string; entityType: string; stage: string;
   yearEstablished: string; address: string; description: string;
@@ -34,7 +37,7 @@ type Data = {
 const empty: Data = {
   registrantType: "",
   firstName: "", lastName: "", email: "", mobile: "", district: "", gender: "", dateOfBirth: "",
-  preferredLanguage: "", howHeard: "", photoDataUrl: "",
+  preferredLanguage: "", howHeard: "", photoDataUrl: "", photoKey: "",
   password: "", confirmPassword: "",
   businessName: "", sector: "", entityType: "", stage: "", yearEstablished: "", address: "", description: "",
   employment: "", livesImpacted: "", turnover: "", govtFunding: "", externalFunding: "", products: "", socialImpact: "",
@@ -100,17 +103,41 @@ export default function RegisterPage() {
   const goBack = () => { setError(null); setIdx((i) => i - 1); };
   const goNext = () => { if (valid(current)) { setError(null); setIdx((i) => i + 1); } };
 
-  function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
-    if (!f) return set("photoDataUrl", "");
+    if (!f) {
+      setData((d) => ({ ...d, photoDataUrl: "", photoKey: "" }));
+      return;
+    }
     if (f.size > 5 * 1024 * 1024) {
       setError("Photo must be under 5 MB.");
       return;
     }
     setError(null);
+    // Local preview only — never submitted.
     const reader = new FileReader();
     reader.onload = () => set("photoDataUrl", String(reader.result));
     reader.readAsDataURL(f);
+    // Upload the file DIRECTLY to R2 via a short-lived presigned URL, so the
+    // (up to 5 MB) photo never travels through the registration Server Action
+    // (Next caps its body at 1 MB). We submit only the returned object key.
+    setData((d) => ({ ...d, photoKey: "" }));
+    const res = await createAvatarUploadUrlAction({ contentType: f.type, size: f.size });
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    try {
+      const put = await fetch(res.url, {
+        method: "PUT",
+        headers: { "Content-Type": res.contentType },
+        body: f,
+      });
+      if (!put.ok) throw new Error(`upload ${put.status}`);
+      set("photoKey", res.key);
+    } catch {
+      setError("We couldn't upload your photo. You can continue without it, or try a different image.");
+    }
   }
 
   function valid(step: StepKey): boolean {
@@ -137,48 +164,58 @@ export default function RegisterPage() {
   async function handleSubmit() {
     setError(null);
     setLoading(true);
-    const res = await registerAction({
-      registrantType: data.registrantType,
-      fullName: `${data.firstName} ${data.lastName}`.trim(),
-      email: data.email,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-      gender: data.gender,
-      dateOfBirth: data.dateOfBirth,
-      mobile: data.mobile,
-      preferredLanguage: data.preferredLanguage,
-      district: data.district,
-      howHeard: data.howHeard,
-      photoDataUrl: data.photoDataUrl,
-      consent: data.consent,
-      guardianName: data.guardianName,
-      guardianRelationship: data.guardianRelationship,
-      guardianConsent: data.guardianConsent,
-      businessName: data.businessName,
-      sector: data.sector,
-      entityType: data.entityType,
-      stage: data.stage,
-      yearEstablished: data.yearEstablished,
-      address: data.address,
-      description: data.description,
-      employment: data.employment,
-      livesImpacted: data.livesImpacted,
-      turnover: data.turnover,
-      govtFunding: data.govtFunding,
-      externalFunding: data.externalFunding,
-      products: data.products,
-      socialImpact: data.socialImpact,
-    });
-    if (!res.ok) {
+    try {
+      const res = await registerAction({
+        registrantType: data.registrantType,
+        fullName: `${data.firstName} ${data.lastName}`.trim(),
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+        mobile: data.mobile,
+        preferredLanguage: data.preferredLanguage,
+        district: data.district,
+        howHeard: data.howHeard,
+        photoKey: data.photoKey,
+        consent: data.consent,
+        guardianName: data.guardianName,
+        guardianRelationship: data.guardianRelationship,
+        guardianConsent: data.guardianConsent,
+        businessName: data.businessName,
+        sector: data.sector,
+        entityType: data.entityType,
+        stage: data.stage,
+        yearEstablished: data.yearEstablished,
+        address: data.address,
+        description: data.description,
+        employment: data.employment,
+        livesImpacted: data.livesImpacted,
+        turnover: data.turnover,
+        govtFunding: data.govtFunding,
+        externalFunding: data.externalFunding,
+        products: data.products,
+        socialImpact: data.socialImpact,
+      });
+      if (!res.ok) {
+        const first = Object.values(res.fieldErrors)[0]?.[0];
+        setError(first ?? "Please review your details and try again.");
+        return;
+      }
+      // Uniform for a new account AND a duplicate email: show a neutral confirmation.
+      // A new account's session cookie is already set (the dashboard opens); a
+      // duplicate has no session and got a "you already have an account" email.
+      setSubmitted(true);
+    } catch {
+      // A rejected Server Action (e.g. an oversized photo payload, a 5xx, or a
+      // dropped connection) must surface — otherwise the button hangs on
+      // "Creating account…" forever. Show a recoverable message instead.
+      setError(
+        "We couldn't create your account just now. Please check your connection and try again — if you added a photo, try a smaller one or continue without it.",
+      );
+    } finally {
       setLoading(false);
-      const first = Object.values(res.fieldErrors)[0]?.[0];
-      setError(first ?? "Please review your details and try again.");
-      return;
     }
-    // Uniform for a new account AND a duplicate email: show a neutral confirmation.
-    // A new account's session cookie is already set (the dashboard opens); a
-    // duplicate has no session and got a "you already have an account" email.
-    setSubmitted(true);
   }
 
   if (submitted) {

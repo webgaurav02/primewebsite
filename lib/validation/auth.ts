@@ -60,8 +60,11 @@ export const registerSchema = z
     preferredLanguage: z.enum(LANGUAGES as unknown as [string, ...string[]]),
     district: z.enum(MEGHALAYA_DISTRICTS as unknown as [string, ...string[]]),
     howHeard: z.enum(HOW_HEARD as unknown as [string, ...string[]]),
-    // Optional profile photo as a data: URL (server re-validates by magic bytes + size).
-    photoDataUrl: z.string().max(8_000_000).optional().default(""),
+    // Optional profile photo: the object KEY of a browser-uploaded staging
+    // avatar (see lib/storage presignAvatarUpload). The photo bytes never travel
+    // through this action; the DAL re-downloads + re-validates them by magic
+    // bytes/size before attaching. Shape is enforced there (isPendingAvatarKey).
+    photoKey: z.string().trim().max(200).optional().default(""),
     consent: z.literal(true, { error: "You must accept to continue." }),
 
     // Guardian block — required only for under-18 registrants (validated below).

@@ -7,15 +7,17 @@ import { describe, test, expect, beforeEach, afterAll, vi } from "vitest";
  * duplicate handling. Object storage is mocked (no real R2).
  */
 
+// The avatar is now a direct-to-R2 presigned upload: registerUser only re-binds
+// a browser-uploaded staging object via finalizeAvatar. Mock that (and the key
+// guard) so no real R2 is touched. finalizeAvatar returns null for a key that
+// doesn't validate — mirroring "bad/oversized photo → account created, no photo".
 vi.mock("@/lib/storage", () => ({
-  MAX_IMAGE_BYTES: 5 * 1024 * 1024,
-  detectImage: (b: Buffer) =>
-    b[0] === 0x89 && b[1] === 0x50
-      ? { ext: "png", mime: "image/png" }
-      : b[0] === 0xff && b[1] === 0xd8
-        ? { ext: "jpg", mime: "image/jpeg" }
-        : null,
-  uploadUserImage: async (prefix: string, userId: string) => ({ ok: true, key: `${prefix}/${userId}/photo.png` }),
+  isPendingAvatarKey: (k: string) =>
+    /^avatars\/pending\/[0-9a-f-]+\.(jpg|png|webp)$/.test(k),
+  finalizeAvatar: async (userId: string, pendingKey: string) =>
+    /^avatars\/pending\/[0-9a-f-]+\.png$/.test(pendingKey)
+      ? `avatars/${userId}/photo.png`
+      : null,
 }));
 
 import { registerUser } from "@/lib/dal/auth";
@@ -153,19 +155,25 @@ describe("under-18 guardian flow (DPDP s.9)", () => {
 });
 
 describe("optional profile photo", () => {
-  test("a valid photo data URL is stored as a private key", async () => {
-    // PNG magic bytes → the mocked storage returns a key.
-    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).toString("base64");
-    await registerUser(base("pic@x.com", { photoDataUrl: `data:image/png;base64,${png}` }), meta);
+  test("a browser-uploaded staging key is bound to the user as a private key", async () => {
+    await registerUser(
+      base("pic@x.com", { photoKey: "avatars/pending/11111111-1111-1111-1111-111111111111.png" }),
+      meta,
+    );
     const [u] = await migratorSql`SELECT photo_path FROM app_user WHERE email='pic@x.com'`;
     expect(u.photo_path).toMatch(/^avatars\//);
   });
 
-  test("a non-image payload is rejected", async () => {
-    const junk = Buffer.from("not an image at all").toString("base64");
-    const r = await registerUser(base("pic2@x.com", { photoDataUrl: `data:image/png;base64,${junk}` }), meta);
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.fieldErrors.photoDataUrl).toBeTruthy();
+  test("a photo that fails re-validation doesn't sink the signup (account created, no photo)", async () => {
+    // finalizeAvatar returns null here (mock treats non-.png as invalid) — the
+    // photo bytes never traveled through the action, so registration still ok.
+    const r = await registerUser(
+      base("pic2@x.com", { photoKey: "avatars/pending/22222222-2222-2222-2222-222222222222.webp" }),
+      meta,
+    );
+    expect(r.ok).toBe(true);
+    const [u] = await migratorSql`SELECT photo_path FROM app_user WHERE email='pic2@x.com'`;
+    expect(u.photo_path).toBeNull();
   });
 });
 

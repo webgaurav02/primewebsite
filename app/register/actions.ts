@@ -8,6 +8,29 @@ import {
 } from "@/lib/auth/user-cookie";
 import { slidingWindow } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/security/client-ip";
+import { presignAvatarUpload, type PresignResult } from "@/lib/storage";
+
+/**
+ * Mint a short-lived presigned URL so the browser can upload the optional
+ * profile photo DIRECTLY to R2, keeping the (up to 5 MB) image out of the
+ * registerAction body (Next caps Server Action bodies at 1 MB). The client
+ * sends back only the returned object key; registerUser re-validates the bytes.
+ * Rate-limited per IP so the URL minting can't be abused.
+ */
+export async function createAvatarUploadUrlAction(input: {
+  contentType: string;
+  size: number;
+}): Promise<PresignResult> {
+  const h = await headers();
+  const ip = clientIp(h);
+
+  const rl = slidingWindow(`avatar-presign:${ip ?? "shared"}`, 20, 15 * 60 * 1000);
+  if (!rl.ok) {
+    return { ok: false, error: `Too many attempts. Try again in ${rl.retryAfterSeconds}s.` };
+  }
+
+  return presignAvatarUpload(input.contentType, input.size);
+}
 
 /**
  * Self-serve registration. The DAL does validation, PII encryption, DPDP consent,

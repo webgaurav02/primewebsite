@@ -43,6 +43,8 @@ const nextConfig: NextConfig = {
     // (used in the Data Access Layer).
     taint: true,
     // Only honor Server Action POSTs from our own public origin(s) when set.
+    // (Server Action bodies keep the tight 1 MB default — the registration photo
+    // no longer travels through an action; it's a direct presigned R2 upload.)
     ...(allowedOrigins.length > 0 ? { serverActions: { allowedOrigins } } : {}),
   },
 

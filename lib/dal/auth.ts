@@ -18,7 +18,7 @@ import {
   accountExistsEmail,
 } from "@/lib/email/templates";
 import { slidingWindow } from "@/lib/security/rate-limit";
-import { detectImage, uploadUserImage, MAX_IMAGE_BYTES } from "@/lib/storage";
+import { finalizeAvatar } from "@/lib/storage";
 import { SECTOR_LABELS } from "@/lib/entrepreneurs-data";
 import {
   registrantTypeToPersona,
@@ -66,18 +66,6 @@ function intOrNull(s: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Decode a `data:image/...;base64,...` URL to bytes (magic bytes validate it next). */
-function decodeImageDataUrl(s: string): Buffer | null {
-  const m = /^data:image\/[a-z+.-]+;base64,([A-Za-z0-9+/=]+)$/i.exec(s);
-  if (!m) return null;
-  try {
-    const buf = Buffer.from(m[1], "base64");
-    return buf.length > 0 ? buf : null;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Self-serve credentialed registration. Creates an ACTIVE account immediately
  * (soft-gate: email verification is a banner, not a login block), records DPDP
@@ -94,19 +82,6 @@ export async function registerUser(
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, fieldErrors: flatten(parsed.error) };
   const d = parsed.data;
-
-  // Validate an optional profile photo by MAGIC BYTES + size before any DB work.
-  let photoBuffer: Buffer | null = null;
-  if (d.photoDataUrl) {
-    const decoded = decodeImageDataUrl(d.photoDataUrl);
-    if (!decoded || !detectImage(decoded)) {
-      return { ok: false, fieldErrors: { photoDataUrl: ["Upload a valid JPEG, PNG, or WebP image."] } };
-    }
-    if (decoded.length > MAX_IMAGE_BYTES) {
-      return { ok: false, fieldErrors: { photoDataUrl: ["Photo must be under 5 MB."] } };
-    }
-    photoBuffer = decoded;
-  }
 
   const registrantType = d.registrantType as RegistrantType;
   const persona = registrantTypeToPersona(registrantType);
@@ -217,16 +192,18 @@ export async function registerUser(
   // Verify email first — its delivery must not depend on object storage.
   await sendVerificationEmail(d.email, outcome.name, outcome.verifyToken);
 
-  // Best-effort: upload the (already-validated) photo AFTER commit, bound to the
-  // real user id. A storage failure must NEVER sink a registration that already
-  // durably committed — the photo is optional and can be added later from the
-  // account area, so we swallow any error here.
-  if (photoBuffer) {
+  // Best-effort: bind the browser-uploaded staging avatar to the new user AFTER
+  // commit. finalizeAvatar re-downloads it, re-validates by magic bytes + size
+  // (the client uploaded it directly to R2, so it is untrusted), moves it under
+  // the user's key, and cleans up the staging object. A bad/oversized photo or
+  // any storage failure must NEVER sink a registration that already durably
+  // committed — the photo is optional and can be added later from the account.
+  if (d.photoKey) {
     try {
-      const up = await uploadUserImage("avatars", outcome.userId, photoBuffer);
-      if (up.ok) {
+      const key = await finalizeAvatar(outcome.userId, d.photoKey);
+      if (key) {
         await withAuthContext(
-          (tx) => tx`UPDATE app_user SET photo_path = ${up.key} WHERE id = ${outcome.userId}`,
+          (tx) => tx`UPDATE app_user SET photo_path = ${key} WHERE id = ${outcome.userId}`,
         );
       }
     } catch {
