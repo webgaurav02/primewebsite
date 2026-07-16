@@ -18,6 +18,7 @@ const ALICE = {
 };
 const BOB = { ...ALICE, id: "80000000-0000-4000-8000-0000000000b2", email: "bob@example.com", fullName: "Bob Marak", district: "West Garo Hills" };
 const SUPER = { id: "80000000-0000-4000-8000-0000000000e9", email: "super@x", name: "Super", role: "super_admin" as const, regions: null };
+const OFFICER = { id: "80000000-0000-4000-8000-0000000000f0", email: "officer@x", name: "Officer", role: "grievance_officer" as const, regions: null };
 
 const state = vi.hoisted(() => ({ user: null as unknown, admin: null as unknown }));
 vi.mock("@/lib/auth/user-session", () => ({
@@ -56,6 +57,8 @@ beforeEach(async () => {
   }
   await migratorSql`INSERT INTO admin_user (id, email, name, role)
     VALUES (${SUPER.id}, ${SUPER.email}, ${SUPER.name}, 'super_admin')`;
+  await migratorSql`INSERT INTO admin_user (id, email, name, role)
+    VALUES (${OFFICER.id}, ${OFFICER.email}, ${OFFICER.name}, 'grievance_officer')`;
 
   const [inc] = await migratorSql`SELECT id FROM program WHERE slug = 'incubation'`;
   const [ele] = await migratorSql`SELECT id FROM program WHERE slug = 'cm-elevate'`;
@@ -128,6 +131,22 @@ describe("listApplications — who registered for what", () => {
     expect(page1.total).toBe(3);
     expect(page2.total).toBe(3);
   });
+
+  test("an offset past the last row still reports the true total (stale ?page= URL)", async () => {
+    await seedApplications();
+    const past = await listApplications({ limit: 50, offset: 100 });
+    expect(past.rows.length).toBe(0);
+    expect(past.total).toBe(3); // NOT 0 — the pagination UI must not vanish
+  });
+
+  test("a grievance_officer (staff, not super_admin) sees applications through RLS", async () => {
+    await seedApplications();
+    state.admin = OFFICER;
+    const { total } = await listApplications();
+    expect(total).toBe(3); // admin_is_staff() must keep covering grievance_officer
+    const stats = await getApplicationStats();
+    expect(stats.total).toBe(3);
+  });
 });
 
 describe("getApplicationStats", () => {
@@ -166,6 +185,22 @@ describe("getApplicationDetail", () => {
   test("returns null for an unknown or malformed id", async () => {
     expect(await getApplicationDetail("80000000-0000-4000-8000-0000000000ff")).toBeNull();
     expect(await getApplicationDetail("not-a-uuid")).toBeNull();
+  });
+
+  test("a note-less quick status change PRESERVES the saved decision note", async () => {
+    await seedApplications();
+    const { rows: [app] } = await listApplications({ userId: ALICE.id, programId: incubationProgramId });
+    await reviewApplication({ applicationId: app.id, status: "shortlisted", note: "Strong fit." });
+    // The list page's quick form posts status only (note "") — must not wipe the note.
+    await reviewApplication({ applicationId: app.id, status: "approved", note: "" });
+
+    const d = await getApplicationDetail(app.id);
+    expect(d!.status).toBe("approved");
+    expect(d!.decisionNote).toBe("Strong fit.");
+
+    // A new non-empty note still overwrites.
+    await reviewApplication({ applicationId: app.id, status: "approved", note: "Final: welcome aboard." });
+    expect((await getApplicationDetail(app.id))!.decisionNote).toBe("Final: welcome aboard.");
   });
 });
 

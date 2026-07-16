@@ -44,15 +44,24 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default async function ApplicationDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const error = Array.isArray(sp.error) ? sp.error[0] : sp.error;
   const a = await getApplicationDetail(id);
   if (!a) notFound();
 
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       <div>
         <Link href="/admin/applications" className="text-sm text-zinc-500 underline">← Back to applications</Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">

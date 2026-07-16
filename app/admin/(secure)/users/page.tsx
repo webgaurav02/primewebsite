@@ -29,12 +29,24 @@ const STATUS_FILTERS: { label: string; value: string }[] = [
 
 const REGISTRANT_TYPE_VALUES = REGISTRANT_TYPES.map((t) => t.value);
 
+/** Duplicated query keys arrive as arrays — take the first, never crash. */
+function first(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v;
+}
+
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; type?: string; district?: string; q?: string; page?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sp = await searchParams;
+  const spRaw = await searchParams;
+  const sp = {
+    status: first(spRaw.status),
+    type: first(spRaw.type),
+    district: first(spRaw.district),
+    q: first(spRaw.q),
+    page: first(spRaw.page),
+  };
   const status = (["pending", "active", "suspended"] as const).includes(sp.status as UserStatus)
     ? (sp.status as UserStatus)
     : undefined;

@@ -34,17 +34,29 @@ function fmtDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
+/** Duplicated query keys arrive as arrays — take the first, never crash. */
+function first(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v;
+}
+
 export default async function ApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; program?: string; q?: string; page?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin || !can(admin, "program:manage")) {
     return <p className="text-sm text-zinc-500">You don&apos;t have access to applications.</p>;
   }
 
-  const sp = await searchParams;
+  const spRaw = await searchParams;
+  const sp = {
+    status: first(spRaw.status),
+    program: first(spRaw.program),
+    q: first(spRaw.q),
+    page: first(spRaw.page),
+    error: first(spRaw.error),
+  };
   const status = APPLICATION_STATUSES.includes(sp.status as ApplicationStatus)
     ? (sp.status as ApplicationStatus)
     : undefined;
@@ -81,6 +93,12 @@ export default async function ApplicationsPage({
         and where each one stands. Click an applicant for their profile, or open an
         application to decide it with a note.
       </p>
+
+      {sp.error && (
+        <div className="mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {sp.error}
+        </div>
+      )}
 
       {/* Status chips (with counts) */}
       <div className="mt-4 flex flex-wrap gap-2">

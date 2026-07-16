@@ -385,7 +385,25 @@ export async function listApplications(
         metadata: { count: rows.length } },
       tx,
     );
-    const total = rows[0]?.total ?? 0;
+    // count(*) OVER () rides on returned rows, so an offset past the last row
+    // yields zero rows AND total=0 — recount so a stale ?page= URL still shows
+    // the true total (and the pagination controls) instead of a lying empty state.
+    let total = rows[0]?.total ?? 0;
+    if (rows.length === 0 && offset > 0) {
+      const [c] = await tx<{ n: number }[]>`
+        SELECT count(*)::int AS n
+        FROM program_application a
+        JOIN app_user u ON u.id = a.user_id
+        JOIN program_cycle c ON c.id = a.cycle_id
+        JOIN program p ON p.id = c.program_id
+        WHERE TRUE
+          ${filters?.status ? tx`AND a.status = ${filters.status}` : tx``}
+          ${filters?.cycleId && UUID_RE.test(filters.cycleId) ? tx`AND a.cycle_id = ${filters.cycleId}` : tx``}
+          ${filters?.programId && UUID_RE.test(filters.programId) ? tx`AND p.id = ${filters.programId}` : tx``}
+          ${filters?.userId && UUID_RE.test(filters.userId) ? tx`AND a.user_id = ${filters.userId}` : tx``}
+          ${q ? tx`AND (u.full_name ILIKE ${q} OR u.email ILIKE ${q})` : tx``}`;
+      total = c.n;
+    }
     return {
       rows: rows.map(({ total: _t, ...r }) => ({
         ...r,
@@ -540,9 +558,13 @@ export async function reviewApplication(raw: unknown): Promise<{ ok: boolean; er
     if (!app) return { ok: false, error: "Application not found." };
     if (app.status === "withdrawn") return { ok: false, error: "That application was withdrawn." };
 
+    // NULLIF+COALESCE: an empty note KEEPS the existing decision_note — the
+    // list page's quick status form posts no note, and flipping a status there
+    // must never silently wipe a note saved from the detail page.
     await tx`
       UPDATE program_application
-      SET status = ${status}, decision_note = ${note || null},
+      SET status = ${status},
+          decision_note = COALESCE(NULLIF(${note}, ''), decision_note),
           reviewed_by = ${admin.id}, reviewed_at = now(), updated_at = now()
       WHERE id = ${applicationId}`;
     await recordAudit(

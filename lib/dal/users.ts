@@ -132,7 +132,22 @@ export async function listUsers(
       tx,
     );
 
-    const total = rows[0]?.total ?? 0;
+    // count(*) OVER () rides on returned rows, so an offset past the last row
+    // yields zero rows AND total=0 — recount so a stale ?page= URL still shows
+    // the true total (and the pagination controls) instead of a lying empty state.
+    let total = rows[0]?.total ?? 0;
+    if (rows.length === 0 && offset > 0) {
+      const [c] = await tx<{ n: number }[]>`
+        SELECT count(*)::int AS n
+        FROM app_user u
+        WHERE TRUE
+          ${filters?.status ? tx`AND u.status = ${filters.status}` : tx``}
+          ${filters?.persona ? tx`AND u.persona = ${filters.persona}` : tx``}
+          ${filters?.registrantType ? tx`AND u.registrant_type = ${filters.registrantType}` : tx``}
+          ${filters?.district ? tx`AND u.district = ${filters.district}` : tx``}
+          ${q ? tx`AND (u.full_name ILIKE ${q} OR u.email ILIKE ${q})` : tx``}`;
+      total = c.n;
+    }
     return {
       rows: rows.map(({ total: _t, ...r }) => ({ ...r, createdAt: r.createdAt.toISOString() })),
       total,
