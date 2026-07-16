@@ -177,8 +177,8 @@ describe("optional profile photo", () => {
   });
 });
 
-describe("enumeration-safe duplicate", () => {
-  test("uniform: no session, no duplicate, and a victim's reset token is NOT consumed", async () => {
+describe("duplicate email on signup", () => {
+  test("is rejected with an email error, creates no second account, and doesn't touch the victim's reset token", async () => {
     await registerUser(base("dupe@x.com"), meta);
     const [u] = await migratorSql`SELECT id FROM app_user WHERE email='dupe@x.com'`;
     // Simulate a reset link the victim legitimately requested and hasn't used yet.
@@ -186,13 +186,23 @@ describe("enumeration-safe duplicate", () => {
       VALUES ('victim-reset-hash', ${u.id}, 'reset', now() + interval '1 hour')`;
 
     const again = await registerUser(base("dupe@x.com"), meta);
-    expect(again.ok).toBe(true);
-    if (again.ok) expect(again.session).toBeUndefined(); // no session for a duplicate
+    // Signup now reveals the duplicate so the user can sign in instead.
+    expect(again.ok).toBe(false);
+    if (!again.ok) expect(again.fieldErrors.email?.[0]).toMatch(/already exists/i);
 
-    // No duplicate account was created...
+    // Still exactly one account (no recreation)...
     expect((await migratorSql`SELECT 1 FROM app_user WHERE email='dupe@x.com'`).length).toBe(1);
-    // ...and the attacker did NOT consume the victim's pending reset token.
+    // ...and the pending reset token was NOT consumed by the second attempt.
     const [tok] = await migratorSql`SELECT consumed_at FROM user_email_token WHERE token_hash='victim-reset-hash'`;
     expect(tok.consumed_at).toBeNull();
+  });
+
+  test("is case-insensitive (citext) — Mixed@Case.com blocks mixed@case.com", async () => {
+    const first = await registerUser(base("Mixed@Case.com"), meta);
+    expect(first.ok).toBe(true);
+    const again = await registerUser(base("mixed@case.com"), meta);
+    expect(again.ok).toBe(false); // citext UNIQUE + the SELECT both treat these as the same
+    // Exactly one row regardless of the casing used.
+    expect((await migratorSql`SELECT 1 FROM app_user WHERE email='mixed@case.com'`).length).toBe(1);
   });
 });

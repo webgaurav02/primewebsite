@@ -96,12 +96,12 @@ describe("registration", () => {
     expect(c.password_hash).toMatch(/^scrypt\$/);
   });
 
-  test("a duplicate email is enumeration-safe (uniform ok, no second account)", async () => {
+  test("a duplicate email is rejected with an email error and creates no second account", async () => {
     await registerUser(validRegistration("dup@example.com"), meta);
     const again = await registerUser(validRegistration("dup@example.com"), meta);
-    // Same uniform success — the response never reveals the account exists...
-    expect(again.ok).toBe(true);
-    if (again.ok) expect(again.session).toBeUndefined(); // ...but no new session
+    // Signup reveals the duplicate so the user can sign in instead...
+    expect(again.ok).toBe(false);
+    if (!again.ok) expect(again.fieldErrors.email?.[0]).toMatch(/already exists/i);
     // ...and no duplicate row was created.
     const rows = await migratorSql`SELECT id FROM app_user WHERE email='dup@example.com'`;
     expect(rows.length).toBe(1);
