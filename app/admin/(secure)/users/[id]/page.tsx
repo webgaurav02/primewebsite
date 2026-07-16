@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUserDetail } from "@/lib/dal/users";
 import { listUserApplications } from "@/lib/dal/programs";
+import { getCurrentAdmin } from "@/lib/auth/session";
+import { can } from "@/lib/auth/rbac";
 import { REGISTRANT_TYPE_LABELS } from "@/lib/users/types";
 import { APPLICATION_STATUS_LABELS } from "@/lib/programs/types";
 import { formatINR } from "@/lib/format/display";
@@ -46,10 +48,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [u, applications] = await Promise.all([getUserDetail(id), listUserApplications(id)]);
+  const [u, applications, admin] = await Promise.all([
+    getUserDetail(id),
+    listUserApplications(id),
+    getCurrentAdmin(),
+  ]);
   if (!u) notFound();
 
   const b = u.business;
+  const canIssuePrimeId = admin ? can(admin, "prime_id:issue") : false;
 
   return (
     <div className="space-y-6">
@@ -72,6 +79,16 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
             {u.activated ? "email verified" : "email unverified"}
           </span>
         </div>
+        {canIssuePrimeId && (
+          <div className="mt-3">
+            <Link
+              href={`/admin/prime-id/generate?userId=${u.id}`}
+              className="inline-flex items-center gap-1.5 rounded border border-[#1B4332] px-3 py-1.5 text-sm font-medium text-[#1B4332] hover:bg-[#1B4332]/5"
+            >
+              Issue PRIME ID →
+            </Link>
+          </div>
+        )}
       </div>
 
       <Section title="Identity">

@@ -16,7 +16,14 @@ const CATEGORY_LABEL: Record<string, string> = {
   livelihood: "Livelihood Entrepreneur",
 };
 
-export default function PrimeIdCard({ card }: { card: PrimeIdCardDTO }) {
+export default function PrimeIdCard({
+  card,
+  preview = false,
+}: {
+  card: PrimeIdCardDTO;
+  /** Live preview before issue: hide the download button (no QR/id yet). */
+  preview?: boolean;
+}) {
   const [qr, setQr] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -96,12 +103,16 @@ export default function PrimeIdCard({ card }: { card: PrimeIdCardDTO }) {
         </div>
       </div>
 
-      <button
-        onClick={download}
-        className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-      >
-        Download card (PNG)
-      </button>
+      {preview ? (
+        <p className="text-xs text-zinc-400">Live preview — issue to sign &amp; enable download.</p>
+      ) : (
+        <button
+          onClick={download}
+          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+        >
+          Download card (PNG)
+        </button>
+      )}
     </div>
   );
 }

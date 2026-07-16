@@ -30,6 +30,9 @@ import {
   revokePrimeIdCredential,
   verifyPrimeIdToken,
   getMyPrimeId,
+  adminIssuePrimeId,
+  getPrimeIdIssueContext,
+  listPrimeIdEligibleUsers,
 } from "@/lib/dal/prime-id";
 import { getSql } from "@/lib/db/client";
 import { migratorSql, truncateAll, closeDb } from "../helpers/db";
@@ -132,5 +135,58 @@ describe("request → approve → issue → verify", () => {
 
     // No pending request now → can request again.
     expect(await requestPrimeId({ holderType: "entrepreneur" })).toEqual({ ok: true });
+  });
+});
+
+describe("admin direct-issue (generator)", () => {
+  test("issues a signed credential for a user with no request; token verifies", async () => {
+    const res = await adminIssuePrimeId({ userId: USER.id, holderType: "entrepreneur", category: "nano" });
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.card.id).toMatch(/^PRM-ML-\d{4}-\d{6}$/);
+    expect(res.card.fullName).toBe(USER.fullName);
+    expect(res.card.district).toBe(USER.district);
+    expect(res.card.category).toBe("nano");
+
+    // Credential row exists, linked to the user, with no request.
+    const [c] = await migratorSql`SELECT request_id, user_id, issued_by, status FROM prime_id_credential WHERE id = ${res.card.id}`;
+    expect(c.request_id).toBeNull();
+    expect(c.user_id).toBe(USER.id);
+    expect(c.issued_by).toBe(ADMIN.id);
+
+    // The signed token authoritatively verifies as valid.
+    const v = await verifyPrimeIdToken(await tokenOf(res.card.id));
+    expect(v.valid).toBe(true);
+    expect(v.credential?.id).toBe(res.card.id);
+  });
+
+  test("blocks a second active credential for the same user", async () => {
+    expect((await adminIssuePrimeId({ userId: USER.id, holderType: "mentor" })).ok).toBe(true);
+    const again = await adminIssuePrimeId({ userId: USER.id, holderType: "mentor" });
+    expect(again.ok).toBe(false);
+    if (!again.ok) expect(again.error).toMatch(/already has an active/i);
+  });
+
+  test("clears the user's pending request when issued directly", async () => {
+    await requestPrimeId({ holderType: "entrepreneur", category: "startup" });
+    expect((await adminIssuePrimeId({ userId: USER.id, holderType: "entrepreneur", category: "startup" })).ok).toBe(true);
+    const [r] = await migratorSql`SELECT status FROM prime_id_request WHERE user_id = ${USER.id}`;
+    expect(r.status).toBe("issued");
+  });
+
+  test("eligibility + context reflect an already-issued credential", async () => {
+    // Before: eligible + no active credential.
+    expect((await listPrimeIdEligibleUsers()).some((u) => u.id === USER.id)).toBe(true);
+    const before = await getPrimeIdIssueContext(USER.id);
+    expect(before?.activeCredentialId).toBeNull();
+    expect(before?.suggestedHolderType).toBe("entrepreneur");
+    expect(before?.ventureName).toBe("Zero9 Farms");
+
+    await adminIssuePrimeId({ userId: USER.id, holderType: "entrepreneur", category: "startup" });
+
+    // After: no longer eligible; context reports the active credential.
+    expect((await listPrimeIdEligibleUsers()).some((u) => u.id === USER.id)).toBe(false);
+    const after = await getPrimeIdIssueContext(USER.id);
+    expect(after?.activeCredentialId).toMatch(/^PRM-ML-/);
   });
 });

@@ -1,5 +1,9 @@
+import Link from "next/link";
 import { listPrimeIdRequests } from "@/lib/dal/prime-id";
+import { getCurrentAdmin } from "@/lib/auth/session";
+import { can } from "@/lib/auth/rbac";
 import { approveIssueAction, rejectRequestAction } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 const HOLDER_LABEL: Record<string, string> = {
   entrepreneur: "Entrepreneur",
@@ -8,12 +12,27 @@ const HOLDER_LABEL: Record<string, string> = {
 };
 
 export default async function PrimeIdAdminPage() {
+  const admin = await getCurrentAdmin();
   const pending = await listPrimeIdRequests("pending");
   const issued = await listPrimeIdRequests("issued");
+  const canIssue = admin ? can(admin, "prime_id:issue") : false;
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">PRIME ID</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">PRIME ID</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          {canIssue && (
+            <Link
+              href="/admin/prime-id/generate"
+              className="inline-flex items-center gap-1.5 rounded bg-[#1B4332] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#2D6A4F]"
+            >
+              Generate a PRIME ID →
+            </Link>
+          )}
+          <ExportButton dataset="prime-id" label="Export requests (XLSX)" />
+        </div>
+      </div>
       <p className="mt-1 text-sm text-zinc-500">
         {pending.length} request(s) awaiting review. Approving issues a signed,
         government-recognized credential.
