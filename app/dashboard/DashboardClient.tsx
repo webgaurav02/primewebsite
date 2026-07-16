@@ -14,6 +14,7 @@ import {
   HiLogout, HiBookOpen, HiChevronDown, HiIdentification, HiSpeakerphone,
 } from "react-icons/hi";
 import { logoutAction } from "@/app/account/actions";
+import { reset as resetAnalytics } from "@/lib/analytics/client";
 import VerifyBanner from "@/app/account/_components/VerifyBanner";
 import type {
   DashboardData, DashUser, DashStats, DashProgram, DashEvent,
@@ -672,7 +673,7 @@ function Sidebar({ user, active, setActive, onClose }: {
           <p className="text-white font-semibold truncate leading-tight" style={{ fontSize: "var(--text-label)" }}>{user.shortName}</p>
           <p className="text-white/30 truncate" style={{ fontSize: "var(--text-label)" }}>{user.headline}</p>
         </div>
-        <form action={logoutAction}>
+        <form action={logoutAction} onSubmit={() => resetAnalytics()}>
           <button type="submit" className="text-white/25 hover:text-white/60 transition-colors flex-shrink-0" title="Sign out"><HiLogout size={16} /></button>
         </form>
       </div>

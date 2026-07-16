@@ -55,8 +55,19 @@ jobs:
           # Set repo variable NEXT_PUBLIC_SENTRY_DSN (Settings → Secrets and
           # variables → Actions → Variables). Empty ⇒ client SDK stays disabled;
           # server-side capture uses the runtime SENTRY_DSN App Service setting.
+          #
+          # Analytics IDs are inlined at build time too. These are PUBLIC IDs (they
+          # appear in the client bundle regardless), so they're set literally here —
+          # no repo variables needed. To rotate one, edit its value below (or move it
+          # to a repo variable like the Sentry DSN). None fires until the visitor
+          # accepts the DPDP cookie consent. Do NOT also add GA4/Clarity tags inside
+          # GTM or events double-count — see AGENTS.md.
           build-args: |
             NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+            NEXT_PUBLIC_GTM_ID=GTM-5DR3RRKS
+            NEXT_PUBLIC_GA4_ID=G-TEPR35TRC6
+            NEXT_PUBLIC_CLARITY_ID=xn6w54iscq
+            NEXT_PUBLIC_MIXPANEL_TOKEN=ed55086c3c9d924efa90d57979753f41
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

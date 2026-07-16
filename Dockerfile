@@ -23,6 +23,18 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # runtime App Service setting and needs no build arg.
 ARG NEXT_PUBLIC_SENTRY_DSN=""
 ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+# Analytics tags/tokens are all NEXT_PUBLIC_* (public IDs, safe in the browser) and
+# so are inlined at BUILD time too. Passed as build args from the deploy workflow.
+# Any left empty ⇒ that tool stays disabled. Analytics never fires until the DPDP
+# cookie consent is accepted (components/ui/CookieConsent.tsx), regardless.
+ARG NEXT_PUBLIC_GTM_ID=""
+ENV NEXT_PUBLIC_GTM_ID=$NEXT_PUBLIC_GTM_ID
+ARG NEXT_PUBLIC_GA4_ID=""
+ENV NEXT_PUBLIC_GA4_ID=$NEXT_PUBLIC_GA4_ID
+ARG NEXT_PUBLIC_CLARITY_ID=""
+ENV NEXT_PUBLIC_CLARITY_ID=$NEXT_PUBLIC_CLARITY_ID
+ARG NEXT_PUBLIC_MIXPANEL_TOKEN=""
+ENV NEXT_PUBLIC_MIXPANEL_TOKEN=$NEXT_PUBLIC_MIXPANEL_TOKEN
 RUN npm run build
 
 # ── runner: minimal runtime image, non-root ──────────────────────────────────

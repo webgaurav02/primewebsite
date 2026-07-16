@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from "react-icons/hi";
 import { signInAction } from "./actions";
+import { track } from "@/lib/analytics/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function LoginPage() {
       setError(res.error);
       return;
     }
+    track("Login", { method: "password" });
     router.push("/dashboard");
   }
 

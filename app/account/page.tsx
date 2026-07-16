@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/user-session";
 import { unreadNotificationCount } from "@/lib/dal/events";
 import { REGISTRANT_TYPE_LABELS, PERSONAS } from "@/lib/users/types";
 import { logoutAction } from "./actions";
+import IdentifyUser from "@/components/analytics/IdentifyUser";
 
 export const metadata: Metadata = {
   title: "My account — PRIME Meghalaya",
@@ -44,6 +45,16 @@ export default async function AccountPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
+      <IdentifyUser
+        user={{
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          registrantType: user.registrantType,
+          district: user.district,
+          status: user.status,
+        }}
+      />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-zinc-900">My account</h1>
         <form action={logoutAction}>

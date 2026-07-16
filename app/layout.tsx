@@ -5,6 +5,7 @@ import PageLoader from "@/components/ui/PageLoader";
 import CookieConsent from "@/components/ui/CookieConsent";
 import PageTransition from "@/components/ui/PageTransition";
 import FloatingWidgets from "@/components/ui/FloatingWidgets";
+import Analytics from "@/components/analytics/Analytics";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
         <PageTransition>{children}</PageTransition>
         <CookieConsent />
         <FloatingWidgets />
+        <Analytics />
       </body>
     </html>
   );
