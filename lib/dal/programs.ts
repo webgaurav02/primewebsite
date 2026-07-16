@@ -308,8 +308,14 @@ export async function setCycleStatus(raw: unknown): Promise<{ ok: boolean; error
 
 export interface AdminApplication {
   id: string;
+  userId: string;
   applicantName: string;
+  applicantEmail: string;
+  registrantType: string | null;
+  district: string | null;
+  programId: string;
   programName: string;
+  cycleId: string;
   cycleLabel: string;
   status: ApplicationStatus;
   answers: { summary?: string; objective?: string };
@@ -317,19 +323,51 @@ export interface AdminApplication {
   decisionNote: string | null;
 }
 
-export async function listApplications(filters?: {
+/**
+ * The driver can hand `answers` jsonb back unparsed (a JSON string) — normalize
+ * to the object shape the UI renders. Tolerates bad data with an empty object.
+ */
+function parseAnswers(a: unknown): { summary?: string; objective?: string } {
+  if (typeof a === "string") {
+    try {
+      return JSON.parse(a) as { summary?: string; objective?: string };
+    } catch {
+      return {};
+    }
+  }
+  return (a ?? {}) as { summary?: string; objective?: string };
+}
+
+export interface ApplicationFilters {
   status?: ApplicationStatus;
   cycleId?: string;
-}): Promise<AdminApplication[]> {
+  programId?: string;
+  userId?: string;
+  /** Applicant name/email search. */
+  q?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export async function listApplications(
+  filters?: ApplicationFilters,
+): Promise<{ rows: AdminApplication[]; total: number }> {
   const admin = await requireAdmin();
   assertCan(admin, "program:manage");
+  const q = filters?.q ? `%${filters.q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` : null;
+  const limit = Math.min(Math.max(filters?.limit ?? 50, 1), 200);
+  const offset = Math.max(filters?.offset ?? 0, 0);
+
   return withAdminContext(admin, async (tx) => {
     const rows = await tx<
-      (Omit<AdminApplication, "submittedAt"> & { submittedAt: Date | null })[]
+      (Omit<AdminApplication, "submittedAt"> & { submittedAt: Date | null; total: number })[]
     >`
-      SELECT a.id, u.full_name AS "applicantName", p.name AS "programName",
-             c.label AS "cycleLabel", a.status, a.answers,
-             a.submitted_at AS "submittedAt", a.decision_note AS "decisionNote"
+      SELECT a.id, a.user_id AS "userId", u.full_name AS "applicantName",
+             u.email AS "applicantEmail", u.registrant_type::text AS "registrantType",
+             u.district, p.id AS "programId", p.name AS "programName",
+             c.id AS "cycleId", c.label AS "cycleLabel", a.status, a.answers,
+             a.submitted_at AS "submittedAt", a.decision_note AS "decisionNote",
+             count(*) OVER ()::int AS total
       FROM program_application a
       JOIN app_user u ON u.id = a.user_id
       JOIN program_cycle c ON c.id = a.cycle_id
@@ -337,13 +375,150 @@ export async function listApplications(filters?: {
       WHERE TRUE
         ${filters?.status ? tx`AND a.status = ${filters.status}` : tx``}
         ${filters?.cycleId && UUID_RE.test(filters.cycleId) ? tx`AND a.cycle_id = ${filters.cycleId}` : tx``}
-      ORDER BY a.created_at DESC`;
+        ${filters?.programId && UUID_RE.test(filters.programId) ? tx`AND p.id = ${filters.programId}` : tx``}
+        ${filters?.userId && UUID_RE.test(filters.userId) ? tx`AND a.user_id = ${filters.userId}` : tx``}
+        ${q ? tx`AND (u.full_name ILIKE ${q} OR u.email ILIKE ${q})` : tx``}
+      ORDER BY a.created_at DESC
+      LIMIT ${limit} OFFSET ${offset}`;
     await recordAudit(
       { actor: admin, action: "program.list_applications", resourceType: "program_application",
         metadata: { count: rows.length } },
       tx,
     );
-    return rows.map((r) => ({ ...r, submittedAt: r.submittedAt ? r.submittedAt.toISOString() : null }));
+    const total = rows[0]?.total ?? 0;
+    return {
+      rows: rows.map(({ total: _t, ...r }) => ({
+        ...r,
+        answers: parseAnswers(r.answers),
+        submittedAt: r.submittedAt ? r.submittedAt.toISOString() : null,
+      })),
+      total,
+    };
+  });
+}
+
+/**
+ * "Who registered for what" at a glance: application counts by status and by
+ * program. Pure aggregates (no PII), so — like the dashboard — not audited.
+ */
+export interface ApplicationStats {
+  total: number;
+  byStatus: Partial<Record<ApplicationStatus, number>>;
+  byProgram: { programId: string; programName: string; total: number; pending: number }[];
+}
+
+export async function getApplicationStats(): Promise<ApplicationStats> {
+  const admin = await requireAdmin();
+  assertCan(admin, "program:manage");
+  return withAdminContext(admin, async (tx) => {
+    const statusRows = await tx<{ status: ApplicationStatus; count: number }[]>`
+      SELECT status, count(*)::int AS count
+      FROM program_application GROUP BY status`;
+    const programRows = await tx<
+      { programId: string; programName: string; total: number; pending: number }[]
+    >`
+      SELECT p.id AS "programId", p.name AS "programName",
+             count(a.id)::int AS total,
+             count(a.id) FILTER (WHERE a.status IN ('submitted', 'under_review', 'shortlisted'))::int AS pending
+      FROM program_application a
+      JOIN program_cycle c ON c.id = a.cycle_id
+      JOIN program p ON p.id = c.program_id
+      GROUP BY p.id, p.name
+      ORDER BY count(a.id) DESC, p.name`;
+
+    const byStatus: Partial<Record<ApplicationStatus, number>> = {};
+    let total = 0;
+    for (const r of statusRows) {
+      byStatus[r.status] = r.count;
+      total += r.count;
+    }
+    return { total, byStatus, byProgram: programRows };
+  });
+}
+
+export interface AdminApplicationDetail extends AdminApplication {
+  organizationName: string | null;
+  reviewedAt: string | null;
+  reviewedByName: string | null;
+  createdAt: string;
+}
+
+export async function getApplicationDetail(id: string): Promise<AdminApplicationDetail | null> {
+  const admin = await requireAdmin();
+  assertCan(admin, "program:manage");
+  if (!UUID_RE.test(id)) return null;
+
+  return withAdminContext(admin, async (tx) => {
+    const [row] = await tx<
+      (Omit<AdminApplicationDetail, "submittedAt" | "reviewedAt" | "createdAt"> & {
+        submittedAt: Date | null; reviewedAt: Date | null; createdAt: Date;
+      })[]
+    >`
+      SELECT a.id, a.user_id AS "userId", u.full_name AS "applicantName",
+             u.email AS "applicantEmail", u.registrant_type::text AS "registrantType",
+             u.district, p.id AS "programId", p.name AS "programName",
+             c.id AS "cycleId", c.label AS "cycleLabel", a.status, a.answers,
+             a.submitted_at AS "submittedAt", a.decision_note AS "decisionNote",
+             o.name AS "organizationName", a.reviewed_at AS "reviewedAt",
+             r.name AS "reviewedByName", a.created_at AS "createdAt"
+      FROM program_application a
+      JOIN app_user u ON u.id = a.user_id
+      JOIN program_cycle c ON c.id = a.cycle_id
+      JOIN program p ON p.id = c.program_id
+      LEFT JOIN organization o ON o.id = a.organization_id
+      LEFT JOIN admin_user r ON r.id = a.reviewed_by
+      WHERE a.id = ${id}`;
+    if (!row) return null;
+
+    await recordAudit(
+      { actor: admin, action: "program.view_application", resourceType: "program_application",
+        resourceId: id },
+      tx,
+    );
+    return {
+      ...row,
+      answers: parseAnswers(row.answers),
+      submittedAt: row.submittedAt ? row.submittedAt.toISOString() : null,
+      reviewedAt: row.reviewedAt ? row.reviewedAt.toISOString() : null,
+      createdAt: row.createdAt.toISOString(),
+    };
+  });
+}
+
+/**
+ * A user's applications for the admin user-detail page ("what did this person
+ * register for"). The page's getUserDetail call already audits `user.view` —
+ * a second audit line for the same view would be noise, so none here.
+ */
+export interface UserApplication {
+  id: string;
+  programName: string;
+  cycleLabel: string;
+  status: ApplicationStatus;
+  submittedAt: string | null;
+  decisionNote: string | null;
+}
+
+export async function listUserApplications(userId: string): Promise<UserApplication[]> {
+  const admin = await requireAdmin();
+  assertCan(admin, "program:manage");
+  if (!UUID_RE.test(userId)) return [];
+
+  return withAdminContext(admin, async (tx) => {
+    const rows = await tx<
+      (Omit<UserApplication, "submittedAt"> & { submittedAt: Date | null })[]
+    >`
+      SELECT a.id, p.name AS "programName", c.label AS "cycleLabel", a.status,
+             a.submitted_at AS "submittedAt", a.decision_note AS "decisionNote"
+      FROM program_application a
+      JOIN program_cycle c ON c.id = a.cycle_id
+      JOIN program p ON p.id = c.program_id
+      WHERE a.user_id = ${userId}
+      ORDER BY a.created_at DESC`;
+    return rows.map((r) => ({
+      ...r,
+      submittedAt: r.submittedAt ? r.submittedAt.toISOString() : null,
+    }));
   });
 }
 

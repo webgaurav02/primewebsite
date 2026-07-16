@@ -16,7 +16,7 @@ import { withAdminContext } from "@/lib/db/client";
 export interface AdminDashboard {
   users: { total: number; pending: number; unverified: number } | null;
   primeId: { pending: number } | null;
-  programs: { pendingDecisions: number; openCycles: number } | null;
+  programs: { pendingDecisions: number; openCycles: number; totalApplications: number } | null;
   documents: { pending: number } | null;
   mentorship: { active: number; certificates: number } | null;
   grievances: { total: number; unassigned: number; open: number } | null;
@@ -60,11 +60,12 @@ export async function getAdminDashboard(): Promise<AdminDashboard> {
     }
 
     if (want.programs) {
-      const [r] = await tx<{ pendingDecisions: number; openCycles: number }[]>`
+      const [r] = await tx<{ pendingDecisions: number; openCycles: number; totalApplications: number }[]>`
         SELECT
           (SELECT count(*)::int FROM program_application
              WHERE status IN ('submitted', 'under_review', 'shortlisted')) AS "pendingDecisions",
-          (SELECT count(*)::int FROM program_cycle WHERE status = 'open') AS "openCycles"`;
+          (SELECT count(*)::int FROM program_cycle WHERE status = 'open') AS "openCycles",
+          (SELECT count(*)::int FROM program_application) AS "totalApplications"`;
       result.programs = r;
     }
 

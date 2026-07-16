@@ -14,7 +14,7 @@ vi.mock("@/lib/auth/session", () => ({
 }));
 
 import { registerUser } from "@/lib/dal/auth";
-import { listUsers, getUserDetail } from "@/lib/dal/users";
+import { listUsers, getUserDetail, getUserBreakdown } from "@/lib/dal/users";
 import { getSql } from "@/lib/db/client";
 import { migratorSql, truncateAll, closeDb } from "../helpers/db";
 
@@ -43,9 +43,46 @@ afterAll(async () => {
 describe("admin user list", () => {
   test("carries registrant type", async () => {
     await registerUser(base("mentor@x.com", { registrantType: "mentor" }), meta);
-    const rows = await listUsers();
+    const { rows } = await listUsers();
     const row = rows.find((r) => r.email === "mentor@x.com");
     expect(row?.registrantType).toBe("mentor");
+  });
+
+  test("filters by registrant type and district; total reflects the filter", async () => {
+    await registerUser(base("mentor2@x.com", { registrantType: "mentor" }), meta);
+    await registerUser(base("stud2@x.com", { registrantType: "student", district: "West Garo Hills" }), meta);
+
+    const mentors = await listUsers({ registrantType: "mentor" });
+    expect(mentors.total).toBe(1);
+    expect(mentors.rows[0].email).toBe("mentor2@x.com");
+
+    const garo = await listUsers({ district: "West Garo Hills" });
+    expect(garo.total).toBe(1);
+    expect(garo.rows[0].email).toBe("stud2@x.com");
+  });
+
+  test("paginates with a stable total", async () => {
+    await registerUser(base("a@x.com"), meta);
+    await registerUser(base("b@x.com"), meta);
+    await registerUser(base("c@x.com"), meta);
+
+    const page1 = await listUsers({ limit: 2, offset: 0 });
+    const page2 = await listUsers({ limit: 2, offset: 2 });
+    expect(page1.rows.length).toBe(2);
+    expect(page2.rows.length).toBe(1);
+    expect(page1.total).toBe(3);
+    expect(page2.total).toBe(3);
+  });
+
+  test("breakdown counts registrants by type", async () => {
+    await registerUser(base("m1@x.com", { registrantType: "mentor" }), meta);
+    await registerUser(base("s1@x.com"), meta);
+    await registerUser(base("s2@x.com"), meta);
+
+    const b = await getUserBreakdown();
+    expect(b.total).toBe(3);
+    expect(b.byType.find((t) => t.registrantType === "student")?.count).toBe(2);
+    expect(b.byType.find((t) => t.registrantType === "mentor")?.count).toBe(1);
   });
 });
 

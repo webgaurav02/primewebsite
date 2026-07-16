@@ -124,8 +124,9 @@ describe("withdraw", () => {
 describe("admin review", () => {
   test("reviewing sets status and notifies the applicant", async () => {
     await applyToProgram({ cycleId: openCycleId, ...answers });
-    const [app] = await listApplications();
+    const { rows: [app] } = await listApplications();
     expect(app.applicantName).toBe("Applicant One");
+    expect(app.userId).toBe(APPLICANT.id); // applications link back to the user
 
     const res = await reviewApplication({ applicationId: app.id, status: "shortlisted", note: "Strong fit." });
     expect(res.ok).toBe(true);

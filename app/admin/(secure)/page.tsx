@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
   const queues: Stat[] = [
     d.users && { label: "Users pending approval", value: d.users.pending, href: "/admin/users?status=pending", actionable: true },
     d.primeId && { label: "PRIME IDs awaiting review", value: d.primeId.pending, href: "/admin/prime-id", actionable: true },
-    d.programs && { label: "Applications to decide", value: d.programs.pendingDecisions, href: "/admin/programs", actionable: true },
+    d.programs && { label: "Applications to decide", value: d.programs.pendingDecisions, href: "/admin/applications", actionable: true },
     d.documents && { label: "Documents to verify", value: d.documents.pending, href: "/admin/documents?status=pending", actionable: true },
     d.grievances && { label: "Grievances unassigned", value: d.grievances.unassigned, href: "/admin/grievances", actionable: true },
     d.grievances && { label: "Grievances open", value: d.grievances.open, href: "/admin/grievances", actionable: true },
@@ -48,6 +48,7 @@ export default async function AdminDashboard() {
   const totals: Stat[] = [
     d.users && { label: "Total users", value: d.users.total, href: "/admin/users" },
     d.users && { label: "Email unverified", value: d.users.unverified, href: "/admin/users" },
+    d.programs && { label: "Total applications", value: d.programs.totalApplications, href: "/admin/applications" },
     d.programs && { label: "Open intake cycles", value: d.programs.openCycles, href: "/admin/programs" },
     d.mentorship && { label: "Active mentorships", value: d.mentorship.active, href: "/admin/mentorship" },
     d.mentorship && { label: "Certificates issued", value: d.mentorship.certificates, href: "/admin/mentorship" },

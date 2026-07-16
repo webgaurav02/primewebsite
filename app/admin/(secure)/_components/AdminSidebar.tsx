@@ -32,6 +32,7 @@ const NAV: Item[] = [
   { href: "/admin/users", label: "Users", perm: "user:manage", icon: <Icon d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7|2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6|17 4.5a3 3 0 0 1 0 6|18.5 14c2 .5 3 2.4 3 5" /> },
   { href: "/admin/prime-id", label: "PRIME ID", perm: "prime_id:review", icon: <Icon d="M3 6h18v12H3z|8 10.5a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6|5.5 16c.4-1.8 1.5-2.6 2.5-2.6s2.1.8 2.5 2.6|13.5 9h5M13.5 12h5M13.5 15h3" /> },
   { href: "/admin/programs", label: "Programs", perm: "program:manage", icon: <Icon d="M12 3 3 8l9 5 9-5-9-5z|3 8v6|7 11v4c0 1 2 2.5 5 2.5s5-1.5 5-2.5v-4" /> },
+  { href: "/admin/applications", label: "Applications", perm: "program:manage", icon: <Icon d="M9 3h6v4H9z|6 5h12v16H6z|9.5 13l2 2 4.5-4.5" /> },
   { href: "/admin/mentorship", label: "Mentorship", perm: "mentorship:manage", icon: <Icon d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6|3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5|16 6.5a2.5 2.5 0 0 1 0 5|18 14.5c1.8.6 3 2.2 3 4.5" /> },
   { href: "/admin/documents", label: "Documents", perm: "document:verify", icon: <Icon d="M6 3h8l4 4v14H6z|14 3v4h4|9 13h6M9 16h6M9 10h3" /> },
   { href: "/admin/events", label: "Events", perm: "event:publish", icon: <Icon d="M4 5h16v15H4z|4 9h16|8 3v4M16 3v4" /> },
