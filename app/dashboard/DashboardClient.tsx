@@ -701,7 +701,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       )}
 
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        <header className="bg-white border-b border-black/[0.07] px-5 md:px-8 h-14 flex items-center gap-4 sticky top-0 z-10">
+        <header className="bg-white border-b border-black/[0.07] px-5 md:px-8 h-14 flex items-center gap-4 sticky top-0 z-20">
           <button className="lg:hidden text-black/40 hover:text-black transition-colors" onClick={() => setSidebarOpen(true)}>
             <HiMenu size={22} />
           </button>
