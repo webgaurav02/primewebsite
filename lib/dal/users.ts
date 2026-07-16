@@ -68,15 +68,25 @@ export interface UserDetail extends UserListItem {
   business: BusinessDetail | null;
 }
 
-export async function listUsers(filters?: {
+export interface UserListFilters {
   status?: UserStatus;
   persona?: Persona;
+  registrantType?: RegistrantType;
+  district?: string;
   q?: string;
-}): Promise<UserListItem[]> {
+  limit?: number;
+  offset?: number;
+}
+
+export async function listUsers(
+  filters?: UserListFilters,
+): Promise<{ rows: UserListItem[]; total: number }> {
   const viewer = await requireAdmin();
   assertCan(viewer, "user:manage");
 
   const q = filters?.q ? `%${filters.q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` : null;
+  const limit = Math.min(Math.max(filters?.limit ?? 50, 1), 200);
+  const offset = Math.max(filters?.offset ?? 0, 0);
 
   return withAdminContext(viewer, async (tx) => {
     const rows = await tx<
@@ -91,20 +101,25 @@ export async function listUsers(filters?: {
         businessName: string | null;
         activated: boolean;
         createdAt: Date;
+        total: number;
       }[]
     >`
       SELECT u.id, u.full_name AS "fullName", u.email, u.persona,
              u.registrant_type AS "registrantType", u.status,
              u.district, ep.business_name AS "businessName",
              (u.email_verified_at IS NOT NULL) AS activated,
-             u.created_at AS "createdAt"
+             u.created_at AS "createdAt",
+             count(*) OVER ()::int AS total
       FROM app_user u
       LEFT JOIN entrepreneur_profile ep ON ep.user_id = u.id
       WHERE TRUE
         ${filters?.status ? tx`AND u.status = ${filters.status}` : tx``}
         ${filters?.persona ? tx`AND u.persona = ${filters.persona}` : tx``}
+        ${filters?.registrantType ? tx`AND u.registrant_type = ${filters.registrantType}` : tx``}
+        ${filters?.district ? tx`AND u.district = ${filters.district}` : tx``}
         ${q ? tx`AND (u.full_name ILIKE ${q} OR u.email ILIKE ${q})` : tx``}
       ORDER BY u.created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
     await recordAudit(
@@ -117,7 +132,33 @@ export async function listUsers(filters?: {
       tx,
     );
 
-    return rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }));
+    const total = rows[0]?.total ?? 0;
+    return {
+      rows: rows.map(({ total: _t, ...r }) => ({ ...r, createdAt: r.createdAt.toISOString() })),
+      total,
+    };
+  });
+}
+
+/**
+ * "Who registered" at a glance: registrant counts by type. Pure aggregates
+ * (no PII), so — like the dashboard — not audited.
+ */
+export interface UserBreakdown {
+  total: number;
+  byType: { registrantType: RegistrantType | null; count: number }[];
+}
+
+export async function getUserBreakdown(): Promise<UserBreakdown> {
+  const viewer = await requireAdmin();
+  assertCan(viewer, "user:manage");
+  return withAdminContext(viewer, async (tx) => {
+    const byType = await tx<{ registrantType: RegistrantType | null; count: number }[]>`
+      SELECT u.registrant_type AS "registrantType", count(*)::int AS count
+      FROM app_user u
+      GROUP BY u.registrant_type
+      ORDER BY count(*) DESC`;
+    return { total: byType.reduce((n, r) => n + r.count, 0), byType };
   });
 }
 

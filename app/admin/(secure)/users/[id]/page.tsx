@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUserDetail } from "@/lib/dal/users";
+import { listUserApplications } from "@/lib/dal/programs";
 import { REGISTRANT_TYPE_LABELS } from "@/lib/users/types";
+import { APPLICATION_STATUS_LABELS } from "@/lib/programs/types";
 import { formatINR } from "@/lib/format/display";
 
 /* eslint-disable @next/next/no-img-element -- data-URL photo, admin CSP allows data: */
@@ -10,6 +12,15 @@ const STATUS_STYLE: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800",
   active: "bg-emerald-100 text-emerald-800",
   suspended: "bg-red-100 text-red-700",
+};
+
+const APP_STATUS_STYLE: Record<string, string> = {
+  submitted: "bg-zinc-100 text-zinc-700",
+  under_review: "bg-amber-100 text-amber-800",
+  shortlisted: "bg-indigo-100 text-indigo-800",
+  approved: "bg-emerald-100 text-emerald-800",
+  rejected: "bg-red-100 text-red-700",
+  withdrawn: "bg-zinc-100 text-zinc-500",
 };
 
 function Row({ label, value }: { label: string; value: string | null | undefined }) {
@@ -35,7 +46,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const u = await getUserDetail(id);
+  const [u, applications] = await Promise.all([getUserDetail(id), listUserApplications(id)]);
   if (!u) notFound();
 
   const b = u.business;
@@ -75,6 +86,39 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         <Row label="Source" value={u.source} />
         <Row label="Registered" value={new Date(u.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} />
       </Section>
+
+      {/* What this person registered for — their applications across programs. */}
+      <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+        <div className="border-b border-zinc-200 bg-zinc-50 px-5 py-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            Program applications ({applications.length})
+          </p>
+        </div>
+        {applications.length > 0 ? (
+          <div>
+            {applications.map((a) => (
+              <Link
+                key={a.id}
+                href={`/admin/applications/${a.id}`}
+                className="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-5 py-2.5 text-sm last:border-0 hover:bg-zinc-50"
+              >
+                <span className="font-medium text-zinc-900">{a.programName}</span>
+                <span className="text-zinc-500">· {a.cycleLabel}</span>
+                {a.submittedAt && (
+                  <span className="text-xs text-zinc-400">
+                    {new Date(a.submittedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </span>
+                )}
+                <span className={`ml-auto rounded-full px-2 py-0.5 text-xs ${APP_STATUS_STYLE[a.status] ?? "bg-zinc-100"}`}>
+                  {APPLICATION_STATUS_LABELS[a.status]}
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="px-5 py-4 text-sm text-zinc-400">No program applications yet.</p>
+        )}
+      </section>
 
       {(u.guardianName || u.guardianRelationship) && (
         <Section title="Guardian (minor)">
