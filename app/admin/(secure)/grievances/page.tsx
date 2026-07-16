@@ -3,6 +3,7 @@ import { getCurrentAdmin } from "@/lib/auth/session";
 import { can } from "@/lib/auth/rbac";
 import { CATEGORY_LABELS, ESCALATION_LABELS, GRIEVANCE_STATUSES } from "@/lib/grievance/types";
 import { updateStatusAction, assignAction, escalateAction } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 const REGION_LABEL: Record<string, string> = {
   khasi_jaintia: "Khasi/Jaintia",
@@ -24,9 +25,16 @@ export default async function GrievancesPage({
   const targets = canAssign ? await listAssignmentTargets() : [];
   const targetName = new Map(targets.map((t) => [t.id, t.name]));
 
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Grievances</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Grievances</h1>
+        {admin && can(admin, "grievance:read") && (
+          <ExportButton dataset="grievances" params={{ status: one(sp.status), region: one(sp.region), q: one(sp.q) }} />
+        )}
+      </div>
       <p className="mt-1 text-sm text-zinc-500">{grievances.length} grievance(s) in your scope</p>
 
       <div className="mt-6 space-y-3">

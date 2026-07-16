@@ -1,5 +1,6 @@
 import { listPublicEvents } from "@/lib/dal/events";
 import PublishForm from "./_components/PublishForm";
+import ExportButton from "../_components/ExportButton";
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -10,7 +11,10 @@ export default async function AdminEventsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Events &amp; Announcements</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Events &amp; Announcements</h1>
+        <ExportButton dataset="events" />
+      </div>
       <p className="mt-1 text-sm text-zinc-500">
         Published events appear on the public /events page and in every member&apos;s timeline.
       </p>

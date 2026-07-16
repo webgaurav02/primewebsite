@@ -4,6 +4,7 @@ import { can } from "@/lib/auth/rbac";
 import type { DocumentStatus } from "@/lib/documents/types";
 import { DOCUMENT_KIND_LABELS, DOCUMENT_STATUS_LABELS } from "@/lib/documents/types";
 import { verifyDocumentAction, rejectDocumentAction } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 const STATUS_STYLE: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800",
@@ -35,7 +36,10 @@ export default async function AdminDocumentsPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Documents</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Documents</h1>
+        <ExportButton dataset="documents" params={{ status: sp.status }} />
+      </div>
       <p className="mt-1 text-sm text-zinc-500">{docs.length} document(s). Verify or reject uploaded KYC / business documents.</p>
 
       <div className="mt-4 flex gap-2">

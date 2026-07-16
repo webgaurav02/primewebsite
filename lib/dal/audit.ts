@@ -49,7 +49,7 @@ export async function listAuditLog(
   const viewer = await requireAdmin();
   assertCan(viewer, "audit:read");
 
-  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 10000);
   const offset = Math.max(filters.offset ?? 0, 0);
   const action = filters.action?.trim() || null;
   const resourceType = filters.resourceType?.trim() || null;

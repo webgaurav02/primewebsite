@@ -3,6 +3,7 @@ import { getCurrentAdmin } from "@/lib/auth/session";
 import { can } from "@/lib/auth/rbac";
 import { formatHours } from "@/lib/mentorship/types";
 import { assignMentorAction, endAssignmentAction } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 export default async function AdminMentorshipPage() {
   const admin = await getCurrentAdmin();
@@ -17,9 +18,12 @@ export default async function AdminMentorshipPage() {
 
   return (
     <div className="space-y-10">
-      <div>
-        <h1 className="text-2xl font-semibold">Mentorship</h1>
-        <p className="mt-1 text-sm text-zinc-500">Pair mentors with mentees; mentors log sessions from their account.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Mentorship</h1>
+          <p className="mt-1 text-sm text-zinc-500">Pair mentors with mentees; mentors log sessions from their account.</p>
+        </div>
+        <ExportButton dataset="mentorship" />
       </div>
 
       {/* Assign */}

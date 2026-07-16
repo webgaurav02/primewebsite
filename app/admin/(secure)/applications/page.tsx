@@ -9,6 +9,7 @@ import type { ApplicationStatus } from "@/lib/programs/types";
 import { APPLICATION_STATUS_LABELS, REVIEW_STATUSES } from "@/lib/programs/types";
 import { REGISTRANT_TYPE_LABELS } from "@/lib/users/types";
 import { reviewApplicationAction } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 const PAGE_SIZE = 50;
 
@@ -87,7 +88,10 @@ export default async function ApplicationsPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Applications</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Applications</h1>
+        <ExportButton dataset="applications" params={{ status: sp.status, program: sp.program, q: sp.q }} />
+      </div>
       <p className="mt-1 text-sm text-zinc-500">
         {stats.total} application(s) across all programs — who registered for what,
         and where each one stands. Click an applicant for their profile, or open an

@@ -85,7 +85,7 @@ export async function listUsers(
   assertCan(viewer, "user:manage");
 
   const q = filters?.q ? `%${filters.q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` : null;
-  const limit = Math.min(Math.max(filters?.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(filters?.limit ?? 50, 1), 10000);
   const offset = Math.max(filters?.offset ?? 0, 0);
 
   return withAdminContext(viewer, async (tx) => {

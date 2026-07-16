@@ -11,6 +11,7 @@ import {
   suspendUserAction,
   reactivateUserAction,
 } from "./actions";
+import ExportButton from "../_components/ExportButton";
 
 const PAGE_SIZE = 50;
 
@@ -85,7 +86,10 @@ export default async function UsersPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Users</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Users</h1>
+        <ExportButton dataset="users" params={{ status: sp.status, type: sp.type, district: sp.district, q: sp.q }} />
+      </div>
       <p className="mt-1 text-sm text-zinc-500">
         {breakdown.total} registrant(s) in total. Filter by who they registered as,
         district, or status — click a name for their full profile and applications.

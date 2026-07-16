@@ -4,6 +4,7 @@ import { listAdmins } from "@/lib/dal/admins";
 import { createAdminAction } from "./actions";
 import AdminForm from "./_components/AdminForm";
 import AdminRow from "./_components/AdminRow";
+import ExportButton from "../_components/ExportButton";
 
 export default async function AdminsPage() {
   const viewer = await getCurrentAdmin();
@@ -15,11 +16,14 @@ export default async function AdminsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Admins</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Manage the admin directory — roles, region scope, and access. {admins.length} admin(s).
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Admins</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            Manage the admin directory — roles, region scope, and access. {admins.length} admin(s).
+          </p>
+        </div>
+        <ExportButton dataset="admins" />
       </div>
 
       <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">

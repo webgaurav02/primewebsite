@@ -1,6 +1,7 @@
 import { getCurrentAdmin } from "@/lib/auth/session";
 import { can } from "@/lib/auth/rbac";
 import { listAuditLog, listAuditFacets, checkAuditIntegrity } from "@/lib/dal/audit";
+import ExportButton from "../_components/ExportButton";
 
 const PAGE_SIZE = 50;
 
@@ -72,7 +73,10 @@ export default async function AuditLogPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Audit log</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Audit log</h1>
+        <ExportButton dataset="audit" params={{ action: sp.action, resourceType: sp.resourceType, actorEmail: sp.actorEmail, from: sp.from, to: sp.to }} />
+      </div>
       <p className="mt-1 text-sm text-zinc-500">
         Append-only, hash-chained record of every administrative action. {total} entr
         {total === 1 ? "y" : "ies"} in scope.
