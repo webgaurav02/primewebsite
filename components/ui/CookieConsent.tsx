@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { CONSENT_EVENT } from "@/lib/analytics/client";
+import {
+  CONSENT_EVENT,
+  OPEN_PREFERENCES_EVENT,
+  withdrawAnalytics,
+} from "@/lib/analytics/client";
 
 // Must stay in sync with CONSENT_STORAGE_KEY in lib/analytics/client.ts.
 const STORAGE_KEY = "prime-cookie-consent";
@@ -18,19 +22,36 @@ export default function CookieConsent() {
 
   useEffect(() => {
     if (isAdmin) return;
+    // First visit (no choice stored yet): surface the banner after a short delay.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (!localStorage.getItem(STORAGE_KEY)) {
       // Delay so it doesn't compete with the page loader
-      const id = setTimeout(() => setVisible(true), 2800);
-      return () => clearTimeout(id);
+      timer = setTimeout(() => setVisible(true), 2800);
     }
+    // Footer "Cookie Preferences" re-opens the banner so consent can be reviewed
+    // or withdrawn at any time.
+    const onOpen = () => setVisible(true);
+    window.addEventListener(OPEN_PREFERENCES_EVENT, onOpen);
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener(OPEN_PREFERENCES_EVENT, onOpen);
+    };
   }, [isAdmin]);
 
   const handle = (choice: "accepted" | "declined") => {
+    const previous = localStorage.getItem(STORAGE_KEY);
     localStorage.setItem(STORAGE_KEY, choice);
     setVisible(false);
-    // Opt-in: boot analytics immediately, no reload. Nothing analytics-related
-    // loads a script or sets a cookie before this event fires.
-    if (choice === "accepted") window.dispatchEvent(new Event(CONSENT_EVENT));
+    if (choice === "accepted") {
+      // Opt-in: boot analytics immediately, no reload. Nothing analytics-related
+      // loads a script or sets a cookie before this event fires.
+      window.dispatchEvent(new Event(CONSENT_EVENT));
+    } else if (previous === "accepted") {
+      // Withdrawal: analytics was running, so purge the cookies/storage we set
+      // and reload — on reload the "declined" state stops everything re-loading.
+      withdrawAnalytics();
+      window.location.reload();
+    }
   };
 
   if (isAdmin) return null;
