@@ -2,25 +2,33 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const STORAGE_KEY = "prime-cookie-consent";
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
+  // The admin console is an authenticated, internal tool (its own strict CSP) —
+  // it uses only essential cookies, so the public consent notice never applies.
+  const isAdmin = pathname?.startsWith("/admin") ?? false;
 
   useEffect(() => {
+    if (isAdmin) return;
     if (!localStorage.getItem(STORAGE_KEY)) {
       // Delay so it doesn't compete with the page loader
       const id = setTimeout(() => setVisible(true), 2800);
       return () => clearTimeout(id);
     }
-  }, []);
+  }, [isAdmin]);
 
   const handle = (choice: "accepted" | "declined") => {
     localStorage.setItem(STORAGE_KEY, choice);
     setVisible(false);
   };
+
+  if (isAdmin) return null;
 
   return (
     <AnimatePresence>
