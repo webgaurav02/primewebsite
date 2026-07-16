@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { CONSENT_EVENT } from "@/lib/analytics/client";
 
+// Must stay in sync with CONSENT_STORAGE_KEY in lib/analytics/client.ts.
 const STORAGE_KEY = "prime-cookie-consent";
 
 export default function CookieConsent() {
@@ -26,6 +28,9 @@ export default function CookieConsent() {
   const handle = (choice: "accepted" | "declined") => {
     localStorage.setItem(STORAGE_KEY, choice);
     setVisible(false);
+    // Opt-in: boot analytics immediately, no reload. Nothing analytics-related
+    // loads a script or sets a cookie before this event fires.
+    if (choice === "accepted") window.dispatchEvent(new Event(CONSENT_EVENT));
   };
 
   if (isAdmin) return null;

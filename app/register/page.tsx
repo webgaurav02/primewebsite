@@ -17,6 +17,7 @@ import {
 import * as Sentry from "@sentry/nextjs";
 import { isMinorDob } from "@/lib/legal/policy";
 import { registerAction, createAvatarUploadUrlAction } from "./actions";
+import { track } from "@/lib/analytics/client";
 
 type Data = {
   registrantType: string;
@@ -208,6 +209,12 @@ export default function RegisterPage() {
       // Uniform for a new account AND a duplicate email: show a neutral confirmation.
       // A new account's session cookie is already set (the dashboard opens); a
       // duplicate has no session and got a "you already have an account" email.
+      // "Submitted" (not "Completed") on purpose — the response is enumeration-safe
+      // so the client genuinely can't tell a new signup from a duplicate. No PII.
+      track("Registration Submitted", {
+        registrantType: data.registrantType,
+        district: data.district,
+      });
       setSubmitted(true);
     } catch (err) {
       // A rejected Server Action (transport error / dropped connection) must
