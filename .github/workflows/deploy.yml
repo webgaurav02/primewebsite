@@ -1,0 +1,109 @@
+name: Deploy Prime Meghalaya to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Track start time for telemetry metrics
+      - name: Set Start Time
+        id: start_time
+        run: echo "time=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+      # 2. Checkout repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 3. Escape commit content safely using jq and alert the team
+      - name: Send Discord Notification - Commit Details
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          payload=$(jq -n --arg msg "📌 New deployment triggered for **PRIME MEGHALAYA**: $commit_message" '{content: $msg}')
+          curl -X POST -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"
+
+      # 4. Authenticate securely using the dedicated resource group credentials
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_PRIME_CREDENTIALS }}
+
+      # 5. Extract short commit hash dynamically and force a rolling revision deployment
+      - name: Deploy Image to Azure Container Apps
+        run: |
+          SHA_TAG=$(git rev-parse --short HEAD)
+          
+          az extension add --name containerapp --upgrade
+          az containerapp update \
+            --name prime-meghalaya-app \
+            --resource-group PrimeMeghalaya-RG \
+            --image ghcr.io/balajied29/primewebsite:${SHA_TAG} \
+            --set-env-vars "DEPLOY_TIMESTAMP=$(date +%s)"
+
+      # 6. Compile telemetry results and push the final execution embed report
+      - name: Send Discord Notification - Deployment Summary
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          end_time=$(date +%s)
+          start_time=${{ steps.start_time.outputs.time }}
+          duration=$((end_time - start_time))
+          minutes=$((duration / 60))
+          seconds=$((duration % 60))
+          duration_formatted="${minutes}m ${seconds}s"
+
+          commit_message=$(git log -1 --pretty=%B)
+          commit_hash=$(git rev-parse --short HEAD)
+          author_name=$(git log -1 --pretty=format:"%an")
+          branch_name="${GITHUB_REF##*/}"
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          commit_url="https://github.com/${{ github.repository }}/commit/$(git rev-parse HEAD)"
+          timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          if [[ "${{ job.status }}" == "success" ]]; then
+            color=3066993
+            status_icon="✅"
+            status_text="Success"
+          else
+            color=15158332
+            status_icon="❌"
+            status_text="Failed"
+          fi
+
+          payload=$(jq -n \
+            --arg username "PRIME MEGHALAYA Bot" \
+            --arg title "$status_icon Deployment $status_text: PRIME MEGHALAYA PLATFORM" \
+            --arg commit "[\`$commit_hash\`]($commit_url) — $commit_message" \
+            --arg branch "\`$branch_name\`" \
+            --arg author "$author_name" \
+            --arg tag "\`ghcr.io/balajied29/primewebsite:${commit_hash}\`" \
+            --arg duration "$duration_formatted" \
+            --arg runurl "$run_url" \
+            --argjson color $color \
+            --arg time "$timestamp" \
+            '{
+              username: $username,
+              embeds: [ {
+                title: $title,
+                color: $color,
+                fields: [
+                  { "name": "**Commit**", "value": $commit },
+                  { "name": "**Branch**", "value": $branch, "inline": true },
+                  { "name": "**Author**", "value": $author, "inline": true },
+                  { "name": "**Image Target**", "value": $tag },
+                  { "name": "**Duration**", "value": $duration, "inline": true },
+                  { "name": "**GitHub Run**", "value": "[View ▶️](\($runurl))", "inline": true }
+                ],
+                footer: { "text": "Prime Meghalaya · GHCR to Azure Container Apps CI/CD" },
+                timestamp: $time
+              }]
+            }')
+
+          curl -X POST -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"

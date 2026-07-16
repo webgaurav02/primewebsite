@@ -72,9 +72,12 @@ function intOrNull(s: string): number | null {
  * (soft-gate: email verification is a banner, not a login block), records DPDP
  * consent, and opens a session so the new member lands on their dashboard.
  *
- * Enumeration-safe: a duplicate email returns the SAME uniform `ok` (no session)
- * and quietly emails that address a "you already have an account" reset link —
- * the response never reveals whether the email exists.
+ * Duplicate email: rejected with a clear `email` field error ("an account
+ * already exists") so the sign-up form can tell the user to sign in instead —
+ * a deliberate product choice to prioritise UX over signup enumeration-safety.
+ * It's bounded by the per-IP rate limit in the action, and login + password
+ * reset REMAIN enumeration-safe. We still (throttled) email the address a
+ * "you already have an account" notice as a heads-up to the real owner.
  */
 export async function registerUser(
   raw: unknown,
@@ -94,9 +97,11 @@ export async function registerUser(
     const [existing] = await tx<{ id: string; fullName: string }[]>`
       SELECT id, full_name AS "fullName" FROM app_user WHERE email = ${d.email}`;
     if (existing) {
-      // Enumeration-safe: don't reveal existence in the response. Do NOT touch the
-      // user's outstanding reset tokens — an unauthenticated caller must not be able
-      // to consume a victim's pending reset link. Just notify out-of-band (below).
+      // Signup reveals the duplicate (see the function doc). Do NOT touch the
+      // user's outstanding reset tokens — an unauthenticated caller must not be
+      // able to consume a victim's pending reset link. Just notify out-of-band.
+      // (email is a citext UNIQUE column, so this SELECT — and the constraint
+      // behind it — also blocks case-variant duplicates like Foo@ vs foo@.)
       return { duplicate: true as const, name: existing.fullName };
     }
 
@@ -185,7 +190,7 @@ export async function registerUser(
     // Throttle the "account exists" mail PER ADDRESS so it can't be weaponised for
     // email bombing (independent of the IP limiter, which is best-effort).
     if (slidingWindow(`acct-exists-mail:${d.email}`, 3, 60 * 60 * 1000).ok) {
-      // Best-effort — a mail hiccup must not change the uniform duplicate response.
+      // Best-effort — a mail hiccup must not swallow the duplicate rejection.
       try {
         await sendAccountExistsEmail(d.email, outcome.name);
       } catch (err) {
@@ -193,7 +198,12 @@ export async function registerUser(
       }
     }
     log.info("register.duplicate", { email: maskEmail(d.email) });
-    return { ok: true }; // uniform response — no session, no enumeration
+    // Tell the user plainly so they can sign in instead (see the function doc:
+    // signup trades enumeration-safety for UX; login + reset stay uniform).
+    return {
+      ok: false,
+      fieldErrors: { email: ["An account with this email already exists. Please sign in instead."] },
+    };
   }
 
   log.info("register.committed", { email: maskEmail(d.email), registrantType, minor });
