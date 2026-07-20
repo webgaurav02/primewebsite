@@ -14,7 +14,14 @@ Sentry.init({
   tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0),
   // DPDP/PII: never let the SDK auto-attach IPs, cookies, or request bodies.
   sendDefaultPii: false,
-  beforeSend(event) {
+  beforeSend(event, hint) {
+    // Client hung up mid-request (mobile lost signal, tab backgrounded, user hit
+    // back). Node emits this from node:_http_server with no app frame on the
+    // stack, and Next's onRequestError auto-captures it — it is transport noise,
+    // not a fault we can act on. Drop it so real /register failures stay visible.
+    const err = hint?.originalException as { code?: string; message?: string } | undefined;
+    if (err?.code === "ECONNRESET" && err?.message === "aborted") return null;
+
     // Belt-and-braces scrub: registration requests carry personal data.
     if (event.request) {
       delete event.request.cookies;

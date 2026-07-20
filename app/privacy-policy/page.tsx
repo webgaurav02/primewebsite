@@ -88,9 +88,9 @@ const sections = [
     body: [`We use two categories of cookies:`],
     list: [
       "Essential cookies: Necessary for the site to function (session management, security). These cannot be declined.",
-      "Analytics cookies: Help us understand how visitors use the site (e.g., most-visited pages). These are optional and require your consent via the cookie banner.",
+      "Analytics cookies: Optional. They help us understand how visitors use the site (e.g., most-visited pages and navigation patterns) and load only after you accept them via the cookie banner. For this we use Google Analytics 4 and Google Tag Manager (provided by Google LLC), Microsoft Clarity (Microsoft Corporation), and Mixpanel (Mixpanel, Inc.). These services process usage data on our behalf and may store or process it on servers located outside India.",
     ],
-    note: "You can withdraw cookie consent at any time by clearing your browser cookies or by adjusting your browser settings.",
+    note: "You can withdraw your consent at any time using the “Cookie Preferences” link in the site footer (or by clearing your browser cookies). Withdrawing removes the optional analytics cookies and stops further analytics collection.",
   },
   {
     id: "security",

@@ -41,6 +41,8 @@ const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 export const CONSENT_STORAGE_KEY = "prime-cookie-consent";
 /** Window event CookieConsent dispatches so analytics can start without a reload. */
 export const CONSENT_EVENT = "prime-analytics-consent";
+/** Window event the footer "Cookie Preferences" control dispatches to re-open the banner. */
+export const OPEN_PREFERENCES_EVENT = "prime-open-cookie-preferences";
 
 const isBrowser = () => typeof window !== "undefined";
 const isProd = process.env.NODE_ENV === "production";
@@ -219,4 +221,60 @@ export function reset(): void {
   if (!started) return;
   if (GA4_ID) gtagSafe("set", { user_id: null });
   void ensureMixpanel().then((m) => m?.reset());
+}
+
+// ── Consent withdrawal ───────────────────────────────────────────────────────
+// First-party analytics cookies we set. (Third-party cookies on *.clarity.ms /
+// google domains aren't reachable from JS and stop being sent once the scripts
+// don't reload.) Prefix-matched.
+const ANALYTICS_COOKIE_PREFIXES = ["_ga", "_gid", "_gat", "_gcl", "_clck", "_clsk", "mp_"];
+
+function deleteCookie(name: string): void {
+  const host = window.location.hostname;
+  const parent = "." + host.split(".").slice(-2).join("."); // e.g. .primemeghalaya.com
+  const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+  // Clear across the path/domain scopes GA/Clarity may have used.
+  for (const scope of ["", `; domain=${host}`, `; domain=${parent}`]) {
+    document.cookie = `${name}=; expires=${past}; path=/${scope}`;
+  }
+}
+
+/**
+ * Delete the analytics cookies + Mixpanel storage we're responsible for. Called
+ * on withdrawal; paired with a reload so nothing re-initialises afterwards.
+ */
+export function purgeAnalyticsStorage(): void {
+  if (!isBrowser()) return;
+  try {
+    for (const c of document.cookie.split(";")) {
+      const name = c.split("=")[0].trim();
+      if (name && ANALYTICS_COOKIE_PREFIXES.some((p) => name.startsWith(p))) deleteCookie(name);
+    }
+  } catch {
+    /* cookie access can throw in locked-down contexts — best effort */
+  }
+  try {
+    for (const k of Object.keys(window.localStorage)) {
+      if (k.startsWith("mp_") || k.toLowerCase().includes("mixpanel")) {
+        window.localStorage.removeItem(k);
+      }
+    }
+  } catch {
+    /* localStorage may be unavailable — best effort */
+  }
+}
+
+/**
+ * Withdraw analytics consent: opt the (only-if-already-loaded) Mixpanel SDK out,
+ * then purge the cookies/storage we set. The caller reloads so the now-"declined"
+ * state means none of the four tools re-initialise. Never LOADS a tool.
+ */
+export function withdrawAnalytics(): void {
+  if (!isBrowser()) return;
+  try {
+    mp?.opt_out_tracking?.();
+  } catch {
+    /* SDK may not expose it in this build — best effort */
+  }
+  purgeAnalyticsStorage();
 }

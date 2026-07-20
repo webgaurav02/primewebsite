@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebook, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa6";
+import CookiePreferencesButton from "@/components/analytics/CookiePreferencesButton";
 
 const footerColumns = [
   {
@@ -114,9 +115,14 @@ export default function Footer() {
           <p className="text-white/25" style={{ fontSize: "12px" }}>
             © {new Date().getFullYear()} All Rights Reserved — PRIME Meghalaya
           </p>
-          <p className="text-white/20" style={{ fontSize: "12px" }}>
-            Government of Meghalaya
-          </p>
+          <div className="flex items-center gap-4">
+            <CookiePreferencesButton
+              className="text-[12px] text-white/25 hover:text-white transition-colors duration-200"
+            />
+            <p className="text-white/20" style={{ fontSize: "12px" }}>
+              Government of Meghalaya
+            </p>
+          </div>
         </div>
       </div>
     </footer>
